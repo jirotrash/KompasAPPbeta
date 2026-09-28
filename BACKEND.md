@@ -10,9 +10,10 @@
 - La app ya existe: **React Native + Expo** (carpeta de la app, ver su `README.md`). Hoy funciona con datos de ejemplo (`EXPO_PUBLIC_USE_MOCK=true`).
 - Este backend reemplaza esos datos de ejemplo. **Debe responder con los tipos que espera la app**:
   - Leer primero `src/services/api.ts` y `src/types/dominio.ts` de la app, y la simulación `src/services/mock/` (en especial `mock/motor.ts`).
-  - Si la app espera un campo que la base no tiene (horario, costo, calificación, tramos en autobús), mandarlo como `null` o vacío. **No inventar el dato.**
+  - Si la app espera un campo que no existe ni en la base ni en Google (costo exacto, tramos en autobús), mandarlo como `null` o vacío. **No inventar el dato.**
 - La base de datos es **MySQL 8**, esquema `kompas`, **tal como está en el diagrama y el dump de Sebas** (`database/Dump20260927.sql`). No se usa MongoDB.
 - **No se modifica el esquema.** Nada de `ALTER TABLE` ni tablas nuevas: el backend trabaja con las 8 tablas que existen. Si se necesita un cambio, se habla con Sebas primero.
+- Los **lugares salen de Google Places API (New)**, consultada desde el backend (nunca desde la app). La tabla `lugares_de_interes` no se usa para la búsqueda.
 - La **IA** es un **sistema experto con lógica proposicional**, en Python, dentro de este mismo backend (`app/ia/`). La programa **Einar**; el backend solo la llama.
 
 ### Reglas que el código nunca debe romper
@@ -98,6 +99,9 @@ DATABASE_URL=mysql+pymysql://root:tu_password@localhost:3306/kompas
 JWT_SECRET=cambia-esto-por-algo-largo-y-aleatorio
 JWT_EXPIRA_MINUTOS=10080
 CORS_ORIGINS=*
+GOOGLE_MAPS_API_KEY=tu-llave-de-google
+GOOGLE_IDIOMA=es
+GOOGLE_REGION=mx
 ```
 
 - **CORS** abierto en desarrollo (la app también corre con `npx expo start --web`).
@@ -123,7 +127,7 @@ CORS_ORIGINS=*
 
 - Todas tienen `created_at`, `updated_at` y `deleted_at` (**borrado lógico**: toda consulta filtra `deleted_at IS NULL`; "eliminar" = poner fecha en `deleted_at`).
 - La columna de contraseña se llama **`password`** (VARCHAR 255): ahí va el hash de bcrypt.
-- `lugares_de_interes.id_usuario` es **quien registró el lugar** (para los datos de prueba, el usuario administrador).
+- `lugares_de_interes` queda sin uso por ahora: los lugares vienen de Google Places.
 
 ### Ojo con `LINESTRING` y SRID 4326 en MySQL 8
 Con SRID 4326, MySQL usa el orden **latitud, longitud** por defecto. Para no confundirse, leer y escribir siempre así:
@@ -152,7 +156,7 @@ Solo `INSERT`, sin tocar la estructura.
 - **Usuario administrador** (dueño de los lugares de prueba) y **usuario demo** `demo@kompas.mx` / `demo1234`. El hash de bcrypt se genera con un script, no a mano.
 - **Categorías** con los mismos nombres que usa la app (revisar `src/constants/catalogos.ts`): Comer, Café, Cultura, Entretenimiento, Aire libre.
 - **Transportes**: Caminando, Transporte público, Taxi/App, Combinado.
-- **Lugares**: los reales los levanta Sebas en la zona piloto. Mientras llegan, 5–10 lugares de prueba con coordenadas dentro de Toluca / Lerma / San Mateo Atenco.
+- **Lugares**: no se cargan; vienen de Google Places en cada consulta.
 - **Rutas**: solo trazos que el equipo haya recorrido. No inventar recorridos de autobús.
 
 ## 6. Endpoints
@@ -183,14 +187,30 @@ Errores con formato de FastAPI: `{"detail": "mensaje claro en español"}` y cód
 | GET | `/api/categorias` | `[{id, nombre, descripcion}]` |
 | GET | `/api/transportes` | `[{id, nombre}]` |
 
-### Lugares — tabla `lugares_de_interes` (+ `categorias`)
+### Lugares — Google Places API (New)
 | Método | Ruta | Uso |
 |---|---|---|
-| GET | `/api/lugares?lat=&lng=&radio_km=5&categoria=` | "Cerca de ti", ordenados por distancia |
-| GET | `/api/lugares/{id}` | Detalle |
+| GET | `/api/lugares?lat=&lng=&radio_km=3&categoria=` | "Cerca de ti": el backend llama a **Nearby Search (New)** y regresa los lugares ordenados por distancia |
+| GET | `/api/lugares/{place_id}` | Detalle con **Place Details (New)** |
 
-Cada lugar: `{id, nombre, lat, lng, categoria, distancia_km, minutos_caminando}`.
-`minutos_caminando` ≈ 12 min por km, marcado como estimado. Campos que la app muestre y la base no tenga (`calificacion`, `horario`, `costo_promedio`, `foto`) van en `null` y la app muestra "Sin dato".
+- Servicio en `app/servicios/google_places.py` con `httpx`. Llave en `.env` (`GOOGLE_MAPS_API_KEY`), **nunca** en la app ni en el repo.
+- Pedir solo los campos necesarios con `X-Goog-FieldMask`:
+  `places.id,places.displayName,places.location,places.types,places.primaryType,places.regularOpeningHours,places.priceLevel,places.priceRange,places.rating,places.userRatingCount`
+  (horario, precio y calificación son de la tarifa **Enterprise**: pedirlos solo en la búsqueda del planificador y en el detalle, no en cada pantalla).
+- `languageCode=es`, `regionCode=mx`, y `locationRestriction` con círculo en el origen (radio máximo 5 km). Rechazar orígenes fuera de Toluca / Lerma / San Mateo Atenco.
+- Mapear categorías de la app a tipos de Google (tabla fija en `app/servicios/google_places.py`):
+
+| Categoría de la app | `includedTypes` de Google |
+|---|---|
+| Comer | `restaurant` |
+| Café | `cafe`, `coffee_shop` |
+| Cultura | `museum`, `art_gallery`, `cultural_center` |
+| Entretenimiento | `movie_theater`, `bowling_alley`, `amusement_center` |
+| Aire libre | `park` |
+
+- Cada lugar para la app: `{id: place_id, nombre, lat, lng, categoria, distancia_km, minutos_caminando, calificacion, total_resenas, nivel_precio, abierto_ahora, horario, fuente: "Google", consultado_en}`.
+- **Condiciones de Google:** no guardar en MySQL nombres, horarios ni calificaciones; solo se puede conservar el `place_id`. Si se quieren favoritos, Sebas agrega `place_id` a una tabla. La app debe mostrar la atribución **"Datos de Google"** donde aparezcan estos datos (el mapa es Leaflet, no Google).
+- Si Google falla o se agota la cuota: responder `503` con mensaje claro; no inventar lugares.
 
 ### Rutas — tabla `rutas`
 | Método | Ruta | Uso |
@@ -198,10 +218,10 @@ Cada lugar: `{id, nombre, lat, lng, categoria, distancia_km, minutos_caminando}`
 | GET | `/api/rutas` | Lista `[{id, trazo: [[lng, lat], ...]}]` |
 | GET | `/api/rutas/{id}` | Una ruta con su `trazo` para dibujarla en el mapa |
 
-### Itinerarios (sistema experto) — tablas `lugares_de_interes`, `categorias`, `planes`
+### Itinerarios (sistema experto) — Google Places + tablas `categorias`, `transportes`, `planes`
 | Método | Ruta | Uso |
 |---|---|---|
-| POST 🔒 | `/api/itinerarios` | Recibe el JSON del planificador, carga los lugares, llama a `ia.motor.recomendar()`, guarda el plan en `planes` (tabla de la sección 4) y regresa la respuesta |
+| POST 🔒 | `/api/itinerarios` | Recibe el JSON del planificador, busca lugares en Google Places, llama a `ia.motor.recomendar()`, guarda el plan en `planes` (tabla de la sección 4) y regresa la respuesta |
 | GET 🔒 | `/api/planes` | Planes que ha creado el usuario (de la tabla `planes`) |
 
 Entrada (igual a CONTEXTO.md §6.1):
@@ -224,21 +244,23 @@ Salida:
       "tipo": "equilibrado",
       "mejor_opcion": true,
       "costo": null,
+      "nivel_precio": "$$",
       "duracion_horas": 3.5,
       "distancia_km": 3.2,
-      "paradas": [{ "lugar_id": 1, "nombre": "…", "llegada_estimada": "18:20" }],
+      "paradas": [{ "lugar_id": "ChIJ…", "nombre": "…", "llegada_estimada": "18:20", "abierto_hasta": "21:00" }],
       "tramos": [{ "modo": "caminando", "desde": "…", "hasta": "…", "minutos": 8 }],
       "explicacion": "Los 3 lugares coinciden con tus intereses y el recorrido cabe en tus 4 horas…",
-      "reglas_cumplidas": [{ "id": "R1", "descripcion": "coincide_intereses ∧ cerca → candidato" }]
+      "puntuacion": 6,
+      "reglas_cumplidas": [{ "id": "R16", "descripcion": "viabilidad_base Y datos_criticos_completos Y … ENTONCES recomendable" }]
     }
   ],
   "descartados": [
-    { "lugar_id": 7, "nombre": "…", "reglas": [{ "id": "R4", "descripcion": "Queda demasiado lejos para el tiempo disponible" }] }
+    { "lugar_id": "ChIJ…", "nombre": "…", "estado": "descartado", "reglas": [{ "id": "R06", "descripcion": "SI NO cabe_en_tiempo ENTONCES descartar" }] }
   ],
-  "aviso": "Todavía no tenemos costos ni horarios de los lugares; revisa antes de ir."
+  "aviso": "No se verifican cierres con una fuente integrada (R13). Horarios y precios según Google; confirma antes de ir."
 }
 ```
-- **`costo` va en `null`**: la base no tiene costos. El presupuesto se recibe pero todavía no se puede evaluar, y así lo dice el `aviso`.
+- **`costo` va en `null`** porque Google no da precios exactos; se manda `nivel_precio` ($–$$$$). Si Google trae `priceRange`, se puede mandar el rango. `lugar_id` es el `place_id` de Google.
 - Los tramos son **caminando** (calculados por distancia) o en taxi si el usuario lo eligió; **no hay tramos en autobús** porque la base no tiene líneas ni paradas.
 - Si no hay lugares suficientes: `planes: []` y `aviso: "No tenemos información suficiente para …"`. **Nunca rellenar con datos inventados.**
 - `origen` debe estar dentro de la zona piloto; si no, `422` con mensaje claro.
@@ -249,53 +271,55 @@ Salida:
 | POST 🔒 | `/api/historial` | Guarda un recorrido que el usuario inició (`id_ruta, id_transporte, tiempo_estimado` en minutos) |
 | GET 🔒 | `/api/historial` | Recorridos del usuario |
 
-## 7. Sistema experto (`app/ia/`) — contrato con Einar
+## 7. Sistema experto — se usa el motor de Einar (no se inventan reglas nuevas)
 
-El router **solo** hace esto:
-```python
-from app.ia.motor import recomendar
-respuesta = recomendar(solicitud.model_dump(), lugares_como_dicts)
+Einar ya tiene el sistema experto hecho y documentado en el manual técnico:
+- `herramientas/sistema_experto_demo.py` → función `evaluar(entrada, base)`.
+- `docs/sistema-experto/reglas.json` → las **20 reglas (R01–R20)**.
+- `docs/sistema-experto/casos.json` → casos A, B, C y las 36 comprobaciones de `--verificar`.
+
+**Leer esos archivos antes de programar.** El backend **no modifica** las reglas ni el motor; solo los usa.
+
+### Cómo trabaja el motor de Einar
+- Evalúa **un itinerario candidato a la vez** con hechos **true / false / null** (null = desconocido, nunca se trata como falso).
+- Estados posibles: `requiere_correccion`, `descartado`, `pendiente_verificacion`, `recomendable`.
+- Solo los `recomendable` reciben **puntuación de 0 a 6** (contexto 2, intereses 2, poca caminata 1, pocos transbordos 1).
+- Rechaza que el cliente mande conclusiones: los hechos los calcula el **backend** a partir de datos.
+
+### Qué hace el backend (`app/ia/`)
+```
+app/ia/
+├── motor.py         # importa/reusa evaluar() y reglas.json de Einar (sin copiar la lógica)
+├── planificador.py  # arma hasta 3 itinerarios candidatos con los lugares cercanos
+├── hechos.py        # convierte cada candidato en las proposiciones de entrada de Einar
+└── servicio.py      # recomendar(solicitud, lugares) -> respuesta para la app
 ```
 
-`motor.py` **no importa nada de FastAPI ni de la BD**: recibe diccionarios y regresa un diccionario. Así Einar lo prueba solo con `pytest tests/test_motor.py`.
+`recomendar(solicitud, lugares)`:
+1. **Lugares:** consulta Google Places con los intereses de la solicitud (mismos campos de la sección 6).
+2. **Planificador:** arma hasta 3 candidatos (equilibrado, rápido, cercano) con 2–3 lugares cada uno, con tramos caminando o en taxi según `movilidad`. Distancias y tiempos **estimados** por coordenadas.
+3. **Hechos:** calcula para cada candidato las proposiciones de Einar (tabla abajo). Lo que no se sabe va en `null`.
+4. **Motor:** llama a `evaluar()` por candidato.
+5. **Respuesta:** los `recomendable` van en `planes` ordenados por puntuación (el mayor es `mejor_opcion`); los `descartado` y `pendiente_verificacion` van en `descartados` con sus reglas y motivos; las advertencias del motor (ej. R13 sin control de cierres) van en `aviso`.
 
-### Hechos que sí se pueden calcular con la base actual
-| Hecho | De dónde sale |
+### De dónde sale cada hecho (con Google Places)
+| Proposición de Einar | De dónde sale |
 |---|---|
-| `coincide_intereses` | categoría del lugar ∈ intereses del usuario |
-| `cerca` | distancia del origen al lugar ≤ radio según movilidad (caminando ≈ 2 km, taxi/app ≈ 8 km) |
-| `cabe_en_tiempo` | minutos de traslado + minutos de estancia por categoría ≤ tiempo disponible |
-| `apto_contexto` | categoría adecuada para el contexto (ej. Aire libre ✔ familia, Café ✔ pareja) — tabla fija en `reglas.py` |
-| `datos_suficientes` | el lugar tiene coordenadas y categoría |
-| `hay_candidatos` | al menos 2 lugares recomendables |
+| `datos_usuario_validos` | validación de la solicitud |
+| `modo_disponible` | a pie y taxi: `true` dentro de la zona · transporte público: `null` (no hay líneas cargadas) |
+| `ruta_calculada` | estimada por distancia; **Einar decide** si cuenta como `true` con advertencia (o se usa Routes API más adelante) |
+| `abierto` | `regularOpeningHours` de Google: **cada visita cabe completa** en el horario del día, a la hora estimada de llegada. Sin horario → `null` |
+| `dentro_presupuesto` | `priceRange` si viene; si solo hay `priceLevel` ($–$$$$), **Einar define** la tabla de equivalencia en MXN o lo deja `null`. Sin precio → `null` |
+| `cabe_en_tiempo` | traslados estimados + estancia por categoría ≤ tiempo disponible |
+| `datos_vigentes` | `true`: los datos se consultan a Google en el momento |
+| `requiere_accesibilidad` / `control_cierres_habilitado` | `false` (configuración del MVP → R13 con advertencia) |
+| `accesibilidad_verificada` / `cierre_vigente` | `null` |
+| `contexto_compatible` | tabla fija categoría ↔ contexto |
+| `intereses_compatibles` | categoría del lugar ∈ intereses |
+| `poca_caminata` | caminata total ≤ límite (ej. 2 km) |
+| `pocos_transbordos` | `true` (a pie o en taxi no hay transbordos) |
 
-Reglas de ejemplo (meta: 15–20):
-```
-R1: coincide_intereses ∧ cerca → candidato
-R2: candidato ∧ apto_contexto → recomendable
-R3: recomendable ∧ cabe_en_tiempo → incluir_en_plan
-R4: ¬cerca → descartar ("queda lejos para tu forma de moverte")
-R5: ¬datos_suficientes → descartar ("no tenemos información suficiente")
-R6: ¬hay_candidatos → avisar_sin_informacion
-R7: movilidad = caminando ∧ distancia > 2 km → descartar
-…
-```
-Horario y presupuesto **no** se evalúan hasta que la base tenga esos datos (ver sección 10).
-
-Estructura sugerida:
-```python
-# hechos.py — un hecho = función que regresa True/False
-# reglas.py — Regla(id, descripcion, condicion, conclusion)
-# motor.py
-def recomendar(solicitud: dict, lugares: list[dict]) -> dict:
-    # 1. calcular hechos por lugar
-    # 2. encadenamiento hacia adelante: aplicar reglas hasta que no salga nada nuevo
-    # 3. armar hasta 3 planes (equilibrado, rápido, cercano) con los lugares incluidos
-    # 4. anotar reglas_cumplidas y una explicación en español por plan
-    # 5. listar descartados con la regla que los sacó
-```
-
-**Mientras Einar termina:** crear `motor.py` como **traducción de `src/services/mock/motor.ts`** de la app, quitando lo que dependa de costo u horario, con un comentario `# TEMPORAL — Einar reemplaza con el motor de reglas`. Así la demo funciona desde el primer día.
+> Con horario y precio de Google, los candidatos **sí pueden llegar a `recomendable`** (R15 → R16). Si un lugar no trae horario o precio, ese candidato queda en `pendiente_verificacion`, que es lo correcto.
 
 ## 8. Convenciones
 
@@ -313,16 +337,16 @@ def recomendar(solicitud: dict, lugares: list[dict]) -> dict:
 | **1** | Proyecto base: `config`, `db`, `main`, `/api/salud`, CORS | `/docs` abre y `/api/salud` responde |
 | **2** | Modelos SQLAlchemy de las 8 tablas + `datos_desarrollo.sql` | Los modelos leen todas las tablas sin error |
 | **3** | Cuenta: registro, login, `yo`, residencia | La app con `USE_MOCK=false` inicia sesión desde el celular |
-| **4** | Catálogos y lugares | "Cerca de ti" muestra lugares de la BD |
-| **5** | `ia/motor.py` temporal + `POST /api/itinerarios` + `GET /api/planes` | "Crear mi plan" devuelve planes reales en la app ← **mínimo para la demo del miércoles** |
+| **4** | Catálogos y lugares con Google Places | "Cerca de ti" muestra lugares reales de Google |
+| **5** | `app/ia/` con el motor de Einar + `POST /api/itinerarios` + `GET /api/planes` | "Crear mi plan" devuelve planes reales en la app ← **mínimo para la demo del miércoles** |
 | **6** | Rutas | El mapa dibuja una ruta de la BD |
 | **7** | Historial | Se guarda un recorrido iniciado |
 | **8** | Pruebas (`pytest`) y revisar `/docs` para el manual técnico | Pruebas en verde |
 
-## 10. Fuera por ahora (necesitan cambios en la base)
+## 10. Fuera por ahora
 
 No se programan hasta que Sebas los agregue al diagrama:
-- **Horario, costo, calificación y fuente de los lugares** → reglas de "está abierto" y "cabe en el presupuesto".
+- **Favoritos / lugares guardados** → necesitan una columna `place_id` (Google no permite guardar el resto de sus datos).
 - **Línea, sentido, tarifa y paradas de las rutas** → instrucciones en autobús (dónde subir y dónde bajar).
 - **Reportes comunitarios** → la pantalla Reportar sigue con datos de ejemplo.
 - **Varios intereses y medios por plan** → hoy `planes` guarda solo el primero de cada uno.
@@ -330,6 +354,6 @@ No se programan hasta que Sebas los agregue al diagrama:
 ## 11. Demo del miércoles 30
 
 1. Iniciar sesión con `demo@kompas.mx` (MySQL).
-2. Ver lugares "Cerca de ti" traídos de la BD.
+2. Ver lugares "Cerca de ti" traídos de Google Places.
 3. Planificador → **Crear mi plan** → la API llama al sistema experto → la app muestra los planes con su explicación y los lugares descartados con la regla que los descartó.
 4. Abrir `/docs` para mostrar los endpoints.

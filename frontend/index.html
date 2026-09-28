@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta name="description" content="Rutas e itinerarios en Toluca, Lerma y San Mateo Atenco" />
+    <title>Brújula Urbana</title>
+    <script>
+      // Aplica el tema guardado antes de pintar (la lógica completa está en src/utils/tema.js)
+      try {
+        var p = localStorage.getItem('bu_tema') || 'sistema'
+        var oscuro = p === 'oscuro' || (p === 'sistema' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.tema = oscuro ? 'oscuro' : 'claro'
+      } catch (e) {
+        document.documentElement.dataset.tema = 'claro'
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/*
+  Identidad visual PROVISIONAL.
+  Valentín: cambia aquí colores y tipografía; toda la app usa estos tokens
+  (bg-primario, text-acento, border-borde, etc.).
+  Tema claro aquí; tema oscuro en :root[data-tema="oscuro"] más abajo.
+*/
+@theme static {
+  --color-primario: #0f766e;
+  --color-primario-oscuro: #115e59;
+  --color-primario-claro: #ccfbf1;
+  --color-acento: #f59e0b;
+  --color-fondo: #f8fafc;
+  --color-superficie: #ffffff;
+  --color-texto: #0f172a;
+  --color-texto-suave: #475569;
+  --color-borde: #e2e8f0;
+  --color-ok: #15803d;
+  --color-aviso: #b45309;
+  --color-peligro: #b91c1c;
+  --color-sobre-primario: #ffffff;
+  --color-sobre-acento: #451a03;
+  --color-ok-fondo: #f0fdf4;
+  --color-aviso-fondo: #fef3c7;
+  --color-peligro-fondo: #fef2f2;
+  --color-ruta: #1a73e8;
+  --color-ruta-borde: #0b57d0;
+
+  --font-sans: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Tema oscuro: data-tema lo pone src/utils/tema.js (y el script de index.html antes de pintar) */
+:root[data-tema="oscuro"] {
+  --color-primario: #2dd4bf;
+  --color-primario-oscuro: #5eead4;
+  --color-primario-claro: #134e4a;
+  --color-acento: #fbbf24;
+  --color-fondo: #0b1120;
+  --color-superficie: #151e2e;
+  --color-texto: #e2e8f0;
+  --color-texto-suave: #94a3b8;
+  --color-borde: #273449;
+  --color-ok: #4ade80;
+  --color-aviso: #fbbf24;
+  --color-peligro: #f87171;
+  --color-sobre-primario: #042f2e;
+  --color-sobre-acento: #451a03;
+  --color-ok-fondo: #0f2a1d;
+  --color-aviso-fondo: #2d2106;
+  --color-peligro-fondo: #2f1316;
+  --color-ruta: #8ab4f8;
+  --color-ruta-borde: #1a4fa0;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-fondo text-texto font-sans antialiased;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primario;
+  }
+}
+
+/* Clases reutilizables de la app */
+@utility tarjeta {
+  @apply rounded-2xl border border-borde bg-superficie p-4 shadow-sm;
+}
+@utility campo {
+  @apply block w-full min-h-11 rounded-xl border border-borde bg-superficie px-3 py-2 text-base text-texto placeholder:text-texto-suave/70 focus:border-primario focus:outline-none focus:ring-2 focus:ring-primario/30;
+}
+@utility etiqueta {
+  @apply mb-1 block text-sm font-medium text-texto-suave;
+}
+@utility boton {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2 font-semibold transition disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility boton-primario {
+  @apply boton bg-primario text-sobre-primario hover:bg-primario-oscuro;
+}
+@utility boton-secundario {
+  @apply boton border border-borde bg-superficie text-texto hover:bg-fondo;
+}
+
+/* ───────── Mapa (Leaflet) con aspecto tipo Google Maps ───────── */
+.leaflet-container {
+  font: inherit;
+  z-index: 0;
+  background: var(--color-fondo);
+}
+.marcador-mapa {
+  background: transparent;
+  border: 0;
+}
+
+/* Rutas: línea azul con borde; a pie, puntos */
+.trazo-ruta {
+  stroke: var(--color-ruta);
+}
+.trazo-borde {
+  stroke: var(--color-ruta-borde);
+}
+.trazo-a-pie {
+  stroke: var(--color-ruta);
+  stroke-dasharray: 0 12;
+  stroke-linecap: round;
+}
+
+/* Punto azul de "mi ubicación" */
+.mi-posicion {
+  fill: #1a73e8;
+  stroke: #fff;
+}
+.mi-posicion-halo {
+  fill: #1a73e8;
+  fill-opacity: 0.15;
+}
+
+/* Controles: botones blancos redondeados con sombra */
+.leaflet-bar {
+  border: 0 !important;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+}
+.leaflet-bar a {
+  width: 40px !important;
+  height: 40px !important;
+  line-height: 40px !important;
+  font-size: 20px !important;
+  background: var(--color-superficie);
+  color: var(--color-texto-suave);
+  border-color: var(--color-borde);
+}
+.leaflet-bar a:hover {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-superficie);
+  color: var(--color-texto);
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: color-mix(in srgb, var(--color-superficie) 80%, transparent) !important;
+  color: var(--color-texto-suave);
+}
+.leaflet-control-attribution a {
+  color: var(--color-primario);
+}

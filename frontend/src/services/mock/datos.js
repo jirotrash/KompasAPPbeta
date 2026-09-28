@@ -1,0 +1,176 @@
+// DATOS DE EJEMPLO para desarrollar sin API.
+// No son rutas, horarios ni lugares reales: tienen nombres genéricos y se marcan
+// en pantalla como "Dato de ejemplo". Se reemplazan por los datos verificados
+// que Sebas carga en MongoDB en cuanto la API esté lista.
+// Coordenadas en GeoJSON: [lng, lat].
+
+const FUENTE_EJEMPLO = 'Dato de ejemplo (sin verificar)'
+
+export const RUTAS = [
+  {
+    _id: 'ruta_ejemplo_a',
+    linea: 'Línea de ejemplo A',
+    sentido: 'Lerma → Toluca',
+    tarifa: null,
+    horario: { inicio: '05:30', fin: '22:00', frecuencia_min: 15, tipo: 'programado' },
+    paradas: [
+      { orden: 1, nombre: 'Parada de ejemplo · Centro de Lerma', ubicacion: { type: 'Point', coordinates: [-99.511, 19.2847] } },
+      { orden: 2, nombre: 'Parada de ejemplo · Lerma oriente', ubicacion: { type: 'Point', coordinates: [-99.527, 19.2815] } },
+      { orden: 3, nombre: 'Parada de ejemplo · Límite San Mateo Atenco', ubicacion: { type: 'Point', coordinates: [-99.545, 19.279] } },
+      { orden: 4, nombre: 'Parada de ejemplo · Poniente de San Mateo', ubicacion: { type: 'Point', coordinates: [-99.57, 19.278] } },
+      { orden: 5, nombre: 'Parada de ejemplo · Oriente de Toluca', ubicacion: { type: 'Point', coordinates: [-99.61, 19.283] } },
+      { orden: 6, nombre: 'Parada de ejemplo · Toluca centro-oriente', ubicacion: { type: 'Point', coordinates: [-99.64, 19.289] } },
+      { orden: 7, nombre: 'Parada de ejemplo · Centro de Toluca', ubicacion: { type: 'Point', coordinates: [-99.6557, 19.2926] } },
+    ],
+    verificada: false,
+    fuente: FUENTE_EJEMPLO,
+    fecha_verificacion: null,
+  },
+  {
+    _id: 'ruta_ejemplo_b',
+    linea: 'Línea de ejemplo B',
+    sentido: 'San Mateo Atenco → Toluca',
+    tarifa: null,
+    horario: { inicio: '06:00', fin: '21:00', frecuencia_min: 20, tipo: 'programado' },
+    paradas: [
+      { orden: 1, nombre: 'Parada de ejemplo · Centro de San Mateo Atenco', ubicacion: { type: 'Point', coordinates: [-99.533, 19.267] } },
+      { orden: 2, nombre: 'Parada de ejemplo · San Mateo sur', ubicacion: { type: 'Point', coordinates: [-99.55, 19.265] } },
+      { orden: 3, nombre: 'Parada de ejemplo · Oriente de Toluca sur', ubicacion: { type: 'Point', coordinates: [-99.59, 19.27] } },
+      { orden: 4, nombre: 'Parada de ejemplo · Toluca sur', ubicacion: { type: 'Point', coordinates: [-99.625, 19.279] } },
+      { orden: 5, nombre: 'Parada de ejemplo · Centro de Toluca sur', ubicacion: { type: 'Point', coordinates: [-99.652, 19.287] } },
+    ],
+    verificada: false,
+    fuente: FUENTE_EJEMPLO,
+    fecha_verificacion: null,
+  },
+]
+
+const todaLaSemana = (abre, cierra) =>
+  Object.fromEntries(['lun', 'mar', 'mie', 'jue', 'vie', 'sab', 'dom'].map((d) => [d, [abre, cierra]]))
+
+const calificacion = (valor) => ({ valor, fuente: FUENTE_EJEMPLO, fecha: '2026-09-20' })
+
+// categoria también funciona como "gusto" en el formulario de itinerarios
+export const LUGARES = [
+  {
+    _id: 'lugar_01',
+    nombre: 'Cafetería de ejemplo · Centro de Toluca',
+    categoria: 'cafeteria',
+    municipio: 'Toluca',
+    ubicacion: { type: 'Point', coordinates: [-99.656, 19.292] },
+    horario: todaLaSemana('08:00', '21:00'),
+    costo_promedio: 120,
+    contextos: ['cita', 'amigos'],
+    calificacion: calificacion(4.5),
+    afluencia: { nivel: 'media', fuente: 'Reporte comunitario (ejemplo)', fecha: '2026-09-25' },
+  },
+  {
+    _id: 'lugar_02',
+    nombre: 'Restaurante familiar de ejemplo',
+    categoria: 'restaurante',
+    municipio: 'Toluca',
+    ubicacion: { type: 'Point', coordinates: [-99.64, 19.287] },
+    horario: todaLaSemana('09:00', '22:00'),
+    costo_promedio: 250,
+    contextos: ['familia', 'cotidiano'],
+    calificacion: calificacion(4.3),
+    afluencia: { nivel: 'baja', fuente: 'Reporte comunitario (ejemplo)', fecha: '2026-09-24' },
+  },
+  {
+    _id: 'lugar_03',
+    nombre: 'Parque de ejemplo · Toluca',
+    categoria: 'parque',
+    municipio: 'Toluca',
+    ubicacion: { type: 'Point', coordinates: [-99.662, 19.296] },
+    horario: todaLaSemana('06:00', '19:00'),
+    costo_promedio: 0,
+    contextos: ['familia', 'amigos', 'cita'],
+    calificacion: calificacion(4.6),
+    afluencia: { nivel: 'alta', fuente: 'Reporte comunitario (ejemplo)', fecha: '2026-09-26' },
+  },
+  {
+    _id: 'lugar_04',
+    nombre: 'Museo de ejemplo',
+    categoria: 'museo',
+    municipio: 'Toluca',
+    ubicacion: { type: 'Point', coordinates: [-99.658, 19.2935] },
+    horario: { ...todaLaSemana('10:00', '18:00'), lun: null },
+    costo_promedio: 40,
+    contextos: ['cita', 'familia'],
+    calificacion: calificacion(4.7),
+    afluencia: null,
+  },
+  {
+    _id: 'lugar_05',
+    nombre: 'Cine de ejemplo',
+    categoria: 'cine',
+    municipio: 'Toluca',
+    ubicacion: { type: 'Point', coordinates: [-99.61, 19.28] },
+    horario: todaLaSemana('11:00', '23:30'),
+    costo_promedio: 90,
+    contextos: ['amigos', 'cita'],
+    calificacion: calificacion(4.2),
+    afluencia: { nivel: 'alta', fuente: 'Reporte comunitario (ejemplo)', fecha: '2026-09-26' },
+  },
+  {
+    _id: 'lugar_06',
+    nombre: 'Cafetería de ejemplo · Centro de Lerma',
+    categoria: 'cafeteria',
+    municipio: 'Lerma',
+    ubicacion: { type: 'Point', coordinates: [-99.5115, 19.285] },
+    horario: todaLaSemana('08:00', '20:00'),
+    costo_promedio: 90,
+    contextos: ['cita', 'amigos', 'cotidiano'],
+    calificacion: calificacion(4.4),
+    afluencia: null,
+  },
+  {
+    _id: 'lugar_07',
+    nombre: 'Fonda de ejemplo · San Mateo Atenco',
+    categoria: 'restaurante',
+    municipio: 'San Mateo Atenco',
+    ubicacion: { type: 'Point', coordinates: [-99.5335, 19.2675] },
+    horario: todaLaSemana('08:00', '18:00'),
+    costo_promedio: 100,
+    contextos: ['cotidiano', 'familia', 'amigos'],
+    calificacion: calificacion(4.1),
+    afluencia: { nivel: 'baja', fuente: 'Reporte comunitario (ejemplo)', fecha: '2026-09-25' },
+  },
+  {
+    _id: 'lugar_08',
+    nombre: 'Plaza comercial de ejemplo · Lerma',
+    categoria: 'plaza',
+    municipio: 'Lerma',
+    ubicacion: { type: 'Point', coordinates: [-99.54, 19.28] },
+    horario: todaLaSemana('10:00', '21:00'),
+    costo_promedio: 200,
+    contextos: ['amigos', 'familia'],
+    calificacion: calificacion(4.0),
+    afluencia: null,
+  },
+  {
+    _id: 'lugar_09',
+    nombre: 'Restaurante de ejemplo · Toluca poniente',
+    categoria: 'restaurante',
+    municipio: 'Toluca',
+    ubicacion: { type: 'Point', coordinates: [-99.675, 19.29] },
+    horario: todaLaSemana('13:00', '17:00'),
+    costo_promedio: 450,
+    contextos: ['cita', 'familia'],
+    calificacion: calificacion(4.8),
+    afluencia: null,
+  },
+  {
+    _id: 'lugar_10',
+    nombre: 'Galería de ejemplo (sin horario registrado)',
+    categoria: 'museo',
+    municipio: 'Lerma',
+    ubicacion: { type: 'Point', coordinates: [-99.515, 19.288] },
+    horario: null,
+    costo_promedio: null,
+    contextos: ['cita', 'amigos'],
+    calificacion: null,
+    afluencia: null,
+  },
+]
+

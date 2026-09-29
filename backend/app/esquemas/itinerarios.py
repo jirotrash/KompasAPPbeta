@@ -3,8 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.esquemas.comun import ReglaSalida, Salida
-from app.esquemas.lugares import LugarSalida
+from app.esquemas.comun import GeoPunto, ReglaSalida, Salida
 
 Contexto = Literal["solo", "pareja", "amigos", "familia"]
 Interes = Literal["comer", "cafe", "cultura", "entretenimiento", "aire_libre"]
@@ -31,13 +30,13 @@ class PeticionPlan(BaseModel):
     """Lo que manda el botón **Crear mi plan** (CONTEXTO.md §6.1)."""
 
     contexto: Contexto
-    presupuesto: Presupuesto = Field(description="Se recibe, pero aún no se evalúa: la base no tiene costos")
+    presupuesto: Presupuesto = Field(description="presupuesto.max es el presupuesto por persona que evalúa el motor")
     tiempo_horas: float = Field(gt=0, le=24)
     intereses: list[Interes] = Field(min_length=1, description="Al menos uno")
     movilidad: list[Movilidad] = Field(min_length=1, description="Al menos uno")
     origen: Punto
     hora_salida: str = Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$", examples=["18:00"])
-    dia: str | None = Field(default=None, description="La app lo manda; aún no se usa (la base no tiene horarios)")
+    dia: str | None = Field(default=None, description="La app lo manda; el servidor usa la fecha de hoy en Toluca")
 
     model_config = {
         "json_schema_extra": {
@@ -57,45 +56,77 @@ class PeticionPlan(BaseModel):
 
 
 class TramoSalida(Salida):
-    modo: Literal["pie", "taxi"]
-    duracion_min: int = Field(description="Estimación por distancia")
-    minutos: int
+    modo: Literal["pie", "taxi", "autobus"]
+    duracion_min: int | None = Field(description="Estimación por distancia; null si no se puede estimar (autobús)")
+    minutos: int | None
     distancia_km: float
     desde: str
     hasta: str
+    estimado: bool = True
     aviso: str | None = None
 
 
-class ParadaPlan(Salida):
-    lugar_id: str
+class RangoCosto(BaseModel):
+    min: float | None
+    max: float | None
+    moneda: Literal["MXN"] = "MXN"
+
+
+class LugarPlan(Salida):
+    """Lugar de Google Places (no se guarda en MySQL: condiciones de Google)."""
+
+    id_texto: str = Field(alias="_id", description="place_id de Google")
     nombre: str
-    llegada_estimada: str = Field(description="HH:MM, estimación")
-    lugar: LugarSalida | None = None
+    lat: float
+    lng: float
+    ubicacion: GeoPunto
+    categoria: str
+    interes: str
+    nivel_precio: str | None = Field(default=None, description="priceLevel de Google; no se convierte a pesos")
+    rango_precio: RangoCosto | None = Field(default=None, description="priceRange de Google, si lo trae")
+    fuente: Literal["Google"] = "Google"
+    consultado_en: str
+
+
+class ParadaPlan(Salida):
+    lugar_id: str = Field(description="place_id de Google")
+    nombre: str
+    llegada_estimada: str | None = Field(description="HH:MM, estimación")
+    lugar: LugarPlan | None = None
 
 
 class PlanSalida(Salida):
-    tipo: Literal["equilibrado", "rapido", "economico"]
+    tipo: Literal["equilibrado", "rapido", "cercano"]
+    estado: Literal["recomendable"] = "recomendable"
     mejor_opcion: bool
-    costo: float | None = Field(description="null: la base no tiene costos")
+    puntuacion: int = Field(ge=0, le=6, description="Puntuación de preferencias del motor de Einar")
+    costo: None = Field(default=None, description="null: Google no da precios exactos")
+    rango_costo: RangoCosto | None = Field(default=None, description="Suma estimada por persona según priceRange")
     duracion_horas: float
     distancia_km: float
     paradas: list[ParadaPlan]
     tramos: list[TramoSalida] = []
     explicacion: str
-    reglas_cumplidas: list[ReglaSalida]
+    reglas_cumplidas: list[ReglaSalida] = Field(description="Traza del motor: reglas activadas con su explicación")
 
 
 class Descartado(Salida):
-    lugar: LugarSalida
-    lugar_id: str
+    """Itinerario candidato que el motor no recomendó, con su estado y los motivos."""
+
+    tipo: Literal["equilibrado", "rapido", "cercano"]
     nombre: str
+    lugares: list[str]
+    estado: Literal["descartado", "pendiente_verificacion", "requiere_correccion"]
     reglas: list[ReglaSalida]
+    datos_faltantes: list[str] = []
 
 
 class RespuestaPlanes(Salida):
     datos_suficientes: bool
     mensaje: str | None = None
     aviso: str | None = None
+    advertencias: list[str] = []
+    version_reglas: str | None = None
     planes: list[PlanSalida]
     descartados: list[Descartado] = []
 

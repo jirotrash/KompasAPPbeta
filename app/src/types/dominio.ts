@@ -86,8 +86,16 @@ export type PeticionPlan = {
 
 export type ParadaPlan = { lugar_id: string; nombre: string; llegada_estimada: string; lugar?: Lugar };
 
+export type EstadoPlan = 'recomendable' | 'pendiente_verificacion' | 'descartado' | 'requiere_correccion';
+
 export type Plan = {
-  tipo: 'equilibrado' | 'rapido' | 'economico';
+  /** "economico" solo lo usa el modo demostración; la API manda equilibrado, rapido o cercano */
+  tipo: 'equilibrado' | 'rapido' | 'economico' | 'cercano';
+  estado?: EstadoPlan;
+  /** Puntuación de preferencias del motor de Einar (0–6) */
+  puntuacion?: number;
+  /** Suma estimada por persona según el rango de precios de Google; no es una cotización */
+  rango_costo?: { min: number | null; max: number | null; moneda: 'MXN' } | null;
   mejor_opcion: boolean;
   /** null mientras la base no tenga costos de los lugares */
   costo: number | null;
@@ -100,11 +108,26 @@ export type Plan = {
   reglas_cumplidas: Regla[];
 };
 
+/** Candidato que no se recomendó. La API manda el itinerario (nombre, estado, datos faltantes);
+ *  el modo demostración manda el lugar descartado. */
+export type Descartado = {
+  reglas: Regla[];
+  tipo?: Plan['tipo'];
+  nombre?: string;
+  lugares?: string[];
+  estado?: Exclude<EstadoPlan, 'recomendable'>;
+  datos_faltantes?: string[];
+  lugar?: Lugar;
+};
+
 export type RespuestaPlanes = {
   datos_suficientes?: boolean;
-  mensaje?: string;
+  mensaje?: string | null;
+  /** Advertencias del motor y de los hechos (p. ej. R13: no se verifican cierres) */
+  aviso?: string | null;
+  version_reglas?: string;
   planes: Plan[];
-  descartados?: { lugar: Lugar; reglas: Regla[] }[];
+  descartados?: Descartado[];
 };
 
 // ───────────── Reportes ─────────────

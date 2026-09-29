@@ -1,153 +1,132 @@
-"""Motor de inferencia: hechos → encadenamiento hacia adelante → hasta 2 planes con explicación.
+"""Motor de inferencia del sistema experto (Einar).
 
-# TEMPORAL — Einar reemplaza con el motor de reglas definitivo.
-# Basado en src/services/mock/motor.ts de la app, quitando lo que depende de costo u horario
-# (la base todavía no tiene esos datos). Lo que Einar debe conservar es el CONTRATO:
-#   recomendar(solicitud, lugares) -> {datos_suficientes, mensaje, aviso, planes, descartados}
-#   - solicitud: el JSON del planificador (dict)
-#   - lugares: dicts con la forma de app/servicios/serializar.py → lugar()
-#   - nunca inventar datos: si faltan, planes = [] y un aviso claro
+Código movido SIN CAMBIOS desde herramientas/sistema_experto_demo.py para que la demo y la API
+ejecuten exactamente la misma lógica. Las reglas R01–R20 se leen de docs/sistema-experto/reglas.json.
+
+    from app.ia.motor import cargar_base, evaluar
+    base = cargar_base()                 # una sola vez al iniciar
+    resultado = evaluar(hechos, base)    # estado, puntuación, traza y advertencias
 """
 
-from dataclasses import dataclass, field
+import json
+from pathlib import Path
 
-from app.ia import hechos as H
-from app.ia.reglas import MIN_CANDIDATOS, R6, REGLAS, REGLAS_LUGAR, REGLAS_TRAMO, como_salida, encadenar
-from app.servicios.geo import a_hora, a_minutos_del_dia
-from app.servicios.traslados import DISTANCIA_CORTA_KM, permite_pie, permite_taxi, tramo
+# backend/app/ia/motor.py → raíz del repositorio → DOCS/Brujula-Urbana/docs/sistema-experto
+CARPETA_REGLAS = Path(__file__).resolve().parents[3] / "DOCS" / "Brujula-Urbana" / "docs" / "sistema-experto"
 
-MAX_PARADAS = 3
-
-AVISO_SIN_COSTOS = "Todavía no tenemos costos ni horarios de los lugares; revisa antes de ir."
-NOMBRES_INTERES = {"comer": "comer", "cafe": "café", "cultura": "cultura", "entretenimiento": "entretenimiento", "aire_libre": "aire libre"}
-
-
-@dataclass
-class Evaluado:
-    lugar: dict
-    incluir: bool
-    cumplidas: list[str] = field(default_factory=list)
-    descartes: list[dict] = field(default_factory=list)
-    traslado: int = 0
-    km: float = 0
-
-
-def _punto(lugar: dict) -> dict:
-    return {"lat": lugar["lat"], "lng": lugar["lng"]}
-
-
-def _evaluar(lugar: dict, solicitud: dict) -> Evaluado:
-    hechos, datos = H.calcular(lugar, solicitud)
-    disparadas = encadenar(hechos, REGLAS_LUGAR)
-    ev = Evaluado(lugar=lugar, incluir=hechos.get("incluir_en_plan", False), traslado=datos["traslado"] or 0, km=datos["km"] or 0)
-    for regla in disparadas:
-        if regla.entonces == "descartar":
-            ev.descartes.append(como_salida(regla, contexto=solicitud["contexto"], minutos=datos["minutos"]))
-        else:
-            ev.cumplidas.append(regla.id)
-    return ev
+ENTRADAS = {
+    "datos_usuario_validos", "modo_disponible", "ruta_calculada", "abierto",
+    "dentro_presupuesto", "cabe_en_tiempo", "requiere_accesibilidad",
+    "accesibilidad_verificada", "control_cierres_habilitado", "cierre_vigente",
+    "datos_vigentes", "contexto_compatible", "intereses_compatibles",
+    "poca_caminata", "pocos_transbordos",
+}
+CRITICOS = {
+    "datos_usuario_validos", "modo_disponible", "ruta_calculada", "abierto",
+    "dentro_presupuesto", "cabe_en_tiempo", "requiere_accesibilidad",
+    "control_cierres_habilitado", "datos_vigentes",
+}
+DERIVADOS = {
+    "requiere_correccion", "descartar", "pendiente_verificacion",
+    "accesibilidad_resuelta", "cierres_resueltos", "advertir_sin_cobertura_cierres",
+    "viabilidad_base", "recomendable", "priorizar_contexto", "priorizar_intereses",
+    "priorizar_caminata", "priorizar_transbordos",
+}
 
 
-def _reglas_del_tramo(t: dict, movilidad: list[str]) -> list[str]:
-    hechos = {
-        "caminando": permite_pie(movilidad),
-        "taxi_app": permite_taxi(movilidad),
-        "distancia_corta": t["distancia_km"] <= DISTANCIA_CORTA_KM,
-    }
-    return [r.id for r in encadenar(hechos, REGLAS_TRAMO) if (r.entonces == "ir_a_pie") == (t["modo"] == "pie")]
+def exigir(condicion, mensaje):
+    if not condicion:
+        raise ValueError(mensaje)
 
 
-def _armar_plan(seleccion: list[Evaluado], solicitud: dict) -> dict:
-    """Secuencia origen → paradas con traslados y horas de llegada ESTIMADAS."""
-    minuto = a_minutos_del_dia(solicitud["hora_salida"])
-    anterior, nombre_anterior = solicitud["origen"], "Tu ubicación"
-    tramos, paradas = [], []
-    for ev in seleccion:
-        lugar = ev.lugar
-        t = tramo(anterior, _punto(lugar), solicitud["movilidad"], nombre_anterior, lugar["nombre"])
-        tramos.append(t)
-        minuto += t["duracion_min"]
-        paradas.append({"lugar_id": lugar["_id"], "nombre": lugar["nombre"], "llegada_estimada": a_hora(minuto), "lugar": lugar})
-        minuto += H.estancia(lugar)
-        anterior, nombre_anterior = _punto(lugar), lugar["nombre"]
-    return {
-        "paradas": paradas,
-        "tramos": tramos,
-        "duracion": minuto - a_minutos_del_dia(solicitud["hora_salida"]),
-        "distancia": sum(t["distancia_km"] for t in tramos),
-    }
+def validar_base(base):
+    reglas = base["reglas"]
+    exigir(len(reglas) == 20, "La versión 0.1.0 debe contener 20 reglas.")
+    exigir({r["id"] for r in reglas} == {f"R{i:02}" for i in range(1, 21)},
+           "Identificadores de regla ausentes o repetidos.")
+    conocidos = ENTRADAS | DERIVADOS | {"datos_criticos_completos"}
+    for regla in reglas:
+        exigir(bool(regla["si"]) and bool(regla["entonces"]), "Regla vacía.")
+        for nombre, valor in regla["si"].items():
+            exigir(nombre in conocidos and type(valor) is bool,
+                   f"Antecedente inválido: {regla['id']} / {nombre}.")
+            exigir(nombre not in DERIVADOS or valor is True,
+                   "No se permite negar un hecho derivado ausente.")
+        exigir(set(regla["entonces"]) <= DERIVADOS, "Conclusión no declarada.")
+        exigir(bool(regla["explicacion"]), "Falta explicación de una regla.")
+    for nombre, peso in base["pesos_preferencias"].items():
+        exigir(nombre in DERIVADOS and type(peso) is int and peso >= 0,
+               "Peso de preferencia inválido.")
 
 
-def _seleccionar(orden: list[Evaluado], solicitud: dict, maximo: int, variedad: bool) -> list[Evaluado]:
-    """Agrega paradas en el orden dado mientras el recorrido quepa en el tiempo disponible."""
-    elegidos: list[Evaluado] = []
-    for ev in orden:
-        if len(elegidos) == maximo:
+def evaluar(entrada, base):
+    """Devuelve estado, preferencias y traza, sin alterar entrada ni base."""
+    exigir(isinstance(entrada, dict), "La entrada debe ser un objeto de hechos.")
+    exigir(set(entrada) <= ENTRADAS, "Hay hechos no permitidos o derivados inyectados.")
+    exigir(all(v is None or type(v) is bool for v in entrada.values()),
+           "Solo se admiten booleanos y null; 0, 1 y cadenas no son booleanos.")
+    iniciales = {nombre: entrada.get(nombre) for nombre in sorted(ENTRADAS)}
+    exigir(type(iniciales["control_cierres_habilitado"]) is bool,
+           "Debe especificarse si el control de cierres está habilitado.")
+    exigir(iniciales["control_cierres_habilitado"] or iniciales["cierre_vigente"] is None,
+           "Con control deshabilitado, cierre_vigente debe ser null.")
+
+    requeridos = set(CRITICOS)
+    if iniciales["requiere_accesibilidad"] is True:
+        requeridos.add("accesibilidad_verificada")
+    if iniciales["control_cierres_habilitado"] is True:
+        requeridos.add("cierre_vigente")
+    iniciales["datos_criticos_completos"] = all(
+        iniciales[nombre] is not None for nombre in requeridos
+    )
+
+    hechos = dict(iniciales)
+    activadas = set()
+    traza = []
+    ronda = 0
+    while True:
+        aplicables = [
+            regla for regla in base["reglas"]
+            if regla["id"] not in activadas
+            and all(hechos.get(nombre) is valor for nombre, valor in regla["si"].items())
+        ]
+        if not aplicables:
             break
-        if variedad and any(x.lugar["interes"] == ev.lugar["interes"] for x in elegidos):
-            continue
-        if _armar_plan([*elegidos, ev], solicitud)["duracion"] <= solicitud["tiempo_horas"] * 60:
-            elegidos.append(ev)
-    return elegidos
+        ronda += 1
+        for regla in aplicables:
+            activadas.add(regla["id"])
+            for conclusion in regla["entonces"]:
+                hechos[conclusion] = True
+            traza.append({"ronda": ronda, "regla_id": regla["id"],
+                          "conclusiones": list(regla["entonces"]),
+                          "explicacion": regla["explicacion"]})
 
-
-def _explicacion(tipo: str, seleccion: list[Evaluado], plan: dict, solicitud: dict) -> str:
-    intereses = sorted({NOMBRES_INTERES.get(e.lugar["interes"], e.lugar["interes"]) for e in seleccion})
-    horas = f"{solicitud['tiempo_horas']:g}"
-    if tipo == "rapido":
-        lejano = max(e.km for e in seleccion)
-        texto = f"Lo más cercano: {len(seleccion)} lugares a menos de {lejano:.1f} km, ideal si tienes poco tiempo."
+    derivados = {nombre for nombre in DERIVADOS if hechos.get(nombre) is True}
+    if "requiere_correccion" in derivados:
+        estado = "requiere_correccion"
+    elif "descartar" in derivados:
+        estado = "descartado"
+    elif "pendiente_verificacion" in derivados:
+        estado = "pendiente_verificacion"
+    elif "recomendable" in derivados:
+        estado = "recomendable"
     else:
-        texto = (
-            f"{len(seleccion)} lugares variados ({', '.join(intereses)}) que coinciden con tus intereses; "
-            f"el recorrido estimado (~{plan['duracion'] / 60:.1f} h) cabe en tus {horas} horas."
-        )
-    return f"{texto} {AVISO_SIN_COSTOS}"
+        estado = "pendiente_verificacion"
+    puntos = None
+    if estado == "recomendable":
+        puntos = sum(peso for nombre, peso in base["pesos_preferencias"].items()
+                     if nombre in derivados)
+    return {
+        "version_reglas": base["version"], "estado": estado,
+        "puntuacion_preferencias": puntos, "hechos_iniciales": iniciales,
+        "hechos_derivados": sorted(derivados), "traza": traza,
+        "advertencias": (["Esta versión no verifica cierres mediante una fuente integrada."]
+                         if "advertir_sin_cobertura_cierres" in derivados else []),
+    }
 
 
-def recomendar(solicitud: dict, lugares: list[dict]) -> dict:
-    evaluados = [_evaluar(l, solicitud) for l in lugares]
-    incluidos = [e for e in evaluados if e.incluir]
-    descartados = [
-        {"lugar": e.lugar, "lugar_id": e.lugar["_id"], "nombre": e.lugar["nombre"], "reglas": e.descartes}
-        for e in evaluados
-        if e.descartes
-    ]
-
-    # R6: ¬hay_candidatos → avisar_sin_informacion
-    if encadenar({"hay_candidatos": len(incluidos) >= MIN_CANDIDATOS}, [R6]):
-        aviso = "No tenemos información suficiente para armar un plan con esos datos. Prueba con otros intereses, más tiempo u otra forma de moverte."
-        return {"datos_suficientes": False, "mensaje": aviso, "aviso": aviso, "planes": [], "descartados": descartados}
-
-    por_cercania = sorted(incluidos, key=lambda e: e.traslado)
-    propuestas = [
-        ("equilibrado", _seleccionar(por_cercania, solicitud, MAX_PARADAS, variedad=True)),
-        ("rapido", _seleccionar(por_cercania, solicitud, 2, variedad=False)),
-    ]
-
-    vistos: set[tuple[str, ...]] = set()
-    planes = []
-    for tipo, seleccion in propuestas:
-        clave = tuple(sorted(e.lugar["_id"] for e in seleccion))
-        if not seleccion or clave in vistos:
-            continue
-        vistos.add(clave)
-        plan = _armar_plan(seleccion, solicitud)
-        ids = {i for e in seleccion for i in e.cumplidas}
-        ids |= {i for t in plan["tramos"] for i in _reglas_del_tramo(t, solicitud["movilidad"])}
-        planes.append(
-            {
-                "tipo": tipo,
-                "mejor_opcion": False,
-                "costo": None,  # la base no tiene costos
-                "duracion_horas": round(plan["duracion"] / 60, 1),
-                "distancia_km": round(plan["distancia"], 1),
-                "paradas": plan["paradas"],
-                "tramos": plan["tramos"],
-                "explicacion": _explicacion(tipo, seleccion, plan, solicitud),
-                "reglas_cumplidas": [como_salida(REGLAS[i]) for i in sorted(ids, key=lambda x: int(x[1:]))],
-            }
-        )
-
-    planes[0]["mejor_opcion"] = True
-    return {"datos_suficientes": True, "mensaje": None, "aviso": AVISO_SIN_COSTOS, "planes": planes, "descartados": descartados}
+def cargar_base(carpeta: Path = CARPETA_REGLAS) -> dict:
+    """Lee docs/sistema-experto/reglas.json y lo valida con validar_base() de Einar."""
+    base = json.loads((carpeta / "reglas.json").read_text(encoding="utf-8"))
+    validar_base(base)
+    return base

@@ -1,0 +1,41 @@
+{
+  "version_reglas": "0.1.0",
+  "naturaleza": "Demostración con hechos sintéticos; no son consultas a servicios ni una salida observada.",
+  "hechos_comunes": {
+    "datos_usuario_validos": true,
+    "modo_disponible": true,
+    "ruta_calculada": true,
+    "abierto": true,
+    "dentro_presupuesto": true,
+    "cabe_en_tiempo": true,
+    "requiere_accesibilidad": false,
+    "accesibilidad_verificada": null,
+    "control_cierres_habilitado": false,
+    "cierre_vigente": null,
+    "datos_vigentes": true,
+    "contexto_compatible": true,
+    "intereses_compatibles": true,
+    "poca_caminata": true,
+    "pocos_transbordos": true
+  },
+  "casos": [
+    {
+      "candidato_id": "A",
+      "descripcion": "Visita básica al Cosmovitral: supuestos de 50 MXN y 99 minutos, con regreso.",
+      "hechos": {},
+      "esperado": {"estado": "recomendable", "puntuacion_preferencias": 6, "reglas": ["R11", "R13", "R15", "R16", "R17", "R18", "R19", "R20"]}
+    },
+    {
+      "candidato_id": "B",
+      "descripcion": "Visita prolongada al mismo lugar: 189 minutos frente a 120 disponibles.",
+      "hechos": {"cabe_en_tiempo": false},
+      "esperado": {"estado": "descartado", "puntuacion_preferencias": null, "reglas": ["R06", "R11", "R13"]}
+    },
+    {
+      "candidato_id": "C",
+      "descripcion": "Variante con un traslado de costo desconocido: falta comprobar el presupuesto.",
+      "hechos": {"dentro_presupuesto": null},
+      "esperado": {"estado": "pendiente_verificacion", "puntuacion_preferencias": null, "reglas": ["R09", "R11", "R13"]}
+    }
+  ]
+}

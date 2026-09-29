@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     jwt_secret: str
     jwt_expira_minutos: int = 60 * 24 * 7
     cors_origins: str = "*"
+    # Google Places API (New). Sin llave, POST /api/itinerarios responde 503 (no se inventan lugares)
+    google_maps_api_key: str | None = None
+    google_idioma: str = "es"
+    google_region: str = "mx"
 
     @property
     def lista_cors(self) -> list[str]:

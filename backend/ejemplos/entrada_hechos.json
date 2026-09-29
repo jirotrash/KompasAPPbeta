@@ -1,0 +1,237 @@
+{
+  "_nota": "Ejemplo sintético (INTEGRAR_IA.md §4): 2 visitas a pie, café y restaurante. No son lugares reales.",
+  "reloj_demostracion": "2026-09-30T17:59:00-06:00",
+  "solicitud": {
+    "contexto": "pareja",
+    "intereses": [
+      "comer",
+      "cafe"
+    ],
+    "presupuesto_por_persona": 400,
+    "tiempo_minutos": 240,
+    "movilidad": [
+      "caminando"
+    ],
+    "fecha_hora_salida": "2026-09-30T18:00:00-06:00",
+    "incluir_regreso": false
+  },
+  "itinerario": {
+    "visitas": [
+      {
+        "place_id": "ejemplo-cafe",
+        "nombre": "Café de ejemplo",
+        "categoria": "cafe",
+        "llegada_estimada": "2026-09-30T18:12:00-06:00",
+        "horario": {
+          "periods": [
+            {
+              "open": {
+                "day": 0,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 0,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 1,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 1,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 2,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 2,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 3,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 3,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 4,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 4,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 5,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 5,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 6,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 6,
+                "hour": 22,
+                "minute": 0
+              }
+            }
+          ]
+        },
+        "rango_precio": {
+          "min": 100,
+          "max": 180,
+          "moneda": "MXN"
+        },
+        "consultado_en": "2026-09-30T17:59:00-06:00"
+      },
+      {
+        "place_id": "ejemplo-restaurante",
+        "nombre": "Restaurante de ejemplo",
+        "categoria": "comer",
+        "llegada_estimada": "2026-09-30T19:00:00-06:00",
+        "horario": {
+          "periods": [
+            {
+              "open": {
+                "day": 0,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 0,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 1,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 1,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 2,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 2,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 3,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 3,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 4,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 4,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 5,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 5,
+                "hour": 22,
+                "minute": 0
+              }
+            },
+            {
+              "open": {
+                "day": 6,
+                "hour": 8,
+                "minute": 0
+              },
+              "close": {
+                "day": 6,
+                "hour": 22,
+                "minute": 0
+              }
+            }
+          ]
+        },
+        "rango_precio": {
+          "min": 100,
+          "max": 180,
+          "moneda": "MXN"
+        },
+        "consultado_en": "2026-09-30T17:59:00-06:00"
+      }
+    ],
+    "tramos": [
+      {
+        "modo": "caminando",
+        "km": 0.9,
+        "minutos": 12,
+        "estimado": true
+      },
+      {
+        "modo": "caminando",
+        "km": 0.5,
+        "minutos": 6,
+        "estimado": true
+      }
+    ],
+    "regreso_incluido": false
+  }
+}

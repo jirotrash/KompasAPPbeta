@@ -1,7 +1,7 @@
 """Filas de MySQL → diccionarios con la forma que espera la app (src/types/dominio.ts).
 
 La base no tiene horario, costo, calificación ni foto de los lugares: van en null (no se inventan).
-Estos mismos diccionarios son la entrada del sistema experto (ia/motor.py).
+El sistema experto ya no usa estos lugares: el planificador trabaja con Google Places (app/ia/servicio.py).
 """
 
 import re

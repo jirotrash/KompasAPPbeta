@@ -10,7 +10,7 @@ cd backend
 python -m venv venv                 # solo la primera vez
 .\venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env              # y pon tu usuario/contraseña de MySQL y un JWT_SECRET largo
+copy .env.example .env              # MySQL, un JWT_SECRET largo y GOOGLE_MAPS_API_KEY
 python -m scripts.preparar_bd       # crea `kompas`: Dump20260927.sql + datos_desarrollo.sql
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -25,10 +25,11 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Funciona con **MySQL 8** y con **MariaDB** (el `LINESTRING` se lee y escribe según el motor).
 
-## Qué NO hay todavía (falta en la base, BACKEND.md §10)
+## Qué NO hay todavía (BACKEND.md §10)
 
-Horario, costo y calificación de lugares (van en `null`), líneas y paradas de autobús, y reportes
-comunitarios (la app los sigue simulando). El presupuesto se recibe pero no se evalúa.
+Líneas y paradas de autobús y reportes comunitarios (la app los sigue simulando).
+`POST /api/itinerarios` usa **Google Places**: sin `GOOGLE_MAPS_API_KEY` responde `503` (no se inventan lugares).
+`GET /api/lugares` ("Cerca de ti") todavía lee la tabla de MySQL.
 
 ## Pruebas
 
@@ -37,7 +38,15 @@ pytest
 ```
 
 Usan el esquema `kompas_test` (se recrea en cada corrida; nunca tocan `kompas`).
-`tests/test_motor.py` prueba el sistema experto sin API ni BD.
+`tests/test_ia.py` prueba el sistema experto de Einar sin API, BD ni Google (casos de INTEGRAR_IA.md §4).
+`tests/test_itinerarios.py` simula a Google Places; no gasta cuota ni necesita la llave.
+
+Motor de Einar por separado:
+
+```powershell
+python ..\DOCS\Brujula-Urbana\herramientas\sistema_experto_demo.py --verificar   # 36 comprobaciones; 20/20 reglas
+python -m app.ia.hechos --ejemplo                                                   # usa ejemplos/entrada_hechos.json
+```
 
 ## Estructura
 
@@ -46,15 +55,25 @@ Usan el esquema `kompas_test` (se recrea en cada corrida; nunca tocan `kompas`).
 | `app/routers/` | Endpoints: cuenta (auth + residencia), catálogos, lugares, rutas, itinerarios + planes, historial |
 | `app/esquemas/` | Modelos Pydantic de entrada y salida (lo que ve `/docs`) |
 | `app/modelos.py` | Las 8 tablas de MySQL (SQLAlchemy) |
-| `app/servicios/` | Distancias y zona piloto, tramos a pie/taxi, conversión a la forma de la app |
-| `app/ia/` | **Sistema experto (Einar)**: `hechos.py`, `reglas.py` (encadenamiento hacia adelante), `motor.py` — versión TEMPORAL |
+| `app/servicios/` | Google Places (`google_places.py`), distancias y zona piloto, tramos a pie/taxi, conversión a la forma de la app |
+| `app/ia/` | **Sistema experto**: `motor.py` y `hechos.py` (Einar), `planificador.py` y `servicio.py` (conexión con la API) |
 | `database/` | Dump de Sebas (no se modifica) y `datos_desarrollo.sql` |
 | `scripts/` | `preparar_bd.py` y `generar_datos_desarrollo.py` |
 
-## Para Einar
+## Sistema experto (INTEGRAR_IA.md)
 
-El router solo llama a `app.ia.motor.recomendar(solicitud, lugares)`: recibe diccionarios
-(forma en `app/servicios/serializar.py` → `lugar()`) y regresa
-`{datos_suficientes, mensaje, aviso, planes, descartados}`.
-Las reglas están en `app/ia/reglas.py` como `Regla(id, si, entonces, motivo)`; reemplázalas conservando
-esa firma y corre `pytest tests/test_motor.py`.
+```
+POST /api/itinerarios → google_places.buscar_para_plan()      lugares con horario y priceRange
+                      → servicio.recomendar()
+                          ├─ planificador.armar_candidatos()  hasta 3: equilibrado, rápido, cercano
+                          ├─ hechos.construir_hechos()        Einar: proposiciones true/false/null
+                          └─ motor.evaluar()                  Einar: R01–R20 → estado, puntuación, traza
+```
+
+- `app/ia/motor.py` tiene el código de Einar **sin cambios** (`evaluar`, `validar_base`…) y `cargar_base()`,
+  que lee `DOCS/Brujula-Urbana/docs/sistema-experto/reglas.json`. La demo de Einar lo importa de aquí:
+  la demo y la API corren el mismo código.
+- `hechos.py`, `reglas.json` y la lógica de `evaluar()` **no se modifican** desde el backend.
+- `recomendable` → `planes` (ordenados por puntuación; el mayor es `mejor_opcion`). `descartado`,
+  `pendiente_verificacion` y `requiere_correccion` → `descartados`, con sus reglas y `datos_faltantes`.
+- `priceLevel` de Google no se convierte a pesos; sin `priceRange` el plan queda pendiente de verificación.

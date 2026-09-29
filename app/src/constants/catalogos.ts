@@ -53,6 +53,15 @@ export const TIPOS_PLAN = {
   equilibrado: 'Plan equilibrado',
   rapido: 'Plan rápido',
   economico: 'Plan económico',
+  cercano: 'Plan cercano',
+} as const;
+
+/** Estado que da el sistema experto de Einar a cada itinerario candidato. */
+export const ESTADOS_PLAN = {
+  recomendable: 'Recomendable',
+  pendiente_verificacion: 'Pendiente de verificar',
+  descartado: 'Descartado',
+  requiere_correccion: 'Requiere corrección',
 } as const;
 
 export const TIPOS_REPORTE: { valor: TipoReporte; texto: string }[] = [

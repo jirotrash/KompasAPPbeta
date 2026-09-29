@@ -23,6 +23,16 @@ function Dato({ icono, texto, extra }: { icono: NombreIcono; texto: string; extr
 
 type Props = { plan: Plan; onPress: () => void };
 
+const pesos = (n: number) => `$${Math.round(n).toLocaleString('es-MX')}`;
+
+/** Costo exacto si lo hay; si no, el rango estimado de Google; si tampoco, "sin dato" (no se inventa). */
+function textoCosto(plan: Plan) {
+  if (plan.costo != null) return `${pesos(plan.costo)} MXN`;
+  const r = plan.rango_costo;
+  if (r?.max != null) return r.min != null && r.min !== r.max ? `${pesos(r.min)}–${pesos(r.max)} MXN` : `${pesos(r.max)} MXN`;
+  return 'Costo: sin dato';
+}
+
 /** Tarjeta de "Tus planes": costo, duración, km, paradas, "Mejor opción" y explicación. */
 export default function TarjetaPlan({ plan, onPress }: Props) {
   const modos = [...new Set((plan.tramos ?? []).map((t) => t.modo))].map((m) => MODOS[m].icono);
@@ -53,7 +63,7 @@ export default function TarjetaPlan({ plan, onPress }: Props) {
         </XStack>
 
         <XStack flexWrap="wrap">
-          <Dato icono="dinero" texto={plan.costo == null ? 'Costo: sin dato' : `$${plan.costo.toLocaleString('es-MX')} MXN`} />
+          <Dato icono="dinero" texto={textoCosto(plan)} />
           <Dato icono="reloj" texto={`${horas} hrs`} />
           <Dato icono="mapa" texto={`${plan.distancia_km.toFixed(1)} km`} />
           <Dato

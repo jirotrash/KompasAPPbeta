@@ -6,11 +6,12 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.esquemas.itinerarios import PeticionPlan, PlanGuardado, RespuestaPlanes
-from app.ia.motor import recomendar
+from app.ia.servicio import recomendar
 from app.modelos import Categoria, Plan, Transporte, Usuario
 from app.seguridad import get_usuario_actual
-from app.servicios import consultas
+from app.servicios import consultas, google_places
 from app.servicios.geo import ZONA, ahora_mexico, esta_dentro_de_zona
+from app.servicios.traslados import radio_km
 
 router = APIRouter(prefix="/api", tags=["Itinerarios (sistema experto)"])
 
@@ -20,10 +21,12 @@ ACOMPANANTES = {"solo": 0, "pareja": 1, "amigos": 3, "familia": 3}
 
 @router.post("/itinerarios", response_model=RespuestaPlanes)
 def crear_itinerarios(peticion: PeticionPlan, db: Session = Depends(get_db), usuario: Usuario = Depends(get_usuario_actual)):
-    """Botón **Crear mi plan** 🔒: carga los lugares, llama al sistema experto (`app.ia.motor.recomendar`),
-    guarda el plan en `planes` y regresa hasta 2 planes (equilibrado y rápido) con explicación, más los
-    lugares descartados con la regla que los descartó. Sin datos suficientes: `planes = []` y `aviso`."""
-    if not esta_dentro_de_zona(peticion.origen.model_dump()):
+    """Botón **Crear mi plan** 🔒: busca lugares en Google Places, arma hasta 3 itinerarios y los evalúa con
+    el sistema experto de Einar (`app.ia.servicio.recomendar` → `hechos.py` + `evaluar()`). Guarda el plan en
+    `planes` y regresa los `recomendable` en `planes` (el de mayor puntuación es `mejor_opcion`) y el resto en
+    `descartados` con su estado, reglas y datos faltantes. Si Google no responde: `503` (no se inventan lugares)."""
+    origen = peticion.origen.model_dump()
+    if not esta_dentro_de_zona(origen):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT, f"El punto de partida está fuera de la zona piloto ({ZONA['nombre']})."
         )
@@ -37,13 +40,11 @@ def crear_itinerarios(peticion: PeticionPlan, db: Session = Depends(get_db), usu
             "Faltan categorías o transportes en la base de datos. Carga database/datos_desarrollo.sql.",
         )
 
-    solicitud = peticion.model_dump()
-    lugares = consultas.lugares_como_dicts(db)
-    if lugares:
-        respuesta = recomendar(solicitud, lugares)
-    else:
-        aviso = "No tenemos información suficiente: aún no hay lugares registrados en la zona."
-        respuesta = {"datos_suficientes": False, "mensaje": aviso, "aviso": aviso, "planes": [], "descartados": []}
+    try:
+        lugares = google_places.buscar_para_plan(origen, peticion.intereses, radio_km(peticion.movilidad))
+    except google_places.ErrorGooglePlaces as error:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(error)) from error
+    respuesta = recomendar(peticion.model_dump(), lugares, ahora_mexico())
 
     hora, minuto = (int(x) for x in peticion.hora_salida.split(":"))
     db.add(

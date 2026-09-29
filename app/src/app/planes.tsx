@@ -9,6 +9,7 @@ import Icono from '@/components/Icono';
 import Pantalla from '@/components/Pantalla';
 import TarjetaPlan from '@/components/TarjetaPlan';
 import { Subtitulo, Tarjeta, Texto, Titulo } from '@/components/ui';
+import { ESTADOS_PLAN } from '@/constants/catalogos';
 import { useTema } from '@/context/Tema';
 import { useUbicacion } from '@/context/Ubicacion';
 import { useViaje } from '@/context/Viaje';
@@ -47,7 +48,7 @@ export default function Planes() {
       <Subtitulo mt={4}>Hemos trazado las mejores opciones para ti hoy</Subtitulo>
 
       <YStack mt={24} gap={16}>
-        {respuesta.datos_suficientes === false && <AvisoSinInformacion mensaje={respuesta.mensaje} />}
+        {respuesta.datos_suficientes === false && <AvisoSinInformacion mensaje={respuesta.mensaje ?? undefined} />}
 
         <XStack flexWrap="wrap" justify="space-between" rowGap={16}>
           {respuesta.planes.map((plan) => (
@@ -60,6 +61,11 @@ export default function Planes() {
         {respuesta.planes.length > 0 && (
           <Texto tam="xs" suave>
             Toca un plan para ver el recorrido en el mapa. Costos y horas son estimados; el costo no incluye transporte.
+          </Texto>
+        )}
+        {respuesta.aviso && respuesta.datos_suficientes !== false && (
+          <Texto tam="xs" color="$aviso">
+            ⚠ {respuesta.aviso}
           </Texto>
         )}
 
@@ -75,17 +81,27 @@ export default function Planes() {
               cursor="pointer"
             >
               <Texto tam="lg" peso="fuerte">
-                Lugares descartados ({descartados.length})
+                No recomendados ({descartados.length})
               </Texto>
               <YStack style={{ transform: [{ rotate: verDescartados ? '90deg' : '0deg' }] }}>
                 <Icono nombre="derecha" color={paleta.textoSuave} tamano={20} />
               </YStack>
             </XStack>
             {verDescartados &&
-              descartados.map(({ lugar, reglas }) => (
-                <Tarjeta key={lugar._id} p={12} gap={8}>
-                  <Texto peso="semi">{lugar.nombre}</Texto>
-                  <ExplicacionReglas reglas={reglas} titulo="Por qué se descartó" tono="peligro" />
+              descartados.map((d, i) => (
+                <Tarjeta key={`${d.tipo ?? d.lugar?._id}-${i}`} p={12} gap={8}>
+                  <Texto peso="semi">{d.nombre ?? d.lugar?.nombre}</Texto>
+                  {d.estado && (
+                    <Texto tam="xs" peso="semi" color={d.estado === 'pendiente_verificacion' ? '$aviso' : '$peligro'}>
+                      {ESTADOS_PLAN[d.estado]}
+                    </Texto>
+                  )}
+                  {d.datos_faltantes?.slice(0, 3).map((f) => (
+                    <Texto key={f} tam="xs" suave>
+                      • {f}
+                    </Texto>
+                  ))}
+                  <ExplicacionReglas reglas={d.reglas} titulo="Reglas que se aplicaron" tono="peligro" />
                 </Tarjeta>
               ))}
           </YStack>

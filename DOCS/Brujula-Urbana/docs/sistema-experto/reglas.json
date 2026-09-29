@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0",
+  "pesos_preferencias": {
+    "priorizar_contexto": 2,
+    "priorizar_intereses": 2,
+    "priorizar_caminata": 1,
+    "priorizar_transbordos": 1
+  },
+  "reglas": [
+    {"id": "R01", "si": {"datos_usuario_validos": false}, "entonces": ["requiere_correccion"], "explicacion": "La solicitud contiene datos inválidos; se necesita una corrección."},
+    {"id": "R02", "si": {"modo_disponible": false}, "entonces": ["descartar"], "explicacion": "El modo solicitado no está habilitado para esta búsqueda."},
+    {"id": "R03", "si": {"ruta_calculada": false}, "entonces": ["descartar"], "explicacion": "Se confirmó que no hay una ruta utilizable para este candidato."},
+    {"id": "R04", "si": {"abierto": false}, "entonces": ["descartar"], "explicacion": "Al menos una visita queda fuera del horario de apertura."},
+    {"id": "R05", "si": {"dentro_presupuesto": false}, "entonces": ["descartar"], "explicacion": "El costo considerado excede el presupuesto declarado."},
+    {"id": "R06", "si": {"cabe_en_tiempo": false}, "entonces": ["descartar"], "explicacion": "La duración del itinerario excede el tiempo disponible."},
+    {"id": "R07", "si": {"cierre_vigente": true}, "entonces": ["descartar"], "explicacion": "Un cierre confirmado afecta el itinerario a la hora prevista."},
+    {"id": "R08", "si": {"requiere_accesibilidad": true, "accesibilidad_verificada": false}, "entonces": ["descartar"], "explicacion": "El candidato incumple un requisito de accesibilidad solicitado."},
+    {"id": "R09", "si": {"datos_criticos_completos": false}, "entonces": ["pendiente_verificacion"], "explicacion": "Falta información crítica para evaluar este candidato."},
+    {"id": "R10", "si": {"datos_vigentes": false}, "entonces": ["pendiente_verificacion"], "explicacion": "Hay evidencia vencida que debe actualizarse."},
+    {"id": "R11", "si": {"requiere_accesibilidad": false}, "entonces": ["accesibilidad_resuelta"], "explicacion": "La solicitud no exige comprobar accesibilidad."},
+    {"id": "R12", "si": {"requiere_accesibilidad": true, "accesibilidad_verificada": true}, "entonces": ["accesibilidad_resuelta"], "explicacion": "Los requisitos de accesibilidad solicitados están verificados."},
+    {"id": "R13", "si": {"control_cierres_habilitado": false}, "entonces": ["cierres_resueltos", "advertir_sin_cobertura_cierres"], "explicacion": "Esta versión no verifica cierres mediante una fuente integrada; la opción requiere esa advertencia."},
+    {"id": "R14", "si": {"control_cierres_habilitado": true, "cierre_vigente": false}, "entonces": ["cierres_resueltos"], "explicacion": "La fuente habilitada no identifica un cierre que afecte el itinerario dentro de su cobertura."},
+    {"id": "R15", "si": {"datos_usuario_validos": true, "modo_disponible": true, "ruta_calculada": true, "abierto": true, "dentro_presupuesto": true, "cabe_en_tiempo": true}, "entonces": ["viabilidad_base"], "explicacion": "El candidato cumple las restricciones básicas de la solicitud."},
+    {"id": "R16", "si": {"viabilidad_base": true, "datos_criticos_completos": true, "datos_vigentes": true, "accesibilidad_resuelta": true, "cierres_resueltos": true}, "entonces": ["recomendable"], "explicacion": "El candidato satisface las condiciones de recomendación del modelo."},
+    {"id": "R17", "si": {"recomendable": true, "contexto_compatible": true}, "entonces": ["priorizar_contexto"], "explicacion": "El candidato coincide con el contexto elegido."},
+    {"id": "R18", "si": {"recomendable": true, "intereses_compatibles": true}, "entonces": ["priorizar_intereses"], "explicacion": "El candidato coincide con al menos un interés elegido."},
+    {"id": "R19", "si": {"recomendable": true, "poca_caminata": true}, "entonces": ["priorizar_caminata"], "explicacion": "La caminata se ajusta a la preferencia declarada."},
+    {"id": "R20", "si": {"recomendable": true, "pocos_transbordos": true}, "entonces": ["priorizar_transbordos"], "explicacion": "Los transbordos se ajustan a la preferencia declarada."}
+  ]
+}

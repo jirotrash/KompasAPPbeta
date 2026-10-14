@@ -8,11 +8,13 @@
 
 import type { Coordenada } from '@/constants/zona';
 import type {
+  ComparacionDistancias,
   Lugar,
   NuevoReporte,
   NuevoUsuario,
   ParadaDFS,
   PeticionPlan,
+  PuntoPlano,
   RespuestaDFS,
   RespuestaPlanes,
   RespuestaRutas,
@@ -109,6 +111,14 @@ export const buscarRutasDfs = (origen: string, destino: string, limiteProfundida
   solicitud<RespuestaDFS>('/api/dfs/buscar', {
     params: { origen, destino, limite_profundidad: String(limiteProfundidad) },
   });
+
+// ──────────────── Laboratorio de métricas de distancia ────────────────
+
+/** GET /api/distancias/plano?a=x,y&b=x,y → Euclidiana vs. Manhattan entre dos puntos del plano */
+export const compararDistancias = (a: PuntoPlano, b: PuntoPlano) =>
+  USA_MOCK
+    ? mock.compararDistancias(a, b)
+    : solicitud<ComparacionDistancias>('/api/distancias/plano', { params: { a: `${a.x},${a.y}`, b: `${b.x},${b.y}` } });
 
 // ────────────────────────────── Lugares (MongoDB) ─────────────────────────────
 

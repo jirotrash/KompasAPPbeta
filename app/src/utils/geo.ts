@@ -15,6 +15,25 @@ export function distanciaKm(a: Coordenada, b: Coordenada) {
   return 2 * 6371 * Math.asin(Math.sqrt(h));
 }
 
+// ─── Métricas de distancia (las mismas que backend/app/ia/metricas_distancia.py) ───
+
+type Punto = { x: number; y: number };
+
+/** Línea recta: √((x2 - x1)² + (y2 - y1)²) */
+export const distanciaEuclidiana = (a: Punto, b: Punto) => Math.hypot(b.x - a.x, b.y - a.y);
+
+/** Por cuadras: |x2 - x1| + |y2 - y1| */
+export const distanciaManhattan = (a: Punto, b: Punto) => Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+
+/** Proyecta lat/lng a un plano local en km (x = este, y = norte) con origen en `ref`. */
+const aPlanoKm = (p: Coordenada, ref: Coordenada): Punto => ({
+  x: (p.lng - ref.lng) * 111.32 * Math.cos((ref.lat * Math.PI) / 180),
+  y: (p.lat - ref.lat) * 110.574,
+});
+
+/** Distancia por calles estimada con la métrica Manhattan (igual que la API). */
+export const distanciaPorCallesKm = (a: Coordenada, b: Coordenada) => distanciaManhattan(aPlanoKm(a, a), aPlanoKm(b, a));
+
 /** La distancia por calles suele ser ~30 % mayor que la línea recta. */
 export const FACTOR_CALLES = 1.3;
 export const VELOCIDAD_KMH = { pie: 4.8, autobus: 18, auto: 25 };

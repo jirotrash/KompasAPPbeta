@@ -4,6 +4,7 @@ import { ActivityIndicator, TextInput } from 'react-native';
 import { XStack, YStack } from 'tamagui';
 
 import { AvisoSinInformacion, Cargando, EtiquetaEjemplo, MensajeError } from '@/components/Avisos';
+import { BotonSecundario } from '@/components/Botones';
 import ExplicacionReglas from '@/components/ExplicacionReglas';
 import Icono from '@/components/Icono';
 import Pantalla from '@/components/Pantalla';
@@ -308,6 +309,13 @@ export default function Buscar() {
             </Texto>
           </>
         )}
+
+        <YStack mt={8} gap={8}>
+          <Texto tam="sm" suave>
+            Para revisar cómo explora el algoritmo todos los caminos de una red académica, abre la demostración DFS.
+          </Texto>
+          <BotonSecundario texto="Ver demostración DFS" icono="ruta" onPress={() => router.push('/dfs')} />
+        </YStack>
       </YStack>
     </Pantalla>
   );

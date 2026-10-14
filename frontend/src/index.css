@@ -1,56 +1,62 @@
 @import "tailwindcss";
 
 /*
-  Identidad visual PROVISIONAL.
-  Valentín: cambia aquí colores y tipografía; toda la app usa estos tokens
-  (bg-primario, text-acento, border-borde, etc.).
-  Tema claro aquí; tema oscuro en :root[data-tema="oscuro"] más abajo.
+  Documentacion de cambios de colorimetria:
+  Se agregaron los colores oficiales del logotipo de Kompas como tokens de diseno para Tailwind v4.
+  Se definio el bloque @theme static para modo claro y el selector :root[data-tema="oscuro"] para modo oscuro.
+  Se asignaron variables semanticas para primario, acento, fondo, superficies, textos y estados.
 */
 @theme static {
-  --color-primario: #0f766e;
-  --color-primario-oscuro: #115e59;
-  --color-primario-claro: #ccfbf1;
-  --color-acento: #f59e0b;
-  --color-fondo: #f8fafc;
-  --color-superficie: #ffffff;
-  --color-texto: #0f172a;
-  --color-texto-suave: #475569;
-  --color-borde: #e2e8f0;
-  --color-ok: #15803d;
-  --color-aviso: #b45309;
-  --color-peligro: #b91c1c;
-  --color-sobre-primario: #ffffff;
-  --color-sobre-acento: #451a03;
-  --color-ok-fondo: #f0fdf4;
-  --color-aviso-fondo: #fef3c7;
-  --color-peligro-fondo: #fef2f2;
-  --color-ruta: #1a73e8;
-  --color-ruta-borde: #0b57d0;
+  --color-primario: #1A62A5;
+  --color-primario-oscuro: #134B80;
+  --color-primario-claro: #E8F0F8;
+  --color-acento: #D7000C;
+  --color-coral: #F5364A;
+  --color-fondo: #F7F8FA;
+  --color-superficie: #FFFFFF;
+  --color-superficie-elevada: #FFFFFF;
+  --color-texto: #1B1F27;
+  --color-texto-suave: #5B6472;
+  --color-borde: #E2E6EC;
+  --color-ok: #198754;
+  --color-aviso: #DFAB36;
+  --color-peligro: #D7000C;
+  --color-detalle: #C43D69;
+  --color-sobre-primario: #FFFFFF;
+  --color-sobre-acento: #FFFFFF;
+  --color-ok-fondo: #EAF7EE;
+  --color-aviso-fondo: #FDF6E7;
+  --color-peligro-fondo: #FEECEB;
+  --color-ruta: #1A62A5;
+  --color-ruta-borde: #134B80;
 
   --font-sans: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Tema oscuro: data-tema lo pone src/utils/tema.js (y el script de index.html antes de pintar) */
 :root[data-tema="oscuro"] {
-  --color-primario: #2dd4bf;
-  --color-primario-oscuro: #5eead4;
-  --color-primario-claro: #134e4a;
-  --color-acento: #fbbf24;
-  --color-fondo: #0b1120;
-  --color-superficie: #151e2e;
-  --color-texto: #e2e8f0;
-  --color-texto-suave: #94a3b8;
-  --color-borde: #273449;
-  --color-ok: #4ade80;
-  --color-aviso: #fbbf24;
-  --color-peligro: #f87171;
-  --color-sobre-primario: #042f2e;
-  --color-sobre-acento: #451a03;
-  --color-ok-fondo: #0f2a1d;
-  --color-aviso-fondo: #2d2106;
-  --color-peligro-fondo: #2f1316;
-  --color-ruta: #8ab4f8;
-  --color-ruta-borde: #1a4fa0;
+  --color-primario: #5BA3E6;
+  --color-primario-oscuro: #7AB8EE;
+  --color-primario-claro: #1A283D;
+  --color-acento: #FF6B6B;
+  --color-coral: #FF6B6B;
+  --color-fondo: #0E1420;
+  --color-superficie: #172030;
+  --color-superficie-elevada: #1F2A3D;
+  --color-texto: #E8ECF3;
+  --color-texto-suave: #A3ADBD;
+  --color-borde: #2B3750;
+  --color-ok: #3DBE82;
+  --color-aviso: #F2C14E;
+  --color-peligro: #FF6B6B;
+  --color-detalle: #E56B93;
+  --color-sobre-primario: #0E1420;
+  --color-sobre-acento: #0E1420;
+  --color-ok-fondo: #132B1F;
+  --color-aviso-fondo: #2E2510;
+  --color-peligro-fondo: #381618;
+  --color-ruta: #5BA3E6;
+  --color-ruta-borde: #7AB8EE;
   color-scheme: dark;
 }
 

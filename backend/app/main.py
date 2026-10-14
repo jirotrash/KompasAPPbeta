@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.db import bd_disponible
-from app.routers import auth, catalogos, historial, itinerarios, lugares, rutas
+from app.routers import auth, catalogos, dfs, historial, itinerarios, lugares, rutas
 
 app = FastAPI(
     title="Kompás API",
@@ -45,5 +45,14 @@ def salud() -> dict:
     return {"ok": True, "bd": bd_disponible()}
 
 
-for router in (auth.router, auth.router_residencia, catalogos.router, lugares.router, rutas.router, itinerarios.router, historial.router):
+for router in (
+    auth.router,
+    auth.router_residencia,
+    catalogos.router,
+    lugares.router,
+    rutas.router,
+    itinerarios.router,
+    historial.router,
+    dfs.router,
+):
     app.include_router(router)

@@ -11,7 +11,9 @@ import type {
   Lugar,
   NuevoReporte,
   NuevoUsuario,
+  ParadaDFS,
   PeticionPlan,
+  RespuestaDFS,
   RespuestaPlanes,
   RespuestaRutas,
   Sesion,
@@ -94,6 +96,19 @@ export const buscarRutas = (c: { origen: Coordenada; destino: Coordenada; hora: 
   USA_MOCK
     ? mock.buscarRutas(c)
     : solicitud<RespuestaRutas>('/api/rutas', { params: { origen: punto(c.origen), destino: punto(c.destino), hora: c.hora } });
+
+// ───────────────── Demostración académica DFS ─────────────────
+
+/**
+ * Estos endpoints se consultan siempre en el backend: el modo mock no contiene
+ * la red DFS. Requiere EXPO_PUBLIC_API_URL apuntando al servidor local.
+ */
+export const listarParadasDfs = () => solicitud<ParadaDFS[]>('/api/dfs/paradas');
+
+export const buscarRutasDfs = (origen: string, destino: string, limiteProfundidad: number) =>
+  solicitud<RespuestaDFS>('/api/dfs/buscar', {
+    params: { origen, destino, limite_profundidad: String(limiteProfundidad) },
+  });
 
 // ────────────────────────────── Lugares (MongoDB) ─────────────────────────────
 

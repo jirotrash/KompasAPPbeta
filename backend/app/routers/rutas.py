@@ -7,9 +7,8 @@ from app.routers._parametros import punto_de_consulta
 from app.servicios import consultas, serializar
 from app.servicios.geo import (
     ESPERA_TAXI_MIN,
-    FACTOR_CALLES,
     VELOCIDAD_AUTO_KMH,
-    distancia_km,
+    distancia_por_calles_km,
     esta_dentro_de_zona,
     minutos_caminando,
     redondear,
@@ -48,7 +47,7 @@ def rutas(
             "alternativas": [],
         }
 
-    km = round(distancia_km(a, b) * FACTOR_CALLES, 2)
+    km = round(distancia_por_calles_km(a, b), 2)
     pie = {
         "id": "pie",
         "modo": "pie",

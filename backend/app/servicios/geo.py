@@ -1,12 +1,14 @@
 """Distancias, horas y zona piloto (misma zona que la app: src/constants/zona.ts).
 
 Coordenadas: dict {"lat": .., "lng": ..}. Geometrías GeoJSON: [lng, lat].
-Todos los tiempos son ESTIMACIONES calculadas por distancia.
+Todos los tiempos son ESTIMACIONES calculadas por distancia (por calles = métrica Manhattan).
 """
 
 import math
 from datetime import datetime, timedelta, timezone
 from typing import TypedDict
+
+from app.ia.metricas_distancia import distancia_euclidiana, distancia_manhattan
 
 
 class Coordenada(TypedDict):
@@ -18,8 +20,11 @@ class Coordenada(TypedDict):
 HORA_MEXICO = timezone(timedelta(hours=-6), "America/Mexico_City")
 
 MIN_POR_KM_A_PIE = 12  # BACKEND.md §6: ≈ 12 min por km
-FACTOR_CALLES = 1.3  # la distancia por calles suele ser ~30 % mayor que la línea recta
 VELOCIDAD_AUTO_KMH = 25
+
+# Kilómetros por grado (aproximación local; suficiente para la zona piloto)
+KM_POR_GRADO_LAT = 110.574
+KM_POR_GRADO_LNG_ECUADOR = 111.320
 ESPERA_TAXI_MIN = 5
 
 # Zona piloto PROVISIONAL (rectángulo aproximado); Sebas define los límites definitivos
@@ -41,6 +46,35 @@ def distancia_km(a: Coordenada, b: Coordenada) -> float:
     d_lng = rad(b["lng"] - a["lng"])
     h = math.sin(d_lat / 2) ** 2 + math.cos(rad(a["lat"])) * math.cos(rad(b["lat"])) * math.sin(d_lng / 2) ** 2
     return 2 * 6371 * math.asin(math.sqrt(h))
+
+
+def a_plano_km(p: Coordenada, referencia: Coordenada) -> tuple[float, float]:
+    """Proyecta lat/lng a un plano local en km (x = este, y = norte) con origen en `referencia`."""
+    km_por_grado_lng = KM_POR_GRADO_LNG_ECUADOR * math.cos(math.radians(referencia["lat"]))
+    return (
+        (p["lng"] - referencia["lng"]) * km_por_grado_lng,
+        (p["lat"] - referencia["lat"]) * KM_POR_GRADO_LAT,
+    )
+
+
+def distancia_euclidiana_km(a: Coordenada, b: Coordenada) -> float:
+    """Línea recta sobre el plano local (en la zona piloto coincide con haversine)."""
+    return distancia_euclidiana(a_plano_km(a, a), a_plano_km(b, a))
+
+
+def distancia_manhattan_km(a: Coordenada, b: Coordenada) -> float:
+    """Recorrido por cuadras (este-oeste + norte-sur) sobre el plano local."""
+    return distancia_manhattan(a_plano_km(a, a), a_plano_km(b, a))
+
+
+def distancia_por_calles_km(a: Coordenada, b: Coordenada) -> float:
+    """Estimación de la distancia por calles: métrica Manhattan.
+
+    Antes se usaba "línea recta × 1.3". En promedio Manhattan mide 4/π ≈ 1.27 veces la línea
+    recta, pero ahora depende de la dirección: igual a la recta si el trayecto va derecho
+    por una calle y hasta 1.41 veces si va en diagonal a la cuadrícula.
+    """
+    return distancia_manhattan_km(a, b)
 
 
 def minutos_caminando(km: float) -> int:

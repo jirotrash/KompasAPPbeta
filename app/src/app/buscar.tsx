@@ -312,9 +312,10 @@ export default function Buscar() {
 
         <YStack mt={8} gap={8}>
           <Texto tam="sm" suave>
-            Para revisar cómo explora el algoritmo todos los caminos de una red académica, abre la demostración DFS.
+            Laboratorios académicos: cómo explora DFS todos los caminos de una red y cómo se mide la distancia por calles.
           </Texto>
           <BotonSecundario texto="Ver demostración DFS" icono="ruta" onPress={() => router.push('/dfs')} />
+          <BotonSecundario texto="Comparar distancias Euclidiana y Manhattan" icono="regla" onPress={() => router.push('/distancias')} />
         </YStack>
       </YStack>
     </Pantalla>

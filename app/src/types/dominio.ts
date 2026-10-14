@@ -109,6 +109,23 @@ export type RespuestaDFS = {
   rutas: RutaDFS[];
 };
 
+// ───────────── Laboratorio de métricas de distancia ─────────────
+
+export type PuntoPlano = { x: number; y: number };
+
+export type ComparacionDistancias = {
+  a: PuntoPlano;
+  b: PuntoPlano;
+  esquina: PuntoPlano;
+  horizontal: number;
+  vertical: number;
+  euclidiana: number;
+  manhattan: number;
+  diferencia: number;
+  alineados: boolean;
+  pasos: { euclidiana: string; manhattan: string };
+};
+
 // ───────────── Planes (sistema experto) ─────────────
 
 export type PeticionPlan = {

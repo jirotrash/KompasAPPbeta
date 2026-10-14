@@ -4,7 +4,7 @@ No hay tramos en autobús: la base todavía no tiene líneas ni paradas (BACKEND
 Todos los tiempos son ESTIMACIONES por distancia.
 """
 
-from app.servicios.geo import FACTOR_CALLES, Coordenada, distancia_km, minutos_caminando, minutos_en_auto
+from app.servicios.geo import Coordenada, distancia_por_calles_km, minutos_caminando, minutos_en_auto
 
 DISTANCIA_CORTA_KM = 1.5
 RADIO_A_PIE_KM = 2  # BACKEND.md §7: caminando ≈ 2 km
@@ -29,7 +29,7 @@ def radio_km(movilidad: list[str]) -> float:
 
 def tramo(a: Coordenada, b: Coordenada, movilidad: list[str], desde: str = "", hasta: str = "") -> dict:
     """A pie si es cerca (o si no eligió taxi); en taxi/app si lo eligió y no es cerca."""
-    km = distancia_km(a, b) * FACTOR_CALLES
+    km = distancia_por_calles_km(a, b)
     a_pie = not permite_taxi(movilidad) or (permite_pie(movilidad) and km <= DISTANCIA_CORTA_KM)
     if a_pie:
         minutos = minutos_caminando(km)

@@ -1,7 +1,7 @@
 // SIMULACIÓN de traslados con las rutas de ejemplo (lo real lo calcula la API con las rutas de MongoDB).
 import type { Coordenada } from '@/constants/zona';
 import type { Alternativa, Movilidad, Tramo } from '@/types/dominio';
-import { aMinutosDelDia, desdeGeoJSON, distanciaKm, FACTOR_CALLES, VELOCIDAD_KMH } from '@/utils/geo';
+import { aMinutosDelDia, desdeGeoJSON, distanciaKm, distanciaPorCallesKm, FACTOR_CALLES, VELOCIDAD_KMH } from '@/utils/geo';
 
 import { RUTAS } from './datos';
 import { reportesVigentes } from './reportes';
@@ -87,7 +87,7 @@ export function elegirTramo(a: Coordenada, b: Coordenada, movilidad: Movilidad[]
     bus: combinado || movilidad.includes('transporte_publico'),
     auto: combinado || movilidad.includes('taxi_app'),
   };
-  const km = distanciaKm(a, b) * FACTOR_CALLES;
+  const km = distanciaPorCallesKm(a, b);
   const aPie = (aviso?: string): Tramo => ({
     modo: 'pie',
     duracion_min: Math.max(1, Math.round((km / VELOCIDAD_KMH.pie) * 60)),

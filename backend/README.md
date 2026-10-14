@@ -56,9 +56,9 @@ python -m app.ia.hechos --ejemplo                                               
 | `app/esquemas/` | Modelos Pydantic de entrada y salida (lo que ve `/docs`) |
 | `app/modelos.py` | Las 8 tablas de MySQL (SQLAlchemy) |
 | `app/servicios/` | Google Places (`google_places.py`), distancias y zona piloto, tramos a pie/taxi, conversión a la forma de la app |
-| `app/ia/` | **Sistema experto**: `motor.py` y `hechos.py` (Einar), `planificador.py` y `servicio.py` (conexión con la API) |
+| `app/ia/` | **Sistema experto**: `motor.py` y `hechos.py` (Einar), `planificador.py` y `servicio.py` (conexión con la API); `busqueda_dfs.py` y `metricas_distancia.py` (laboratorios académicos) |
 | `database/` | Dump de Sebas (no se modifica) y `datos_desarrollo.sql` |
-| `scripts/` | `preparar_bd.py` y `generar_datos_desarrollo.py` |
+| `scripts/` | `preparar_bd.py`, `generar_datos_desarrollo.py` y `distancias_clic.py` (gráfica de escritorio) |
 
 ## Sistema experto (INTEGRAR_IA.md)
 
@@ -77,3 +77,16 @@ POST /api/itinerarios → google_places.buscar_para_plan()      lugares con hora
 - `recomendable` → `planes` (ordenados por puntuación; el mayor es `mejor_opcion`). `descartado`,
   `pendiente_verificacion` y `requiere_correccion` → `descartados`, con sus reglas y `datos_faltantes`.
 - `priceLevel` de Google no se convierte a pesos; sin `priceRange` el plan queda pendiente de verificación.
+
+## Métricas de distancia: Euclidiana y Manhattan
+
+`app/ia/metricas_distancia.py` tiene las dos fórmulas y las usan tres partes del proyecto:
+
+- **Cálculo real**: `servicios/geo.py` → `distancia_por_calles_km()` estima la distancia por calles con
+  **Manhattan** sobre un plano local en km (antes era línea recta × 1.3). La usan `/api/rutas`, los tramos a
+  pie/taxi y el planificador de itinerarios. En promedio Manhattan mide ≈ 1.27 × la línea recta.
+- **API**: `GET /api/distancias/plano?a=1,2&b=5,5` compara ambas métricas en un plano cartesiano y regresa
+  el cálculo paso a paso; `GET /api/distancias/geo?origen=lat,lng&destino=lat,lng` hace lo mismo con coordenadas reales.
+- **App**: pantalla *Distancias* (botón en Buscar): se tocan los puntos A y B en el plano.
+- **Escritorio**: `python -m scripts.distancias_clic` abre la gráfica de matplotlib y se colocan los puntos con el mouse
+  (requiere `pip install matplotlib`; en WSL también `sudo apt install python3-tk`).

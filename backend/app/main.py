@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import get_settings
 from app.db import bd_disponible
-from app.routers import auth, catalogos, dfs, historial, itinerarios, lugares, rutas
+from app.routers import auth, catalogos, dfs, distancias, historial, itinerarios, lugares, rutas
 
 app = FastAPI(
     title="Kompás API",
@@ -54,5 +54,6 @@ for router in (
     itinerarios.router,
     historial.router,
     dfs.router,
+    distancias.router,
 ):
     app.include_router(router)

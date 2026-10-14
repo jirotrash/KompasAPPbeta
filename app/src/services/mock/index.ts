@@ -1,7 +1,7 @@
 // Implementación de ejemplo de cada endpoint (misma forma de respuesta que la API real).
 import { estaDentroDeZona, type Coordenada } from '@/constants/zona';
 import type { Alternativa, Lugar, NuevoReporte, NuevoUsuario, PeticionPlan, RespuestaRutas, Sesion } from '@/types/dominio';
-import { desdeGeoJSON, distanciaKm, FACTOR_CALLES, VELOCIDAD_KMH } from '@/utils/geo';
+import { desdeGeoJSON, distanciaKm, distanciaPorCallesKm, VELOCIDAD_KMH } from '@/utils/geo';
 
 import { trazarPorCalles } from '../mapas';
 import { LUGARES } from './datos';
@@ -56,7 +56,7 @@ export async function buscarRutas({ origen, destino, hora }: { origen: Coordenad
     trazarPorCalles(origen, destino, 'pie'),
     trazarPorCalles(origen, destino, 'auto'),
   ]);
-  const kmEstimados = distanciaKm(origen, destino) * FACTOR_CALLES;
+  const kmEstimados = distanciaPorCallesKm(origen, destino);
   const FUENTE_CALLES = 'OSRM · OpenStreetMap';
 
   const kmPie = callesPie?.distancia_km ?? kmEstimados;
@@ -123,3 +123,5 @@ export async function obtenerReportes(rutaId?: string) {
   const vigentes = reportesVigentes();
   return rutaId ? vigentes.filter((r) => r.ruta_id === rutaId) : vigentes;
 }
+
+export { compararDistancias } from './distancias';

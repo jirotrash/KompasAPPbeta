@@ -3,7 +3,7 @@
 Solo ORGANIZA datos con el formato que espera hechos.py (INTEGRAR_IA.md §3). No decide si un plan es
 recomendable: eso lo hacen construir_hechos() y evaluar() de Einar.
 
-- Distancias y minutos son ESTIMADOS por coordenadas (haversine × 1.3; a pie ≈ 12 min/km).
+- Distancias y minutos son ESTIMADOS por coordenadas (por calles con la métrica Manhattan; a pie ≈ 12 min/km).
 - No hay tramos en autobús: si el usuario solo eligió transporte público, el tramo va sin minutos
   (no se inventa el tiempo) y el motor lo deja pendiente de verificación.
 - Se prefieren lugares con priceRange y regularOpeningHours: sin ellos el candidato queda pendiente.
@@ -13,7 +13,7 @@ from collections.abc import Callable
 from datetime import datetime, timedelta
 
 from app.ia.hechos import CONTEXTOS_CATEGORIAS, ESTANCIAS_MINUTOS, visita_en_horario
-from app.servicios.geo import FACTOR_CALLES, distancia_km, minutos_caminando, minutos_en_auto
+from app.servicios.geo import distancia_km, distancia_por_calles_km, minutos_caminando, minutos_en_auto
 from app.servicios.traslados import DISTANCIA_CORTA_KM
 
 MIN_VISITAS = 2
@@ -30,7 +30,7 @@ def modos_permitidos(movilidad: list[str]) -> set[str]:
 
 def tramo(a: dict, b: dict, movilidad: list[str]) -> dict:
     """Tramo para hechos.py: {modo, km, minutos, estimado}. A pie si es cerca o si no eligió taxi."""
-    km = round(distancia_km(a, b) * FACTOR_CALLES, 2)
+    km = round(distancia_por_calles_km(a, b), 2)
     permitidos = modos_permitidos(movilidad)
     if "caminando" in permitidos and (km <= DISTANCIA_CORTA_KM or "taxi_app" not in permitidos):
         return {"modo": "caminando", "km": km, "minutos": minutos_caminando(km), "estimado": True}

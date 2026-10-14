@@ -71,6 +71,44 @@ export type Alternativa = {
 
 export type RespuestaRutas = { datos_suficientes: boolean; mensaje?: string; alternativas: Alternativa[] };
 
+// ───────────── Demostración académica DFS ─────────────
+
+export type ParadaDFS = { id: string; nombre: string; lat: number; lng: number };
+
+export type TramoDFS = { de: string; a: string; linea: string; modo: string; tiempo_min: number };
+
+export type RutaDFS = {
+  paradas: string[];
+  nodos_id: string[];
+  tiempo_total_minutos: number;
+  numero_transbordos: number;
+  tramos: TramoDFS[];
+};
+
+export type PasoDFS = {
+  paso: number;
+  tipo: 'visita' | 'avanza' | 'objetivo' | 'limite' | 'ciclo_evitado' | 'retroceso';
+  nodo: string;
+  hacia?: string | null;
+  profundidad: number;
+  camino: string[];
+  mensaje: string;
+};
+
+/** Respuesta del backend para la demostración; nunca representa una ruta operativa. */
+export type RespuestaDFS = {
+  exito: boolean;
+  fuente: string;
+  datos_verificados: boolean;
+  mensaje?: string | null;
+  aviso?: string | null;
+  orden_exploracion: string[];
+  traza: PasoDFS[];
+  total_nodos_explorados: number;
+  total_rutas_encontradas: number;
+  rutas: RutaDFS[];
+};
+
 // ───────────── Planes (sistema experto) ─────────────
 
 export type PeticionPlan = {

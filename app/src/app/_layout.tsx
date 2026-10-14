@@ -55,6 +55,7 @@ function Navegacion() {
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="planes" options={{ headerShown: true, title: '' }} />
               <Stack.Screen name="buscar" options={{ headerShown: true, title: '¿A dónde vas?' }} />
+              <Stack.Screen name="dfs" options={{ headerShown: true, title: 'Demostración DFS' }} />
               <Stack.Screen name="reportar" options={{ headerShown: true, title: 'Reportar' }} />
             </Stack.Protected>
             {/* Disponible con y sin sesión (se abre desde el registro y el perfil). Va al final: al cambiar la

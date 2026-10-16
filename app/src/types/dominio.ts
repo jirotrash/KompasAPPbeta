@@ -126,6 +126,24 @@ export type ComparacionDistancias = {
   pasos: { euclidiana: string; manhattan: string };
 };
 
+/** GET /api/distancias/geo: las mismas métricas con coordenadas reales (km). */
+export type ComparacionGeo = {
+  origen: { lat: number; lng: number };
+  destino: { lat: number; lng: number };
+  /** Vuelta del recorrido Manhattan: latitud del origen, longitud del destino. */
+  esquina: { lat: number; lng: number };
+  este_oeste_km: number;
+  norte_sur_km: number;
+  linea_recta_km: number;
+  euclidiana_km: number;
+  manhattan_km: number;
+  diferencia_km: number;
+  minutos_caminando_recta: number;
+  minutos_caminando_calles: number;
+  pasos: { euclidiana: string; manhattan: string };
+  nota: string;
+};
+
 // ───────────── Planes (sistema experto) ─────────────
 
 export type PeticionPlan = {

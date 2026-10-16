@@ -103,7 +103,11 @@ export const HTML_MAPA = `<!doctype html>
     d.lineas.forEach(function (l) {
       var puntos = l.coordenadas.map(function (p) { return [p.lat, p.lng]; });
       if (puntos.length < 2) return;
-      if (l.modo === 'pie') {
+      if (l.color) {
+        // Línea con color propio: borde blanco para que se vea sobre cualquier calle
+        L.polyline(puntos, { color: '#ffffff', weight: 9, opacity: .9, dashArray: l.punteada ? '10 10' : null }).addTo(dibujos);
+        L.polyline(puntos, { color: l.color, weight: 5, opacity: 1, dashArray: l.punteada ? '10 10' : null }).addTo(dibujos);
+      } else if (l.modo === 'pie') {
         L.polyline(puntos, { color: c.ruta, weight: 6, opacity: 1, dashArray: '1 11', lineCap: 'round' }).addTo(dibujos);
       } else {
         L.polyline(puntos, { color: '#ffffff', weight: 10, opacity: .9 }).addTo(dibujos);
@@ -128,7 +132,7 @@ export const HTML_MAPA = `<!doctype html>
 
     // Solo se vuelve a encuadrar cuando cambian los puntos (no al cambiar de tema).
     // Los reportes no cuentan para el encuadre, salvo que sean lo único en el mapa.
-    if (d.clave !== ultimaClave) {
+    if (d.encuadrar !== false && d.clave !== ultimaClave) {
       ultimaClave = d.clave;
       var todos = [];
       d.lineas.forEach(function (l) { l.coordenadas.forEach(function (p) { todos.push([p.lat, p.lng]); }); });

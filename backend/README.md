@@ -86,7 +86,9 @@ POST /api/itinerarios → google_places.buscar_para_plan()      lugares con hora
   **Manhattan** sobre un plano local en km (antes era línea recta × 1.3). La usan `/api/rutas`, los tramos a
   pie/taxi y el planificador de itinerarios. En promedio Manhattan mide ≈ 1.27 × la línea recta.
 - **API**: `GET /api/distancias/plano?a=1,2&b=5,5` compara ambas métricas en un plano cartesiano y regresa
-  el cálculo paso a paso; `GET /api/distancias/geo?origen=lat,lng&destino=lat,lng` hace lo mismo con coordenadas reales.
-- **App**: pantalla *Distancias* (botón en Buscar): se tocan los puntos A y B en el plano.
+  el cálculo paso a paso; `GET /api/distancias/geo?origen=lat,lng&destino=lat,lng` hace lo mismo con coordenadas reales
+  (km este-oeste + km norte-sur, la esquina del recorrido Manhattan y minutos caminando).
+- **App**: pantalla *Distancias* (botón en Buscar): se tocan los puntos A y B en el **mapa** y se dibujan la línea recta
+  (Euclidiana) y el recorrido por cuadras (Manhattan). Con `EXPO_PUBLIC_USE_MOCK=false` los km los calcula esta API.
 - **Escritorio**: `python -m scripts.distancias_clic` abre la gráfica de matplotlib y se colocan los puntos con el mouse
   (requiere `pip install matplotlib`; en WSL también `sudo apt install python3-tk`).

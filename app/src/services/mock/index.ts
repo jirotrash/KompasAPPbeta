@@ -124,4 +124,4 @@ export async function obtenerReportes(rutaId?: string) {
   return rutaId ? vigentes.filter((r) => r.ruta_id === rutaId) : vigentes;
 }
 
-export { compararDistancias } from './distancias';
+export { compararDistancias, compararDistanciasGeo } from './distancias';

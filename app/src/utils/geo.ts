@@ -31,6 +31,12 @@ const aPlanoKm = (p: Coordenada, ref: Coordenada): Punto => ({
   y: (p.lat - ref.lat) * 110.574,
 });
 
+/** Kilómetros este-oeste y norte-sur entre a y b (los dos tramos del recorrido Manhattan). */
+export function desgloseManhattanKm(a: Coordenada, b: Coordenada) {
+  const { x, y } = aPlanoKm(b, a);
+  return { esteOeste: Math.abs(x), norteSur: Math.abs(y) };
+}
+
 /** Distancia por calles estimada con la métrica Manhattan (igual que la API). */
 export const distanciaPorCallesKm = (a: Coordenada, b: Coordenada) => distanciaManhattan(aPlanoKm(a, a), aPlanoKm(b, a));
 

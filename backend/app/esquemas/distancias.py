@@ -26,10 +26,22 @@ class ComparacionPlano(BaseModel):
     pasos: PasosCalculo
 
 
+class PuntoGeo(BaseModel):
+    lat: float
+    lng: float
+
+
 class ComparacionGeo(BaseModel):
+    origen: PuntoGeo
+    destino: PuntoGeo
+    esquina: PuntoGeo
+    este_oeste_km: float
+    norte_sur_km: float
     linea_recta_km: float
     euclidiana_km: float
     manhattan_km: float
+    diferencia_km: float
     minutos_caminando_recta: int
     minutos_caminando_calles: int
+    pasos: PasosCalculo
     nota: str

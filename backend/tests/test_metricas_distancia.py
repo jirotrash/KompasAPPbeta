@@ -68,3 +68,7 @@ def test_endpoint_geo():
     datos = respuesta.json()
     assert datos["manhattan_km"] > datos["linea_recta_km"]
     assert datos["minutos_caminando_calles"] >= datos["minutos_caminando_recta"]
+    # Manhattan = tramo este-oeste + tramo norte-sur; la esquina comparte latitud con el origen
+    assert abs(datos["este_oeste_km"] + datos["norte_sur_km"] - datos["manhattan_km"]) < 0.01
+    assert datos["esquina"] == {"lat": 19.2926, "lng": -99.605}
+    assert datos["pasos"]["manhattan"].endswith(" km")

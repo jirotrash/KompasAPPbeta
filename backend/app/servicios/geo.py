@@ -67,6 +67,12 @@ def distancia_manhattan_km(a: Coordenada, b: Coordenada) -> float:
     return distancia_manhattan(a_plano_km(a, a), a_plano_km(b, a))
 
 
+def desglose_manhattan_km(a: Coordenada, b: Coordenada) -> tuple[float, float]:
+    """Kilómetros este-oeste y norte-sur entre a y b (los dos tramos del recorrido Manhattan)."""
+    x, y = a_plano_km(b, a)
+    return abs(x), abs(y)
+
+
 def distancia_por_calles_km(a: Coordenada, b: Coordenada) -> float:
     """Estimación de la distancia por calles: métrica Manhattan.
 

@@ -9,6 +9,7 @@
 import type { Coordenada } from '@/constants/zona';
 import type {
   ComparacionDistancias,
+  ComparacionGeo,
   Lugar,
   NuevoReporte,
   NuevoUsuario,
@@ -119,6 +120,12 @@ export const compararDistancias = (a: PuntoPlano, b: PuntoPlano) =>
   USA_MOCK
     ? mock.compararDistancias(a, b)
     : solicitud<ComparacionDistancias>('/api/distancias/plano', { params: { a: `${a.x},${a.y}`, b: `${b.x},${b.y}` } });
+
+/** GET /api/distancias/geo?origen=lat,lng&destino=lat,lng → Euclidiana vs. Manhattan en el mapa (km) */
+export const compararDistanciasGeo = (origen: Coordenada, destino: Coordenada) =>
+  USA_MOCK
+    ? mock.compararDistanciasGeo(origen, destino)
+    : solicitud<ComparacionGeo>('/api/distancias/geo', { params: { origen: punto(origen), destino: punto(destino) } });
 
 // ────────────────────────────── Lugares (MongoDB) ─────────────────────────────
 

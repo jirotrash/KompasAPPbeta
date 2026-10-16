@@ -11,7 +11,7 @@ export type MensajeMapa =
   | { tipo: 'marcador'; id: string };
 
 /** Lógica compartida del mapa en celular (WebView) y web (iframe): datos a dibujar y respuesta a los toques. */
-export default function useMapa({ marcadores = [], lineas = [], onPressMapa, margen, mostrarMiUbicacion = true }: PropsMapa) {
+export default function useMapa({ marcadores = [], lineas = [], onPressMapa, margen, mostrarMiUbicacion = true, encuadrar = true }: PropsMapa) {
   const { esquema, paleta } = useTema();
   const { posicion, estado } = useUbicacion();
   const miUbicacion = mostrarMiUbicacion && estado === 'gps' ? { lat: posicion.lat, lng: posicion.lng } : null;
@@ -35,10 +35,11 @@ export default function useMapa({ marcadores = [], lineas = [], onPressMapa, mar
       marcadores: marcadores.map(({ onPress, ...m }) => ({ ...m, tocable: !!onPress })),
       miUbicacion,
       margen,
+      encuadrar,
       // Si cambia, la página vuelve a encuadrar el mapa
       clave: JSON.stringify([puntos, margen]),
     };
-  }, [esquema, paleta, lineas, marcadores, miUbicacion?.lat, miUbicacion?.lng, margen?.arriba, margen?.abajo, margen?.izquierda]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [esquema, paleta, lineas, marcadores, miUbicacion?.lat, miUbicacion?.lng, margen?.arriba, margen?.abajo, margen?.izquierda, encuadrar]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const alMensaje = (msg: MensajeMapa) => {
     if (msg.tipo === 'toque') onPressMapa?.({ lat: msg.lat, lng: msg.lng });

@@ -143,3 +143,26 @@ export const IconoTabla = (p) => (
     <path d="M3 10h18M9 10v10" />
   </Icono>
 )
+export const IconoUsuarios = (p) => (
+  <Icono {...p}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5" />
+  </Icono>
+)
+export const IconoReloj = (p) => (
+  <Icono {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </Icono>
+)
+export const IconoCerebro = (p) => (
+  <Icono {...p}>
+    <rect x="6" y="6" width="12" height="12" rx="2" />
+    <path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4M10 10h4v4h-4z" />
+  </Icono>
+)
+export const IconoMatraz = (p) => (
+  <Icono {...p}>
+    <path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3M7.5 14h9" />
+  </Icono>
+)

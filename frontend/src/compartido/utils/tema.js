@@ -6,7 +6,8 @@
 import { useSyncExternalStore } from 'react'
 
 const CLAVE = 'bu_tema'
-const COLOR_BARRA = { claro: '#0f766e', oscuro: '#0b1120' }
+// Barra del navegador con los colores de COLORIMETRIA.md (primario en claro, fondo base en oscuro)
+const COLOR_BARRA = { claro: '#1A62A5', oscuro: '#0E1420' }
 const medio = window.matchMedia('(prefers-color-scheme: dark)')
 const oyentes = new Set()
 

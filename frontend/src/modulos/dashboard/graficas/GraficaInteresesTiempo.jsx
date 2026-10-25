@@ -1,4 +1,5 @@
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import LeyendaKompas from '../componentes/LeyendaKompas.jsx'
 import TarjetaGrafica from '../componentes/TarjetaGrafica.jsx'
 import TooltipKompas from '../componentes/TooltipKompas.jsx'
 import { COLOR, EJE, fechaCorta, INTERESES, numero, REJILLA } from '../estilo.js'
@@ -23,7 +24,7 @@ export default function GraficaInteresesTiempo({ series }) {
           <XAxis dataKey="fecha" tickFormatter={fechaCorta} {...EJE} minTickGap={24} />
           <YAxis allowDecimals={false} {...EJE} />
           <Tooltip content={<TooltipKompas titulo={(l) => fechaCorta(l)} formato={numero} />} cursor={{ stroke: COLOR.textoSuave, strokeDasharray: '3 3' }} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend content={<LeyendaKompas items={Object.values(INTERESES)} />} />
           {Object.entries(INTERESES).map(([clave, i]) => (
             <Area
               key={clave}

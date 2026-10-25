@@ -33,9 +33,9 @@ export default function TarjetaGrafica({ titulo, descripcion, archivo, columnas,
 
   return (
     <section aria-labelledby={idTitulo} className={`tarjeta flex min-w-0 flex-col gap-3 ${className}`}>
-      <header className="flex flex-wrap items-start justify-between gap-2">
+      <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 id={idTitulo} className="font-semibold leading-tight">
+          <h3 id={idTitulo} className="font-semibold leading-tight tracking-tight">
             {titulo}
           </h3>
           <p className="mt-0.5 text-sm text-texto-suave">{descripcion}</p>
@@ -46,16 +46,22 @@ export default function TarjetaGrafica({ titulo, descripcion, archivo, columnas,
               type="button"
               onClick={() => setVerTabla((v) => !v)}
               aria-pressed={verTabla}
-              className="boton min-h-9 px-2 text-xs text-texto-suave hover:bg-fondo"
+              aria-label={verTabla ? `Ver gráfica: ${titulo}` : `Ver como tabla: ${titulo}`}
+              title={verTabla ? 'Ver gráfica' : 'Ver como tabla'}
+              className={`grid size-9 place-items-center rounded-lg border transition ${
+                verTabla ? 'border-primario bg-primario-claro text-primario-oscuro' : 'border-borde text-texto-suave hover:bg-fondo hover:text-texto'
+              }`}
             >
-              <IconoTabla className="size-4" /> {verTabla ? 'Ver gráfica' : 'Ver como tabla'}
+              <IconoTabla className="size-4" />
             </button>
             <button
               type="button"
               onClick={() => descargarCsv(archivo, columnas, filas)}
-              className="boton min-h-9 px-2 text-xs text-texto-suave hover:bg-fondo"
+              aria-label={`Descargar CSV: ${titulo}`}
+              title="Descargar CSV"
+              className="grid size-9 place-items-center rounded-lg border border-borde text-texto-suave transition hover:bg-fondo hover:text-texto"
             >
-              <IconoDescargar className="size-4" /> CSV
+              <IconoDescargar className="size-4" />
             </button>
           </div>
         )}

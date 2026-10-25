@@ -1,6 +1,14 @@
 import { useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { MensajeError } from '../../../compartido/componentes/Avisos.jsx'
-import Pagina from '../../../compartido/componentes/Pagina.jsx'
+import {
+  IconoItinerario,
+  IconoReloj,
+  IconoReporte,
+  IconoRuta,
+  IconoUbicacion,
+  IconoUsuarios,
+} from '../../../compartido/componentes/Iconos.jsx'
 import FiltrosDashboard from '../componentes/FiltrosDashboard.jsx'
 import TarjetaKpi, { EsqueletoKpi } from '../componentes/TarjetaKpi.jsx'
 import { minutos, numero } from '../estilo.js'
@@ -27,27 +35,19 @@ import GraficaTiempoDisponible from '../graficas/GraficaTiempoDisponible.jsx'
 import GraficaTransporte from '../graficas/GraficaTransporte.jsx'
 import MapaLugaresReportes from '../graficas/MapaLugaresReportes.jsx'
 import useDashboard from '../hooks/useDashboard.js'
-
-const PESTANAS = [
-  { id: 'resumen', texto: 'Resumen' },
-  { id: 'planes', texto: 'Planes' },
-  { id: 'sistema', texto: 'Sistema experto' },
-  { id: 'movilidad', texto: 'Movilidad' },
-  { id: 'reportes', texto: 'Reportes y lugares' },
-  { id: 'laboratorio', texto: 'Laboratorio IA' },
-]
+import { SECCIONES, seccionDe } from '../secciones.js'
 
 function Resumen({ d }) {
   const k = d.kpis
   return (
     <div className="grid gap-4 [&>*]:min-w-0">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
-        <TarjetaKpi titulo="Usuarios" valor={numero(k.usuarios_totales)} detalle={`${numero(k.usuarios_nuevos)} nuevos en el periodo`} />
-        <TarjetaKpi titulo="Planes creados" valor={numero(k.planes)} detalle={`${numero(k.planes_evaluados)} evaluados por la IA`} />
-        <TarjetaKpi titulo="Recorridos" valor={numero(k.recorridos)} detalle="guardados en el historial" />
-        <TarjetaKpi titulo="Tiempo promedio" valor={minutos(k.tiempo_promedio_recorrido_min)} detalle="por recorrido (estimado)" />
-        <TarjetaKpi titulo="Reportes vigentes" valor={numero(k.reportes_vigentes)} detalle="en este momento" />
-        <TarjetaKpi titulo="Lugares" valor={numero(k.lugares)} detalle="registrados en la base" />
+        <TarjetaKpi Icono={IconoUsuarios} tono="primario" titulo="Usuarios" valor={numero(k.usuarios_totales)} detalle={`${numero(k.usuarios_nuevos)} nuevos en el periodo`} />
+        <TarjetaKpi Icono={IconoItinerario} tono="detalle" titulo="Planes creados" valor={numero(k.planes)} detalle={`${numero(k.planes_evaluados)} evaluados por la IA`} />
+        <TarjetaKpi Icono={IconoRuta} tono="ok" titulo="Recorridos" valor={numero(k.recorridos)} detalle="guardados en el historial" />
+        <TarjetaKpi Icono={IconoReloj} tono="primario" titulo="Tiempo promedio" valor={minutos(k.tiempo_promedio_recorrido_min)} detalle="por recorrido (estimado)" />
+        <TarjetaKpi Icono={IconoReporte} tono="peligro" titulo="Reportes vigentes" valor={numero(k.reportes_vigentes)} detalle="en este momento" />
+        <TarjetaKpi Icono={IconoUbicacion} tono="aviso" titulo="Lugares" valor={numero(k.lugares)} detalle="registrados en la base" />
       </div>
       <div className="grid gap-4 lg:grid-cols-3 [&>*]:min-w-0">
         <GraficaRecomendacion kpis={k} />
@@ -134,69 +134,85 @@ function Esqueleto() {
 export default function Dashboard() {
   const [seleccion, setSeleccion] = useState(SELECCION_INICIAL)
   const filtros = useMemo(() => filtrosDesde(seleccion), [seleccion])
-  const [pestana, setPestana] = useState('resumen')
+  const [params, setParams] = useSearchParams()
+  const seccion = seccionDe(params.get('seccion'))
   const { datos, cargando, error, recargar } = useDashboard(filtros)
   const botones = useRef({})
 
   const incluyeDemo = datos && Object.values(datos).some((d) => d?.incluye_demo)
+  const irA = (id) => setParams(id === 'resumen' ? {} : { seccion: id })
 
   function moverConTeclado(e, indice) {
-    const siguiente = { ArrowRight: indice + 1, ArrowLeft: indice - 1, Home: 0, End: PESTANAS.length - 1 }[e.key]
+    const siguiente = { ArrowRight: indice + 1, ArrowLeft: indice - 1, Home: 0, End: SECCIONES.length - 1 }[e.key]
     if (siguiente === undefined) return
     e.preventDefault()
-    const destino = PESTANAS[(siguiente + PESTANAS.length) % PESTANAS.length].id
-    setPestana(destino)
+    const destino = SECCIONES[(siguiente + SECCIONES.length) % SECCIONES.length].id
+    irA(destino)
     botones.current[destino]?.focus()
   }
 
   return (
-    <Pagina titulo="Dashboard" descripcion="Cómo se usa Kompás y cómo decide la IA. Todas las cifras vienen agregadas desde la API." ancho="max-w-screen-2xl">
-      <div className="grid gap-4">
-        <FiltrosDashboard inicial={seleccion} onAplicar={setSeleccion} cargando={cargando} />
-
+    <div className="mx-auto grid w-full max-w-screen-2xl gap-5 px-4 py-5 sm:px-6 md:py-8 lg:px-8">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primario">Dashboard</p>
+          <h1 className="mt-1 flex items-center gap-3 text-2xl font-bold tracking-tight md:text-3xl">
+            <seccion.Icono className="size-7 text-primario" />
+            {seccion.texto}
+          </h1>
+          <p className="mt-1 text-texto-suave">{seccion.descripcion}</p>
+        </div>
         {incluyeDemo && seleccion.incluirDemo && (
-          <p role="status" className="rounded-xl bg-aviso-fondo px-3 py-2 text-sm font-medium text-texto">
-            Incluye datos de demostración (marcados con demo: true). Desactiva “Incluir datos demo” para ver solo la actividad real.
-          </p>
+          <span
+            role="status"
+            title="Incluye documentos marcados con demo: true. Desactiva “Incluir datos demo” para ver solo la actividad real."
+            className="inline-flex items-center gap-2 rounded-full border border-aviso/40 bg-aviso-fondo px-3 py-1 text-xs font-semibold text-texto"
+          >
+            <span aria-hidden="true" className="size-2 rounded-full bg-aviso" />
+            Incluye datos de demostración
+          </span>
         )}
+      </header>
 
-        <div role="tablist" aria-label="Secciones del dashboard" className="-mx-1 flex gap-1 overflow-x-auto border-b border-borde px-1">
-          {PESTANAS.map((p, i) => (
-            <button
-              key={p.id}
-              ref={(el) => (botones.current[p.id] = el)}
-              id={`pestana-${p.id}`}
-              type="button"
-              role="tab"
-              aria-selected={pestana === p.id}
-              aria-controls={`panel-${p.id}`}
-              tabIndex={pestana === p.id ? 0 : -1}
-              onClick={() => setPestana(p.id)}
-              onKeyDown={(e) => moverConTeclado(e, i)}
-              className={`min-h-11 shrink-0 border-b-2 px-3 text-sm font-semibold transition ${
-                pestana === p.id ? 'border-primario text-primario' : 'border-transparent text-texto-suave hover:text-texto'
-              }`}
-            >
-              {p.texto}
-            </button>
-          ))}
-        </div>
+      <FiltrosDashboard inicial={seleccion} onAplicar={setSeleccion} cargando={cargando} />
 
-        <div role="tabpanel" id={`panel-${pestana}`} aria-labelledby={`pestana-${pestana}`}>
-          {error ? (
-            <div className="grid justify-items-start gap-3">
-              <MensajeError>{error}</MensajeError>
-              <button type="button" className="boton-secundario" onClick={recargar}>
-                Reintentar
-              </button>
-            </div>
-          ) : cargando || !datos ? (
-            <Esqueleto />
-          ) : (
-            CONTENIDO[pestana](datos)
-          )}
-        </div>
+      {/* En escritorio las secciones están en la barra lateral; en celular, aquí como pestañas */}
+      <div role="tablist" aria-label="Secciones del dashboard" className="-mx-1 flex gap-1 overflow-x-auto border-b border-borde px-1 md:hidden">
+        {SECCIONES.map((p, i) => (
+          <button
+            key={p.id}
+            ref={(el) => (botones.current[p.id] = el)}
+            id={`pestana-${p.id}`}
+            type="button"
+            role="tab"
+            aria-selected={seccion.id === p.id}
+            aria-controls="panel-dashboard"
+            tabIndex={seccion.id === p.id ? 0 : -1}
+            onClick={() => irA(p.id)}
+            onKeyDown={(e) => moverConTeclado(e, i)}
+            className={`min-h-11 shrink-0 border-b-2 px-3 text-sm font-semibold transition ${
+              seccion.id === p.id ? 'border-primario text-primario' : 'border-transparent text-texto-suave hover:text-texto'
+            }`}
+          >
+            {p.texto}
+          </button>
+        ))}
       </div>
-    </Pagina>
+
+      <div id="panel-dashboard" role="region" aria-label={seccion.texto}>
+        {error ? (
+          <div className="grid justify-items-start gap-3">
+            <MensajeError>{error}</MensajeError>
+            <button type="button" className="boton-secundario" onClick={recargar}>
+              Reintentar
+            </button>
+          </div>
+        ) : cargando || !datos ? (
+          <Esqueleto />
+        ) : (
+          CONTENIDO[seccion.id](datos)
+        )}
+      </div>
+    </div>
   )
 }

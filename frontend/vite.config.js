@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon-180x180.png'],
+      includeAssets: ['favicon.ico', 'logo-kompas.png', 'apple-touch-icon-180x180.png'],
       manifest: {
         name: 'Kompás · Panel de administración',
         short_name: 'Kompás',
@@ -20,7 +20,7 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        theme_color: '#0f766e',
+        theme_color: '#1A62A5',
         background_color: '#f8fafc',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },

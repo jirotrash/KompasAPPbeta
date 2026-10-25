@@ -51,4 +51,5 @@ def hora_local(fecha: datetime | None) -> datetime | None:
         return None
     if fecha.tzinfo is not None:
         fecha = fecha.astimezone(ZONA_HORARIA).replace(tzinfo=None)
-    return fecha
+    # MySQL guardaba segundos enteros (TIMESTAMP sin fracción)
+    return fecha.replace(microsecond=0)

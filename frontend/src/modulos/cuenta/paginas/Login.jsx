@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { MensajeError } from '../../../compartido/componentes/Avisos.jsx'
 import PantallaAcceso from '../componentes/PantallaAcceso.jsx'
 import { useAuth } from '../contexto/auth.js'
 import { USA_MOCK } from '../../../compartido/api/cliente.js'
 
 export default function Login() {
-  const { usuario, login } = useAuth()
+  const { usuario, login, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [datos, setDatos] = useState({ email: '', password: '' })
@@ -20,7 +20,14 @@ export default function Login() {
     setError('')
     setEnviando(true)
     try {
-      await login(datos)
+      const sesion = await login(datos)
+      // El panel es solo para administradores: no se deja abierta la sesión de otros roles
+      if (sesion.usuario?.rol !== 'admin') {
+        logout()
+        setError('Esta cuenta no es de administrador. El panel de Kompás solo lo pueden abrir administradores.')
+        setEnviando(false)
+        return
+      }
       const desde = location.state?.desde
       navigate(desde ? `${desde.pathname}${desde.search ?? ''}` : '/', { replace: true })
     } catch (err) {
@@ -74,12 +81,6 @@ export default function Login() {
           </p>
         )}
       </form>
-      <p className="mt-6 text-center text-sm text-texto-suave">
-        ¿No tienes cuenta?{' '}
-        <Link to="/registro" className="font-semibold text-primario hover:underline">
-          Regístrate
-        </Link>
-      </p>
     </PantallaAcceso>
   )
 }

@@ -63,13 +63,13 @@ router  →  servicio  →  repositorio  →  nucleo.bd (MongoDB)
 ```mermaid
 flowchart LR
   U([Usuario]) -- usa --> APP[App móvil Kompás]
-  A([Administrador]) -- consulta --> WEB[Web + Dashboard]
+  A([Administrador]) -- consulta --> WEB[Panel web<br/>solo dashboard]
   APP & WEB -- HTTP/JSON --> K[[Kompás API]]
   K -- lugares, horarios, precios --> G[(Google Places API)]
   APP & WEB -- mapas y trazos por calles --> O[(OpenStreetMap / OSRM / Esri)]
 ```
 
-El usuario planea salidas desde la app móvil; el administrador revisa estadísticas en la web. Ambos clientes
+El usuario planea salidas desde la app móvil; el administrador revisa estadísticas en el panel web, que solo tiene el dashboard. Ambos clientes
 hablan solo con la API de Kompás. La API consulta Google Places para los lugares de un plan (la llave nunca sale
 del servidor). Los mosaicos del mapa y el trazo por calles los piden los clientes directamente a servicios abiertos.
 
@@ -79,7 +79,7 @@ del servidor). Los mosaicos del mapa y el trazo por calles los piden los cliente
 flowchart TB
   subgraph Clientes
     M[App móvil<br/>React Native + Expo Router]
-    W[Web + Dashboard<br/>React 19 + Vite + Recharts]
+    W[Panel web de administración<br/>React 19 + Vite + Recharts]
   end
   API[API Kompás<br/>FastAPI + Uvicorn · Python]
   DB[(MongoDB<br/>local o Atlas)]
@@ -100,7 +100,7 @@ local para desarrollo o Atlas en la nube; solo cambia la variable `MONGO_URI`.
 flowchart LR
   subgraph Clientes
     M[App móvil<br/>React Native + Expo]
-    W[Web + Dashboard<br/>React + Vite]
+    W[Panel web<br/>React + Vite]
   end
   subgraph API["API Kompás (FastAPI)"]
     direction TB
@@ -299,4 +299,6 @@ capas equivalente:
 2. Un módulo importa de `compartido/` libremente, pero de otro módulo solo a través de su `index.js`
    (por ejemplo `import { useAuth } from '../cuenta'`).
 3. Las páginas nunca llaman `fetch` directo.
-4. El dashboard se descarga solo cuando un admin lo abre (`React.lazy`).
+4. La web es **solo el panel de administración**: login y dashboard en `/`. Las rutas, itinerarios y reportes para
+   usuarios viven en la app móvil; los módulos `inicio`, `rutas`, `itinerarios` y `reportes` de la web ya no están
+   en el enrutador. El login rechaza cuentas que no son admin.

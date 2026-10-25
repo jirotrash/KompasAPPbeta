@@ -7,7 +7,7 @@ Incluye una web con dashboard de estadísticas para administradores.
 |---|---|---|
 | [`backend/`](backend/) | API FastAPI + MongoDB (capas por módulos) | [`backend/README.md`](backend/README.md) |
 | [`app/`](app/) | App móvil React Native + Expo | `app/README.md` |
-| [`frontend/`](frontend/) | Web React + Vite y `/dashboard` | `cd frontend && npm install && npm run dev` |
+| [`frontend/`](frontend/) | Panel web de administración (solo dashboard, rol admin) | `cd frontend && npm install && npm run dev` |
 
 **Empieza por [`CONTEXTO.md`](CONTEXTO.md).**
 

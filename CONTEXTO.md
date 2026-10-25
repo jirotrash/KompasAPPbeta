@@ -48,7 +48,7 @@ y `DOCS/manual-tecnico/arquitectura.md`.
 App (Expo) ─┐                ┌─ router → servicio → repositorio ──► MongoDB kompas
             ├─HTTP/JSON+JWT─►│ API FastAPI (backend/app/modulos/<módulo>/)
 Web (React)─┘                ├─► Google Places (lugares, horario, nivel de precio)
-  └ /dashboard (admin)       └─► Sistema experto (R01–R20) → planes recomendables + explicación
+  └ panel: solo dashboard    └─► Sistema experto (R01–R20) → planes recomendables + explicación
 ```
 
 ## 6. Documentos del repo

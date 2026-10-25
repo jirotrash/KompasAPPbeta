@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const iniciar = useCallback((nueva) => {
     guardarSesion(nueva)
     setSesion(nueva)
+    return nueva
   }, [])
 
   const valor = useMemo(

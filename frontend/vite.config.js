@@ -12,9 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon-180x180.png'],
       manifest: {
-        name: 'Brújula Urbana',
-        short_name: 'Brújula',
-        description: 'Rutas e itinerarios en Toluca, Lerma y San Mateo Atenco',
+        name: 'Kompás · Panel de administración',
+        short_name: 'Kompás',
+        description: 'Panel de administración de Kompás: estadísticas de uso y del sistema experto',
         lang: 'es-MX',
         start_url: '/',
         scope: '/',

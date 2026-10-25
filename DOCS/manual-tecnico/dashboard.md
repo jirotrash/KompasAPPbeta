@@ -2,7 +2,7 @@
 
 > Fuente: `DASHBOARD.md`. Backend: `backend/app/modulos/dashboard/`. Web: `frontend/src/modulos/dashboard/`.
 
-La sección **`/dashboard`** de la web muestra cómo se usa Kompás y cómo decide la IA. Solo la ven usuarios con
+El **panel web** (`frontend/`, ruta `/`) es solo el dashboard: muestra cómo se usa Kompás y cómo decide la IA. Solo la ven usuarios con
 `rol: "admin"`. **Todas las cifras salen de agregaciones de MongoDB calculadas en la API**; la web solo dibuja
 (Recharts, un mapa de calor en CSS grid y un mapa con react-leaflet).
 
@@ -18,7 +18,7 @@ sequenceDiagram
   participant Repo as RepositorioDashboard
   participant DB as MongoDB
 
-  Admin->>Web: abre /dashboard (RutaAdmin revisa el rol)
+  Admin->>Web: inicia sesión y abre / (RutaAdmin revisa el rol)
   Web->>R: GET /api/dashboard/planes?desde&hasta&incluir_demo (JWT)
   R->>Seg: get_usuario_actual + rol == admin
   alt sin token
@@ -156,7 +156,8 @@ Las descripciones de las reglas se leen con `app.ia.motor.cargar_base()` (solo l
 - `rol` vive en `usuarios` (`usuario` por defecto). La API lo regresa en el login y en `/api/auth/yo`.
 - Backend: el router del dashboard declara `dependencies=[Depends(requiere_admin)]`; sin token responde 401 y con un
   usuario normal 403 `"Solo un administrador puede ver el dashboard."`.
-- Web: `app/RutaAdmin.jsx` redirige a `/` si `usuario.rol !== 'admin'` y el menú solo muestra **Dashboard** al admin.
+- Web: el login rechaza cuentas que no son admin ("Esta cuenta no es de administrador…") y `app/RutaAdmin.jsx`
+  muestra *Sin acceso al panel* si una sesión guardada no es admin. El menú solo tiene **Dashboard**.
   (La protección real es la de la API; la de la web solo evita mostrar algo que no se puede usar.)
 - Crear un admin:
 

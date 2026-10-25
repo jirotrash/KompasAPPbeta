@@ -79,7 +79,7 @@ async function solicitud<T>(
   return datos as T;
 }
 
-// ─────────────────────────── Autenticación (MySQL) ───────────────────────────
+// ─────────────────────────── Autenticación (MongoDB) ─────────────────────────
 
 /** POST /api/auth/login → { token, usuario } */
 export const login = (datos: { email: string; password: string }) =>

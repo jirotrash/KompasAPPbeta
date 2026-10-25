@@ -1,13 +1,20 @@
-# Reglas del Proyecto (Workspace Rules)
+# Reglas del proyecto Kompás
 
-## 🚫 Restricción Estricta: Archivos Python y Backend
+## Arquitectura
+- Backend: arquitectura en capas por módulos (ver ARQUITECTURA.md). Router → Servicio → Repositorio → MongoDB.
+- Los routers no acceden a la base. Los repositorios no lanzan HTTPException ni devuelven documentos crudos con ObjectId.
+- Un módulo no importa el repositorio de otro módulo: usa su servicio.
 
-- **NO tocar ni modificar ningún archivo Python (`.py`)** ni ningún archivo dentro del directorio `backend/`.
-- Queda prohibida la edición, creación, eliminación o refactorización de código Python/backend hasta nuevo aviso.
+## Zonas protegidas
+- `backend/app/ia/` (sistema experto, DFS y métricas): no se cambia su lógica sin acuerdo con Einar.
+- El contrato de la API (rutas y campos) no cambia sin avisar al equipo de la app móvil.
 
-## 📱 Enfoque Exclusivo: Frontend Móvil (React Native / Expo)
+## Frontend
+- App móvil en `app/` (Expo): seguir `app/AGENTS.md`.
+- Web en `frontend/`: módulos en `src/modulos/`, código común en `src/compartido/`.
+- Colores y contraste: respetar estrictamente `COLORIMETRIA.md` en ambos clientes.
 
-- **Área de trabajo activa**: Exclusivamente la aplicación móvil React Native con Expo ubicada en el directorio `app/`.
-- Todo el trabajo de frontend, interfaz de usuario, navegación (Expo Router), estado y componentes se realiza dentro de `app/`.
-- Seguir las buenas prácticas y pautas definidas para Expo en [`app/AGENTS.md`](file:///c:/Users/kevin/Downloads/KompasAPPbeta/app/AGENTS.md).
-- **Colorimetría y Diseño**: Respetar estrictamente los colores y tokens definidos en [`COLORIMETRIA.md`](file:///c:/Users/kevin/Downloads/KompasAPPbeta/COLORIMETRIA.md).
+## Git
+- Ramas `feature/*`, `refactor/*`, `docs/*` y Pull Request a `main`.
+- Commits en español e imperativo, sin líneas Co-Authored-By ni Claude-Session.
+- Nunca subir `.env`, `venv/`, `node_modules/` ni llaves.

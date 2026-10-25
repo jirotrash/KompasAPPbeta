@@ -161,3 +161,12 @@
 .leaflet-control-attribution a {
   color: var(--color-primario);
 }
+
+/* ───────── Gráficas (Recharts) ───────── */
+/* El texto de las leyendas usa tokens de texto; el color de la serie va solo en la muestra */
+.recharts-legend-item-text {
+  color: var(--color-texto-suave) !important;
+}
+.recharts-text {
+  font-family: inherit;
+}

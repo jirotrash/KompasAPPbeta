@@ -16,7 +16,7 @@ Proyecto escolar: *Formulación de proyectos de tecnología* · UTVT · ITIID-D7
 2. Los tiempos son **estimaciones** y se marcan así.
 3. Los datos de Google se muestran con su atribución y **no se guardan** en la base (solo `place_id`).
 4. Llaves y contraseñas **nunca** en el repo: van en `.env` (se sube solo `.env.example`).
-5. No se cambia el esquema de MySQL sin acuerdo con Sebas.
+5. No se cambia el esquema de MongoDB sin acuerdo con Sebas.
 
 ## 3. Equipo
 
@@ -33,19 +33,22 @@ Proyecto escolar: *Formulación de proyectos de tecnología* · UTVT · ITIID-D7
 | Capa | Tecnología |
 |---|---|
 | App móvil | **React Native + Expo SDK 57** (Expo Router), estilos con **Tamagui**, mapa **Leaflet** en WebView, **expo-location** |
-| API | **FastAPI** (Python 3.11+), SQLAlchemy 2, PyMySQL, JWT, bcrypt |
-| Base de datos | **MySQL 8**, esquema `kompas` (8 tablas, ver `database/`) |
+| Web + dashboard | **React 19 + Vite**, Tailwind CSS 4, **Recharts** (gráficas), react-leaflet |
+| API | **FastAPI** (Python 3.11+), **PyMongo**, JWT, bcrypt. Arquitectura en capas por módulos |
+| Base de datos | **MongoDB** (local o **Atlas**), base `kompas`: usuarios, categorías, transportes, lugares, rutas, historial, planes, reportes, bitácora del laboratorio. Antes MySQL 8 (evidencia en `backend/database/mysql_legacy/`) |
 | Lugares | **Google Places API (New)**, consultada solo desde la API |
 | IA | Motor de reglas de Einar en Python (`backend/app/ia/`) |
 
 ## 5. Arquitectura
 
+Cliente-servidor + API en **capas por módulos** (monolito modular). Detalle y diagramas en `ARQUITECTURA.md`
+y `DOCS/manual-tecnico/arquitectura.md`.
+
 ```
-App (Expo) ──HTTP/JSON──► API FastAPI ──► MySQL kompas (usuarios, residencia, catálogos, planes, rutas, historial)
-                              │
-                              ├──► Google Places (lugares, horario, nivel de precio)
-                              │
-                              └──► Sistema experto (R01–R20) → planes recomendables + explicación
+App (Expo) ─┐                ┌─ router → servicio → repositorio ──► MongoDB kompas
+            ├─HTTP/JSON+JWT─►│ API FastAPI (backend/app/modulos/<módulo>/)
+Web (React)─┘                ├─► Google Places (lugares, horario, nivel de precio)
+  └ /dashboard (admin)       └─► Sistema experto (R01–R20) → planes recomendables + explicación
 ```
 
 ## 6. Documentos del repo
@@ -55,7 +58,9 @@ App (Expo) ──HTTP/JSON──► API FastAPI ──► MySQL kompas (usuarios
 | `CONTEXTO.md` | Este archivo |
 | `BACKEND.md` | Especificación completa de la API: endpoints, tablas, Google Places, fases de trabajo |
 | `IA.md` | Cómo se conecta el sistema experto de Einar con la API |
-| `database/Dump20260927.sql` | Esquema MySQL de Sebas |
+| `ARQUITECTURA.md`, `MIGRACION_MONGODB.md`, `DASHBOARD.md` | Plan v0.5: capas por módulos, MongoDB y dashboard |
+| `DOCS/manual-tecnico/` | Manual técnico: arquitectura, modelo de datos MongoDB y dashboard |
+| `backend/database/mysql_legacy/` | Esquema MySQL anterior (evidencia histórica) |
 | `app/README.md` | Cómo correr la app (cuando se suba el código de la app) |
 
 ## 7. Estado y próxima entrega

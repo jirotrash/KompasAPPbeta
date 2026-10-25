@@ -1,7 +1,7 @@
 import pytest
 
-from app.servicios import google_places
-from app.servicios.geo import ahora_mexico
+from app.externos import google_places
+from app.compartido.geo import ahora_mexico
 from tests.conftest import encabezado, registrar
 
 PETICION = {

@@ -1,16 +1,14 @@
-"""Las pruebas usan el esquema `kompas_test` (mismo servidor que DATABASE_URL), que se recrea en
-cada corrida. Nunca tocan el esquema `kompas`. Si MySQL no responde, las pruebas con BD se omiten."""
+"""Las pruebas usan la base `kompas_test` (mismo servidor que MONGO_URI), que se recrea en cada corrida.
+Nunca tocan la base `kompas`. Si MongoDB no responde, las pruebas con BD se omiten."""
 
 import os
 
 import pytest
-from sqlalchemy import make_url
 
-from app.config import Settings
-
-# Debe ir antes de importar app.db / app.main (el engine se crea al importarlos)
-_url = make_url(os.environ.get("TEST_DATABASE_URL") or Settings().database_url).set(database="kompas_test")
-os.environ["DATABASE_URL"] = _url.render_as_string(hide_password=False)
+# Debe ir antes de importar app.nucleo.config / app.main (la configuración se lee una sola vez)
+os.environ["MONGO_DB"] = "kompas_test"
+if os.environ.get("TEST_MONGO_URI"):
+    os.environ["MONGO_URI"] = os.environ["TEST_MONGO_URI"]
 
 from fastapi.testclient import TestClient  # noqa: E402
 
@@ -19,12 +17,18 @@ from app.main import app  # noqa: E402
 
 @pytest.fixture(scope="session")
 def bd():
+    from pymongo import MongoClient
+
+    from app.nucleo.bd import get_bd
+    from app.nucleo.config import get_settings
     from scripts.preparar_bd import preparar
 
     try:
-        preparar(_url, recrear=True, silencioso=True)
+        MongoClient(get_settings().mongo_uri, serverSelectionTimeoutMS=1500).admin.command("ping")
+        preparar(recrear=True, silencioso=True)
     except Exception as error:  # noqa: BLE001
-        pytest.skip(f"MySQL no disponible para pruebas: {error}")
+        pytest.skip(f"MongoDB no disponible para pruebas: {error}")
+    return get_bd()
 
 
 @pytest.fixture(scope="session")

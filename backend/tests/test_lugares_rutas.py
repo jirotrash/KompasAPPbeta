@@ -1,7 +1,6 @@
 import pytest
 
-from app.db import SessionLocal
-from app.modelos import Ruta, Transporte
+from app.modulos.rutas.repositorio import RepositorioRutas
 from tests.conftest import encabezado, registrar
 
 CENTRO_TOLUCA = {"lat": 19.2926, "lng": -99.6557}
@@ -47,12 +46,8 @@ def test_lugar_inexistente_da_404(cliente):
 
 @pytest.fixture(scope="module")
 def id_ruta(bd) -> int:
-    """El dump no trae rutas: se inserta una solo para las pruebas (esquema kompas_test)."""
-    with SessionLocal() as db:
-        ruta = Ruta(ruta=TRAZO)
-        db.add(ruta)
-        db.commit()
-        return ruta.id_ruta
+    """Los datos de desarrollo no traen rutas: se inserta una solo para las pruebas (base kompas_test)."""
+    return RepositorioRutas(bd).crear(TRAZO)["id"]
 
 
 def test_rutas_con_trazo_lng_lat(cliente, id_ruta):
@@ -74,10 +69,9 @@ def test_alternativas_de_la_pantalla_buscar(cliente):
     assert cliente.get("/api/rutas", params={"origen": "hola", "destino": "19.2926,-99.6557"}).status_code == 422
 
 
-def test_historial(cliente, id_ruta):
+def test_historial(cliente, bd, id_ruta):
     h = encabezado(registrar(cliente, "viajero@ejemplo.mx")["token"])
-    with SessionLocal() as db:
-        id_transporte = db.query(Transporte).filter_by(nombre="Caminando").one().id_transporte
+    id_transporte = bd.transportes.find_one({"nombre": "Caminando"})["_id"]
 
     assert cliente.get("/api/historial", headers=h).json() == []
     creado = cliente.post("/api/historial", json={"id_ruta": id_ruta, "id_transporte": id_transporte, "tiempo_estimado": 35}, headers=h)

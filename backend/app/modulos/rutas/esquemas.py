@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from app.esquemas.comun import Salida
+from app.nucleo.esquemas_comunes import Salida
 
 
 class RutaSalida(Salida):

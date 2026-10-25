@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.esquemas.comun import GeoPunto, ReglaSalida, Salida
+from app.nucleo.esquemas_comunes import GeoPunto, ReglaSalida, Salida
 
 Contexto = Literal["solo", "pareja", "amigos", "familia"]
 Interes = Literal["comer", "cafe", "cultura", "entretenimiento", "aire_libre"]
@@ -73,7 +73,7 @@ class RangoCosto(BaseModel):
 
 
 class LugarPlan(Salida):
-    """Lugar de Google Places (no se guarda en MySQL: condiciones de Google)."""
+    """Lugar de Google Places (no se guarda en la base: condiciones de Google)."""
 
     id_texto: str = Field(alias="_id", description="place_id de Google")
     nombre: str
@@ -132,7 +132,7 @@ class RespuestaPlanes(Salida):
 
 
 class PlanGuardado(BaseModel):
-    """Fila de la tabla `planes`."""
+    """Documento de la colección `planes` (mismos campos que antes)."""
 
     id: int
     no_acompanantes: int

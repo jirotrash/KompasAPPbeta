@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from app.esquemas.comun import GeoPunto, Salida
+from app.nucleo.esquemas_comunes import GeoPunto, Salida
 
 
 class LugarSalida(Salida):
@@ -10,7 +10,7 @@ class LugarSalida(Salida):
     lat: float
     lng: float
     ubicacion: GeoPunto
-    categoria: str | None = Field(description="Nombre de la categoría (tabla categorias)")
+    categoria: str | None = Field(description="Nombre de la categoría (colección categorias)")
     interes: str | None = Field(description="Valor de la app: comer, cafe, cultura, entretenimiento, aire_libre")
     distancia_km: float | None = Field(default=None, description="En línea recta desde lat/lng o `cerca`")
     minutos_caminando: int | None = Field(default=None, description="Estimación: ≈ 12 min por km")

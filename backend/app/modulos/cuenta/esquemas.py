@@ -3,8 +3,6 @@ from datetime import date
 
 from pydantic import AliasChoices, BaseModel, Field, field_validator
 
-from app.modelos import Usuario
-
 PATRON_CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 # BACKEND.md lo llama `correo`; la app manda `email`. Se aceptan los dos.
@@ -60,7 +58,7 @@ class LoginEntrada(BaseModel):
 
 
 class UsuarioSalida(BaseModel):
-    """Campos de la tabla `usuarios` (nunca la contraseña). `email` y `rol` son los que lee la app."""
+    """Campos de la colección `usuarios` (nunca la contraseña). `email` y `rol` son los que lee la app."""
 
     id: int
     nombre: str
@@ -69,19 +67,19 @@ class UsuarioSalida(BaseModel):
     correo: str
     fecha_nacimiento: date | None
     email: str
-    rol: str = Field(description="La base no tiene roles: siempre 'usuario'")
+    rol: str = Field(description="'usuario' o 'admin' (sale de la base; admin puede ver el dashboard)")
 
     @classmethod
-    def desde_modelo(cls, u: Usuario) -> "UsuarioSalida":
+    def desde_usuario(cls, u: dict) -> "UsuarioSalida":
         return cls(
-            id=u.id_usuario,
-            nombre=u.nombre,
-            primer_apellido=u.primer_apellido,
-            segundo_apellido=u.segundo_apellido,
-            correo=u.correo,
-            fecha_nacimiento=u.fecha_nacimiento,
-            email=u.correo,
-            rol="usuario",
+            id=u["id"],
+            nombre=u["nombre"],
+            primer_apellido=u["primer_apellido"],
+            segundo_apellido=u["segundo_apellido"],
+            correo=u["correo"],
+            fecha_nacimiento=u["fecha_nacimiento"],
+            email=u["correo"],
+            rol=u["rol"],
         )
 
 

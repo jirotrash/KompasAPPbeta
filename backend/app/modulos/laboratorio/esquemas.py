@@ -1,4 +1,4 @@
-"""Esquemas de respuesta para la demostración académica de búsqueda DFS."""
+"""Esquemas de respuesta de las demostraciones académicas: búsqueda DFS y métricas de distancia."""
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -59,3 +59,50 @@ class RespuestaDFS(SalidaDFS):
     total_nodos_explorados: int = 0
     total_rutas_encontradas: int = 0
     rutas: list[RutaDFS] = Field(default_factory=list)
+
+
+# ───────────── Métricas de distancia (Euclidiana y Manhattan) ─────────────
+
+
+class PuntoPlano(BaseModel):
+    x: float
+    y: float
+
+
+class PasosCalculo(BaseModel):
+    euclidiana: str
+    manhattan: str
+
+
+class ComparacionPlano(BaseModel):
+    a: PuntoPlano
+    b: PuntoPlano
+    esquina: PuntoPlano
+    horizontal: float
+    vertical: float
+    euclidiana: float
+    manhattan: float
+    diferencia: float
+    alineados: bool
+    pasos: PasosCalculo
+
+
+class PuntoGeo(BaseModel):
+    lat: float
+    lng: float
+
+
+class ComparacionGeo(BaseModel):
+    origen: PuntoGeo
+    destino: PuntoGeo
+    esquina: PuntoGeo
+    este_oeste_km: float
+    norte_sur_km: float
+    linea_recta_km: float
+    euclidiana_km: float
+    manhattan_km: float
+    diferencia_km: float
+    minutos_caminando_recta: int
+    minutos_caminando_calles: int
+    pasos: PasosCalculo
+    nota: str

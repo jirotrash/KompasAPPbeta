@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.modulos.catalogos import router as catalogos
 from app.modulos.cuenta import router as cuenta
+from app.modulos.dashboard import router as dashboard
 from app.modulos.historial import router as historial
 from app.modulos.itinerarios import router as itinerarios
 from app.modulos.laboratorio import router as laboratorio
@@ -54,5 +55,6 @@ for router in (
     reportes.router,
     laboratorio.router_dfs,
     laboratorio.router_distancias,
+    dashboard.router,
 ):
     app.include_router(router)

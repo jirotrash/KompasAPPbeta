@@ -1,0 +1,235 @@
+{
+  "_nota": "Datos SOLO para desarrollo. Generado por scripts/generar_datos_desarrollo.py el 2026-10-25. No editar a mano. Usuario de prueba: demo@kompas.mx / demo1234",
+  "usuarios": [
+    {
+      "_id": 1,
+      "nombre": "Administrador",
+      "primer_apellido": "Kompás",
+      "segundo_apellido": null,
+      "correo": "admin@kompas.mx",
+      "password": "$2b$12$R69KYoWNzLRI0Covu5HEt.I/IHZgAAlcX2uBL5aoLg0QD/tzAoyw.",
+      "fecha_nacimiento": null,
+      "rol": "admin",
+      "residencia": null
+    },
+    {
+      "_id": 2,
+      "nombre": "Demo",
+      "primer_apellido": "Kompás",
+      "segundo_apellido": null,
+      "correo": "demo@kompas.mx",
+      "password": "$2b$12$iqHpxm7tRWZye8R2V49WIerqTeIVfAcDLoiY06jj.IQg0blTtiLg.",
+      "fecha_nacimiento": null,
+      "rol": "admin",
+      "residencia": null
+    }
+  ],
+  "categorias": [
+    {
+      "_id": 1,
+      "nombre": "Comer",
+      "descripcion": "Restaurantes, fondas y lugares para comer"
+    },
+    {
+      "_id": 2,
+      "nombre": "Café",
+      "descripcion": "Cafeterías"
+    },
+    {
+      "_id": 3,
+      "nombre": "Cultura",
+      "descripcion": "Museos, galerías y centros culturales"
+    },
+    {
+      "_id": 4,
+      "nombre": "Entretenimiento",
+      "descripcion": "Cines, plazas y lugares de diversión"
+    },
+    {
+      "_id": 5,
+      "nombre": "Aire libre",
+      "descripcion": "Parques y jardines"
+    }
+  ],
+  "transportes": [
+    {
+      "_id": 1,
+      "nombre": "Caminando"
+    },
+    {
+      "_id": 2,
+      "nombre": "Transporte público"
+    },
+    {
+      "_id": 3,
+      "nombre": "Taxi/App"
+    },
+    {
+      "_id": 4,
+      "nombre": "Combinado"
+    }
+  ],
+  "lugares": [
+    {
+      "_id": 1,
+      "nombre": "Cafetería de ejemplo · Centro de Toluca",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.656,
+          19.292
+        ]
+      },
+      "categoria": {
+        "id": 2,
+        "nombre": "Café"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 2,
+      "nombre": "Restaurante familiar de ejemplo · Toluca",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.64,
+          19.287
+        ]
+      },
+      "categoria": {
+        "id": 1,
+        "nombre": "Comer"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 3,
+      "nombre": "Parque de ejemplo · Toluca",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.662,
+          19.296
+        ]
+      },
+      "categoria": {
+        "id": 5,
+        "nombre": "Aire libre"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 4,
+      "nombre": "Museo de ejemplo · Toluca",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.658,
+          19.2935
+        ]
+      },
+      "categoria": {
+        "id": 3,
+        "nombre": "Cultura"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 5,
+      "nombre": "Cine de ejemplo · Toluca oriente",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.61,
+          19.28
+        ]
+      },
+      "categoria": {
+        "id": 4,
+        "nombre": "Entretenimiento"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 6,
+      "nombre": "Cafetería de ejemplo · Centro de Lerma",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.5115,
+          19.285
+        ]
+      },
+      "categoria": {
+        "id": 2,
+        "nombre": "Café"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 7,
+      "nombre": "Fonda de ejemplo · San Mateo Atenco",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.5335,
+          19.2675
+        ]
+      },
+      "categoria": {
+        "id": 1,
+        "nombre": "Comer"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 8,
+      "nombre": "Plaza de ejemplo · Lerma",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.54,
+          19.28
+        ]
+      },
+      "categoria": {
+        "id": 4,
+        "nombre": "Entretenimiento"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 9,
+      "nombre": "Jardín de ejemplo · Lerma",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.514,
+          19.2875
+        ]
+      },
+      "categoria": {
+        "id": 5,
+        "nombre": "Aire libre"
+      },
+      "id_usuario": 1
+    },
+    {
+      "_id": 10,
+      "nombre": "Galería de ejemplo · Lerma",
+      "ubicacion": {
+        "type": "Point",
+        "coordinates": [
+          -99.515,
+          19.288
+        ]
+      },
+      "categoria": {
+        "id": 3,
+        "nombre": "Cultura"
+      },
+      "id_usuario": 1
+    }
+  ],
+  "rutas": []
+}

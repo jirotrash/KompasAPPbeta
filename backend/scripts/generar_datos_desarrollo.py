@@ -1,22 +1,25 @@
-"""Genera database/datos_desarrollo.sql (BACKEND.md §5): solo INSERTs, sin tocar la estructura.
+"""Genera database/datos_desarrollo.json (BACKEND.md §5): los mismos registros que tenía datos_desarrollo.sql.
 
 Los hashes de bcrypt se calculan aquí, nunca a mano. Correr de nuevo solo si cambian estos datos:
     python -m scripts.generar_datos_desarrollo
 
 - Usuario administrador (dueño de los lugares de prueba; contraseña aleatoria que nadie conoce).
-- Usuario demo: demo@kompas.mx / demo1234.
+- Usuario demo: demo@kompas.mx / demo1234, con rol `admin` para poder abrir el dashboard.
 - Categorías y transportes con los nombres de la app.
 - 10 lugares GENÉRICOS "de ejemplo" dentro de la zona piloto (no son negocios reales).
 - Sin rutas: solo se cargan trazos que el equipo haya recorrido.
+
+Los ids son los mismos que asignaba MySQL (AUTO_INCREMENT en el orden de los INSERT).
 """
 
+import json
 import secrets
 from datetime import date
 from pathlib import Path
 
-from app.seguridad import hash_password
+from app.nucleo.seguridad import hash_password
 
-ARCHIVO = Path(__file__).resolve().parent.parent / "database" / "datos_desarrollo.sql"
+ARCHIVO = Path(__file__).resolve().parent.parent / "database" / "datos_desarrollo.json"
 
 ADMIN = ("Administrador", "Kompás", "admin@kompas.mx")
 DEMO = ("Demo", "Kompás", "demo@kompas.mx", "demo1234")
@@ -46,42 +49,48 @@ LUGARES = [
 ]
 
 
-def texto(valor: str) -> str:
-    return "'" + valor.replace("\\", "\\\\").replace("'", "''") + "'"
+def usuario(id_usuario: int, nombre: str, apellido: str, correo: str, password: str) -> dict:
+    return {
+        "_id": id_usuario,
+        "nombre": nombre,
+        "primer_apellido": apellido,
+        "segundo_apellido": None,
+        "correo": correo,
+        "password": hash_password(password),
+        "fecha_nacimiento": None,
+        "rol": "admin",
+        "residencia": None,
+    }
 
 
-def generar() -> str:
-    lineas = [
-        "-- Datos SOLO para desarrollo (BACKEND.md §5). Solo INSERTs: no modifica la estructura.",
-        f"-- Generado por scripts/generar_datos_desarrollo.py el {date.today().isoformat()}. No editar a mano.",
-        "-- Se puede ejecutar varias veces: no duplica registros.",
-        "-- Usuario de prueba: demo@kompas.mx / demo1234",
-        "",
-        "INSERT IGNORE INTO categorias (nombre, descripcion) VALUES",
-        ",\n".join(f"  ({texto(n)}, {texto(d)})" for n, d in CATEGORIAS) + ";",
-        "",
-        "INSERT IGNORE INTO transportes (nombre) VALUES",
-        ",\n".join(f"  ({texto(n)})" for n in TRANSPORTES) + ";",
-        "",
-        "-- Administrador: dueño de los lugares de prueba (su contraseña es aleatoria y nadie la conoce)",
-        "INSERT IGNORE INTO usuarios (nombre, primer_apellido, correo, password) VALUES",
-        f"  ({texto(ADMIN[0])}, {texto(ADMIN[1])}, {texto(ADMIN[2])}, {texto(hash_password(secrets.token_urlsafe(32)))}),",
-        f"  ({texto(DEMO[0])}, {texto(DEMO[1])}, {texto(DEMO[2])}, {texto(hash_password(DEMO[3]))});",
-        "",
-        "-- Lugares GENÉRICOS de ejemplo (no son negocios reales); Sebas carga los reales",
-    ]
-    for nombre, categoria, lat, lng in LUGARES:
-        lineas += [
-            "INSERT INTO lugares_de_interes (nombre, latitud, longitud, id_usuario, id_cat)",
-            f"SELECT {texto(nombre)}, {lat}, {lng}, u.id_usuario, c.id_categoria",
-            f"FROM usuarios u JOIN categorias c ON c.nombre = {texto(categoria)}",
-            f"WHERE u.correo = {texto(ADMIN[2])}",
-            f"  AND NOT EXISTS (SELECT 1 FROM lugares_de_interes l WHERE l.nombre = {texto(nombre)});",
-            "",
-        ]
-    return "\n".join(lineas)
+def generar() -> dict:
+    categorias = [{"_id": i, "nombre": n, "descripcion": d} for i, (n, d) in enumerate(CATEGORIAS, start=1)]
+    por_nombre = {c["nombre"]: c["_id"] for c in categorias}
+    return {
+        "_nota": f"Datos SOLO para desarrollo. Generado por scripts/generar_datos_desarrollo.py el "
+        f"{date.today().isoformat()}. No editar a mano. Usuario de prueba: demo@kompas.mx / demo1234",
+        "usuarios": [
+            # Administrador: dueño de los lugares de prueba (su contraseña es aleatoria y nadie la conoce)
+            usuario(1, *ADMIN, secrets.token_urlsafe(32)),
+            usuario(2, *DEMO),
+        ],
+        "categorias": categorias,
+        "transportes": [{"_id": i, "nombre": n} for i, n in enumerate(TRANSPORTES, start=1)],
+        # Lugares GENÉRICOS de ejemplo (no son negocios reales); Sebas carga los reales
+        "lugares": [
+            {
+                "_id": i,
+                "nombre": nombre,
+                "ubicacion": {"type": "Point", "coordinates": [lng, lat]},
+                "categoria": {"id": por_nombre[categoria], "nombre": categoria},
+                "id_usuario": 1,
+            }
+            for i, (nombre, categoria, lat, lng) in enumerate(LUGARES, start=1)
+        ],
+        "rutas": [],
+    }
 
 
 if __name__ == "__main__":
-    ARCHIVO.write_text(generar(), encoding="utf-8")
+    ARCHIVO.write_text(json.dumps(generar(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Generado {ARCHIVO}")

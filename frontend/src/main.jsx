@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import 'leaflet/dist/leaflet.css'
 import './index.css'
-import './utils/tema.js'
-import App from './App.jsx'
-import { AuthProvider } from './context/AuthContext.jsx'
+import './compartido/utils/tema.js'
+import App from './app/App.jsx'
+import { AuthProvider } from './modulos/cuenta'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

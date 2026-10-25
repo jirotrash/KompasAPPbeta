@@ -1,0 +1,5 @@
+export { default as Login } from './paginas/Login.jsx'
+export { default as Registro } from './paginas/Registro.jsx'
+export { AuthProvider } from './contexto/AuthContext.jsx'
+export { useAuth } from './contexto/auth.js'
+export { login, registrar } from './api.js'

@@ -4,7 +4,7 @@ No hay tramos en autobús: la base todavía no tiene líneas ni paradas (BACKEND
 Todos los tiempos son ESTIMACIONES por distancia.
 """
 
-from app.servicios.geo import Coordenada, distancia_por_calles_km, minutos_caminando, minutos_en_auto
+from app.compartido.geo import Coordenada, distancia_por_calles_km, minutos_caminando, minutos_en_auto
 
 DISTANCIA_CORTA_KM = 1.5
 RADIO_A_PIE_KM = 2  # BACKEND.md §7: caminando ≈ 2 km

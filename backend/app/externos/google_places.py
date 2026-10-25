@@ -1,6 +1,6 @@
 """Lugares cercanos desde Google Places API (New) — Nearby Search (BACKEND.md §6).
 
-Se consulta desde el backend (la llave nunca va en la app). Condiciones de Google: no guardar en MySQL
+Se consulta desde el backend (la llave nunca va en la app). Condiciones de Google: no guardar en la base
 nombres, horarios ni calificaciones; solo se puede conservar el place_id.
 Si Google falla o no hay llave, se lanza ErrorGooglePlaces (la API responde 503): no se inventan lugares.
 """
@@ -9,8 +9,8 @@ from datetime import datetime
 
 import httpx
 
-from app.config import get_settings
-from app.servicios.geo import ahora_mexico
+from app.nucleo.config import get_settings
+from app.compartido.geo import ahora_mexico
 
 URL_CERCANOS = "https://places.googleapis.com/v1/places:searchNearby"
 # Horario, precio y calificación son de la tarifa Enterprise: se piden solo para el planificador

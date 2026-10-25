@@ -1,0 +1,4 @@
+# Solo para scripts/migrar_mysql_a_mongo.py (la API no lo necesita)
+sqlalchemy>=2.0
+pymysql
+cryptography

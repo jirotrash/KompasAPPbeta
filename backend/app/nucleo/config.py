@@ -6,13 +6,15 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # backend/.env, sin importar desde qué carpeta se levante uvicorn
-ARCHIVO_ENV = Path(__file__).resolve().parent.parent / ".env"
+ARCHIVO_ENV = Path(__file__).resolve().parents[2] / ".env"
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=ARCHIVO_ENV, env_file_encoding="utf-8", extra="ignore")
 
-    database_url: str
+    # MongoDB local (mongodb://localhost:27017) o Atlas (mongodb+srv://...): solo cambia esta variable
+    mongo_uri: str
+    mongo_db: str = "kompas"
     jwt_secret: str
     jwt_expira_minutos: int = 60 * 24 * 7
     cors_origins: str = "*"

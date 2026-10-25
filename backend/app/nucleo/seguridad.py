@@ -4,13 +4,13 @@ from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
+from pymongo.database import Database
 
-from app.config import get_settings
-from app.db import get_db
-from app.modelos import Usuario
+from app.nucleo.bd import get_bd
+from app.nucleo.config import get_settings
+from app.nucleo.errores import NoAutorizado, Prohibido
 
 ALGORITMO = "HS256"
 
@@ -35,24 +35,29 @@ def crear_token(id_usuario: int) -> str:
     return jwt.encode(datos, ajustes.jwt_secret, algorithm=ALGORITMO)
 
 
-def _no_autorizado(mensaje: str) -> HTTPException:
-    return HTTPException(status.HTTP_401_UNAUTHORIZED, detail=mensaje, headers={"WWW-Authenticate": "Bearer"})
-
-
 def get_usuario_actual(
     credenciales: HTTPAuthorizationCredentials | None = Depends(_bearer),
-    db: Session = Depends(get_db),
-) -> Usuario:
-    """Dependencia de los endpoints 🔒: regresa el usuario del token o responde 401."""
+    bd: Database = Depends(get_bd),
+) -> dict:
+    """Dependencia de los endpoints 🔒: regresa el usuario del token (dict del dominio) o responde 401."""
+    # Import local: el módulo cuenta importa este archivo (crear_token, hash_password)
+    from app.modulos.cuenta.repositorio import RepositorioCuenta
+
     if credenciales is None:
-        raise _no_autorizado("Inicia sesión para continuar.")
+        raise NoAutorizado("Inicia sesión para continuar.")
     try:
         datos = jwt.decode(credenciales.credentials, get_settings().jwt_secret, algorithms=[ALGORITMO])
         id_usuario = int(datos["sub"])
     except (jwt.PyJWTError, KeyError, ValueError):
-        raise _no_autorizado("Tu sesión expiró o no es válida. Inicia sesión de nuevo.") from None
+        raise NoAutorizado("Tu sesión expiró o no es válida. Inicia sesión de nuevo.") from None
 
-    usuario = db.get(Usuario, id_usuario)
-    if usuario is None or usuario.deleted_at is not None:
-        raise _no_autorizado("Tu cuenta ya no está disponible. Inicia sesión de nuevo.")
+    usuario = RepositorioCuenta(bd).por_id(id_usuario)
+    if usuario is None:
+        raise NoAutorizado("Tu cuenta ya no está disponible. Inicia sesión de nuevo.")
+    return usuario
+
+
+def requiere_admin(usuario: dict = Depends(get_usuario_actual)) -> dict:
+    if usuario.get("rol") != "admin":
+        raise Prohibido("Solo un administrador puede ver el dashboard.")
     return usuario

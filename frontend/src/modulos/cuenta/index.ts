@@ -1,0 +1,5 @@
+export { default as Login } from './paginas/Login.tsx'
+export { default as Registro } from './paginas/Registro.tsx'
+export { AuthProvider } from './contexto/AuthContext.tsx'
+export { useAuth } from './contexto/auth.ts'
+export { login, registrar } from './api.ts'

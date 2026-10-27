@@ -1,4 +1,5 @@
-"""Demostraciones académicas: envuelve `app.ia.busqueda_dfs` y `app.ia.metricas_distancia` sin cambiar su respuesta.
+"""Demostraciones académicas: envuelve `app.ia.busqueda_dfs`, `app.ia.metricas_distancia`,
+`app.ia.busqueda_informada` y `app.ia.algoritmo_genetico` sin cambiar su respuesta.
 
 Después de calcular, deja un registro en la bitácora para el dashboard. Si la escritura falla, la
 respuesta se devuelve igual (solo se registra un aviso).
@@ -15,10 +16,12 @@ from app.compartido.geo import (
     distancia_manhattan_km,
     minutos_caminando,
 )
+from app.ia.algoritmo_genetico import ordenar_paradas
 from app.ia.busqueda_dfs import PARADAS_KOMPAS, planificar_rutas_dfs
+from app.ia.busqueda_informada import comparar_algoritmos
 from app.ia.metricas_distancia import Punto, comparar_distancias, fmt
 from app.modulos.laboratorio.repositorio import RepositorioBitacora
-from app.nucleo.errores import DatosInvalidos
+from app.nucleo.errores import DatosInvalidos, NoEncontrado
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +41,8 @@ class ServicioLaboratorio:
     def __init__(self, bitacora: RepositorioBitacora):
         self.bitacora = bitacora
 
-    def _registrar(self, tipo: str, datos: dict) -> None:
+    def registrar(self, tipo: str, datos: dict) -> None:
+        """Escribe en la bitácora sin romper nunca la respuesta (la usan también rutas e itinerarios)."""
         try:
             self.bitacora.registrar(tipo, datos)
         except Exception as error:  # noqa: BLE001 — la bitácora nunca debe romper la demostración
@@ -50,7 +54,7 @@ class ServicioLaboratorio:
 
     def buscar_dfs(self, origen: str, destino: str, limite_profundidad: int) -> dict:
         resultado = planificar_rutas_dfs(origen, destino, limite_profundidad)
-        self._registrar(
+        self.registrar(
             "dfs",
             {
                 "origen": origen,
@@ -66,7 +70,7 @@ class ServicioLaboratorio:
 
     def comparar_plano(self, a: Punto, b: Punto) -> dict:
         resultado = comparar_distancias(a, b)
-        self._registrar("distancia", {"modo": "plano", "euclidiana": resultado["euclidiana"], "manhattan": resultado["manhattan"]})
+        self.registrar("distancia", {"modo": "plano", "euclidiana": resultado["euclidiana"], "manhattan": resultado["manhattan"]})
         return resultado
 
     def comparar_geo(self, a: Coordenada, b: Coordenada) -> dict:
@@ -93,7 +97,51 @@ class ServicioLaboratorio:
             },
             "nota": "Kompás usa la distancia Manhattan para estimar trayectos por calles.",
         }
-        self._registrar(
+        self.registrar(
             "distancia", {"modo": "geo", "euclidiana": resultado["euclidiana_km"], "manhattan": resultado["manhattan_km"]}
+        )
+        return resultado
+
+    def comparar_busqueda(self, origen: str, destino: str) -> dict:
+        """DFS, UCS, voraz y A* sobre la red académica (tabla comparativa)."""
+        resultado = comparar_algoritmos(origen, destino)
+        if not resultado["exito"]:
+            raise NoEncontrado(resultado["mensaje"])
+        campos = ("algoritmo", "heuristica", "costo_km", "nodos_explorados", "longitud_camino", "optimo", "ms")
+        self.registrar(
+            "busqueda",
+            {
+                "origen": origen,
+                "destino": destino,
+                "costo_optimo_km": resultado["costo_optimo_km"],
+                "algoritmos": [{k: f[k] for k in campos} for f in resultado["filas"]],
+            },
+        )
+        return resultado
+
+    def ordenar_paradas(self, peticion: dict) -> dict:
+        """Ejecuta el genético con los parámetros que elija el administrador."""
+        paradas = peticion["paradas"]
+        parametros = {k: peticion.get(k) for k in ("poblacion", "generaciones", "prob_cruza", "prob_mutacion", "semilla")}
+        try:
+            resultado = ordenar_paradas(paradas, peticion.get("origen"), None, None, **parametros)
+        except ValueError as error:
+            raise DatosInvalidos(str(error)) from None
+        resultado["orden_paradas"] = [paradas[i].get("nombre") or f"Parada {i + 1}" for i in resultado["mejor_orden"]]
+        self.registrar(
+            "genetico",
+            {
+                "origen": "endpoint",
+                "paradas": len(paradas),
+                "km_antes": resultado["distancia_original_km"],
+                "km_despues": resultado["distancia_km"],
+                "aplicado": resultado["mejor_orden"] != list(range(len(paradas))),
+                "generaciones": resultado["parametros"]["generaciones"],
+                "generacion_mejor": resultado["generacion_mejor"],
+                "brecha_vs_optimo_pct": resultado["brecha_vs_optimo_%"],
+                "historial_mejor": [h["mejor"] for h in resultado["historial"]],
+                "historial_promedio": [h["promedio"] for h in resultado["historial"]],
+                "ms": resultado["ms"],
+            },
         )
         return resultado

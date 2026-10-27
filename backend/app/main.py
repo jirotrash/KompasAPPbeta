@@ -55,6 +55,8 @@ for router in (
     reportes.router,
     laboratorio.router_dfs,
     laboratorio.router_distancias,
+    laboratorio.router_busqueda,
+    laboratorio.router_genetico,
     dashboard.router,
 ):
     app.include_router(router)

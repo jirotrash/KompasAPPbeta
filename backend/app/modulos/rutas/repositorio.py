@@ -6,7 +6,13 @@ from app.nucleo.bd import ahora, siguiente_id
 
 
 def _ruta(doc: dict) -> dict:
-    return {"id": doc["_id"], "_id": str(doc["_id"]), "trazo": doc["trazo"]["coordinates"]}
+    ruta = {"id": doc["_id"], "_id": str(doc["_id"]), "trazo": doc["trazo"]["coordinates"]}
+    # Opcionales: nombre de la línea y paradas reales capturadas por el equipo ({nombre, ubicacion: Point})
+    if doc.get("nombre"):
+        ruta["nombre"] = doc["nombre"]
+    if doc.get("paradas"):
+        ruta["paradas"] = [{"nombre": p["nombre"], "ubicacion": p["ubicacion"]} for p in doc["paradas"]]
+    return ruta
 
 
 class RepositorioRutas:

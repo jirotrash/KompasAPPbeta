@@ -95,6 +95,16 @@ class ParadaPlan(Salida):
     lugar: LugarPlan | None = None
 
 
+class OrdenOptimizado(Salida):
+    """Resultado del algoritmo genético sobre el orden de las paradas (para el dashboard y el manual)."""
+
+    distancia_antes_km: float
+    distancia_despues_km: float
+    generaciones: int
+    generacion_mejor: int | None = None
+    aplicado: bool = Field(description="false si el orden original ya era el más corto o el nuevo no pasaba las reglas")
+
+
 class PlanSalida(Salida):
     tipo: Literal["equilibrado", "rapido", "cercano"]
     estado: Literal["recomendable"] = "recomendable"
@@ -108,6 +118,7 @@ class PlanSalida(Salida):
     tramos: list[TramoSalida] = []
     explicacion: str
     reglas_cumplidas: list[ReglaSalida] = Field(description="Traza del motor: reglas activadas con su explicación")
+    orden_optimizado: OrdenOptimizado | None = Field(default=None, description="La app y la web no lo muestran")
 
 
 class Descartado(Salida):

@@ -1,6 +1,6 @@
 // SIMULACIÓN de traslados con las rutas de ejemplo (lo real lo calcula la API con las rutas de MongoDB).
 import type { Coordenada } from '@/constants/zona';
-import type { Alternativa, Movilidad, Tramo } from '@/types/dominio';
+import type { Alternativa, Movilidad, ParadaRuta, Tramo } from '@/types/dominio';
 import { aMinutosDelDia, desdeGeoJSON, distanciaKm, distanciaPorCallesKm, FACTOR_CALLES, VELOCIDAD_KMH } from '@/utils/geo';
 
 import { RUTAS } from './datos';
@@ -27,10 +27,15 @@ export function alternativaAutobus(
   if (sube.km > RADIO_CAMINATA_KM || baja.km > RADIO_CAMINATA_KM || sube.i >= baja.i) return null;
 
   const tramo = ruta.paradas.slice(sube.i, baja.i + 1);
-  let kmTramo = 0;
-  for (let i = 1; i < tramo.length; i++) {
-    kmTramo += distanciaKm(desdeGeoJSON(tramo[i - 1].ubicacion.coordinates), desdeGeoJSON(tramo[i].ubicacion.coordinates));
+  // km acumulado desde la primera parada (la misma clave que usa el árbol de paradas de la API)
+  const acumulado = [0];
+  for (let i = 1; i < ruta.paradas.length; i++) {
+    acumulado.push(acumulado[i - 1] + distanciaKm(desdeGeoJSON(ruta.paradas[i - 1].ubicacion.coordinates), desdeGeoJSON(ruta.paradas[i].ubicacion.coordinates)));
   }
+  const kmTramo = acumulado[baja.i] - acumulado[sube.i];
+  const paradaRuta = (i: number): ParadaRuta => ({ nombre: ruta.paradas[i].nombre, ...desdeGeoJSON(ruta.paradas[i].ubicacion.coordinates), km: acumulado[i] });
+  const intermedias = tramo.slice(1, -1).map((_, j) => paradaRuta(sube.i + 1 + j));
+  const minutosTrayecto = Math.round(((kmTramo * FACTOR_CALLES) / VELOCIDAD_KMH.autobus) * 60);
 
   const avisos: string[] = [];
   const min = aMinutosDelDia(hora);
@@ -46,17 +51,36 @@ export function alternativaAutobus(
   return {
     id: `bus_${ruta._id}`,
     modo: 'autobus',
+    tipo: 'directo',
     ruta_id: ruta._id,
     linea: ruta.linea,
     sentido: ruta.sentido,
     tarifa: ruta.tarifa,
     abordaje: { nombre: sube.parada.nombre, ubicacion: sube.parada.ubicacion },
     descenso: { nombre: baja.parada.nombre, ubicacion: baja.parada.ubicacion },
+    parada_subida: paradaRuta(sube.i),
+    parada_bajada: paradaRuta(baja.i),
+    paradas_intermedias: intermedias,
+    tramo_en_ruta: tramo.map((p) => p.ubicacion.coordinates),
+    numero_transbordos: 0,
+    tramos: [
+      {
+        modo: 'autobus',
+        linea: ruta.linea,
+        distancia_km: kmTramo * FACTOR_CALLES,
+        duracion_min: minutosTrayecto,
+        parada_subida: paradaRuta(sube.i),
+        parada_bajada: paradaRuta(baja.i),
+        paradas_intermedias: intermedias,
+        tramo_en_ruta: tramo.map((p) => p.ubicacion.coordinates),
+        trazo_ruta: ruta.paradas.map((p) => p.ubicacion.coordinates),
+      },
+    ],
     transbordos: [],
     tiempos: {
       caminata: Math.round(((sube.km + baja.km) * FACTOR_CALLES * 60) / VELOCIDAD_KMH.pie),
       espera: Math.round(ruta.horario.frecuencia_min / 2),
-      trayecto: Math.round(((kmTramo * FACTOR_CALLES) / VELOCIDAD_KMH.autobus) * 60),
+      trayecto: minutosTrayecto,
       transbordos: 0,
     },
     distancia_km: kmTramo * FACTOR_CALLES + sube.km + baja.km,

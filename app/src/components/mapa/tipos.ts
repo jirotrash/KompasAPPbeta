@@ -5,8 +5,10 @@ export type MarcadorMapa = Coordenada & {
   id: string;
   /** Texto dentro del círculo (número de parada, "A"…). */
   etiqueta?: string;
-  tipo: 'origen' | 'lugar' | 'parada' | 'destino' | 'reporte' | 'seleccion';
+  tipo: 'origen' | 'lugar' | 'parada' | 'destino' | 'reporte' | 'seleccion' | 'subida' | 'bajada' | 'transbordo' | 'intermedia';
   titulo?: string;
+  /** Muestra `titulo` siempre junto al marcador (p. ej. dónde subir y dónde bajar). */
+  nombreVisible?: boolean;
   onPress?: () => void;
 };
 
@@ -18,6 +20,8 @@ export type LineaMapa = {
   color?: string;
   /** Línea punteada en lugar de continua. */
   punteada?: boolean;
+  /** Línea tenue (el resto de la ruta fuera del tramo en autobús). */
+  tenue?: boolean;
 };
 
 export type PropsMapa = {

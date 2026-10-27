@@ -45,6 +45,29 @@ export type Tramo = {
   descenso?: Parada;
   trazo?: GeoLinea;
   aviso?: string;
+  /** Texto bajo el tramo en autobús (si no viene: "Incluye caminata a la parada y espera estimada."). */
+  nota?: string;
+};
+
+/** Parada de una ruta de Kompás: real o "Punto N" del trazo (no se inventan nombres). km = desde el inicio de la ruta. */
+export type ParadaRuta = Coordenada & { nombre: string; km: number };
+
+/** Tramo de una opción en autobús: camina → ruta X → (transbordo) → ruta Y → camina. */
+export type TramoOpcion = {
+  modo: 'pie' | 'autobus';
+  distancia_km: number;
+  duracion_min: number;
+  desde?: Coordenada;
+  hasta?: Coordenada;
+  id_ruta?: number;
+  linea?: string;
+  parada_subida?: ParadaRuta;
+  parada_bajada?: ParadaRuta;
+  /** [[lng, lat], ...] entre subida y bajada */
+  tramo_en_ruta?: ParGeoJSON[];
+  paradas_intermedias?: ParadaRuta[];
+  /** Trazo completo de la ruta [[lng, lat], ...] (se dibuja tenue) */
+  trazo_ruta?: ParGeoJSON[];
 };
 
 /** Respuesta de GET /api/rutas: una alternativa para ir de A a B. */
@@ -67,6 +90,15 @@ export type Alternativa = {
   reglas_cumplidas?: Regla[];
   avisos?: string[];
   ejemplo?: boolean;
+  // Opcionales (v0.6): opciones en autobús directas o combinadas con transbordo
+  tipo?: 'directo' | 'combinado';
+  id_ruta?: number;
+  parada_subida?: ParadaRuta;
+  parada_bajada?: ParadaRuta;
+  tramo_en_ruta?: ParGeoJSON[];
+  paradas_intermedias?: ParadaRuta[];
+  numero_transbordos?: number;
+  tramos?: TramoOpcion[];
 };
 
 export type RespuestaRutas = { datos_suficientes: boolean; mensaje?: string; alternativas: Alternativa[] };
@@ -253,6 +285,8 @@ export type Sesion = { token: string; usuario: Usuario };
 export type PuntoRecorrido = Coordenada & {
   nombre: string;
   tipo: 'origen' | 'lugar' | 'parada' | 'destino';
+  /** Solo en paradas de autobús: dónde subir, dónde bajar o dónde transbordar (el mapa las distingue). */
+  rol?: 'subida' | 'bajada' | 'transbordo';
   hora?: string;
   interes?: Interes;
 };
@@ -262,7 +296,63 @@ export type Recorrido = {
   puntos: PuntoRecorrido[];
   /** tramos[i] va de puntos[i] a puntos[i + 1] */
   tramos: Tramo[];
+  /** Rutas de autobús completas (se dibujan tenues; el tramo en autobús va resaltado en `tramos`). */
+  trazosRuta?: GeoLinea[];
+  /** Paradas intermedias del tramo en autobús (puntos pequeños). */
+  intermedias?: (Coordenada & { nombre: string })[];
   avisos?: string[];
   fuente?: string;
   ejemplo?: boolean;
+};
+
+// ───────────── Asistente (Ollama, a través de la API) ─────────────
+
+export type EstadoAsistente = { disponible: boolean; modelo: string; modelo_instalado?: boolean };
+
+export type PuntoNombrado = Coordenada & { nombre: string };
+
+/** Ruta o plan que regresó el asistente. Las de conversaciones guardadas solo traen la referencia. */
+export type TarjetaAsistente = {
+  tipo: 'ruta' | 'plan';
+  titulo: string;
+  subtitulo?: string | null;
+  id_ruta?: number | null;
+  id_plan?: number | null;
+  origen?: PuntoNombrado | null;
+  destino?: PuntoNombrado | null;
+  alternativa?: Alternativa | null;
+  plan?: Plan | null;
+  /** Destino como lo escribió el usuario (tarjetas de conversaciones guardadas) */
+  destino_texto?: string | null;
+  ejemplo?: boolean;
+};
+
+export type MensajeChat = {
+  rol: 'usuario' | 'asistente' | 'herramienta' | 'error';
+  contenido?: string | null;
+  nombre?: string | null;
+  duracion_ms?: number | null;
+  tarjeta?: TarjetaAsistente | null;
+  creado_en: string;
+};
+
+export type ResumenConversacion = { id: string; titulo: string | null; ultimo_mensaje: string | null; fecha: string; total_mensajes: number };
+
+export type Conversacion = {
+  id: string;
+  titulo: string | null;
+  modelo: string;
+  mensajes: MensajeChat[];
+  planes_creados: number[];
+  created_at: string;
+  updated_at: string;
+};
+
+/** POST /api/asistente/conversaciones/{id}/mensajes */
+export type RespuestaMensaje = {
+  conversacion_id: string;
+  titulo: string | null;
+  mensaje: MensajeChat;
+  tarjetas: TarjetaAsistente[];
+  herramientas_usadas: string[];
 };

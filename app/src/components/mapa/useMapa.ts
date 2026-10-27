@@ -30,6 +30,12 @@ export default function useMapa({ marcadores = [], lineas = [], onPressMapa, mar
         sobreOscuro: paleta.tarjeta,
         tarjeta: paleta.tarjeta,
         peligro: paleta.peligro,
+        ok: paleta.ok,
+        aviso: paleta.aviso,
+        acento: paleta.acento,
+        // Texto sobre verde/rojo: blanco en claro y oscuro profundo en oscuro; sobre dorado siempre oscuro (COLORIMETRIA.md §4)
+        sobreColor: esquema === 'oscuro' ? paleta.fondo : '#FFFFFF',
+        sobreAviso: esquema === 'oscuro' ? paleta.fondo : paleta.texto,
       },
       lineas,
       marcadores: marcadores.map(({ onPress, ...m }) => ({ ...m, tocable: !!onPress })),

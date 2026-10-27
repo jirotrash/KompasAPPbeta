@@ -46,6 +46,7 @@ class Tarjeta(Salida):
     destino: PuntoNombrado | None = None
     alternativa: dict | None = Field(default=None, description="Mejor opción de GET /api/rutas (solo en la respuesta)")
     plan: dict | None = Field(default=None, description="Plan recomendado de POST /api/itinerarios (solo en la respuesta)")
+    destino_texto: str | None = Field(default=None, description="Destino como lo escribió el usuario (tarjetas guardadas)")
 
 
 class MensajeChat(Salida):

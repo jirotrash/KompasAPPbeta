@@ -10,6 +10,7 @@ const PESTANAS: { name: string; title: string; icono: NombreIcono }[] = [
   { name: 'index', title: 'Inicio', icono: 'inicio' },
   { name: 'planificar', title: 'Planificar', icono: 'planificar' },
   { name: 'mapa', title: 'Mapa', icono: 'mapa' },
+  { name: 'asistente', title: 'Asistente', icono: 'chat' },
   { name: 'perfil', title: 'Perfil', icono: 'perfil' },
 ];
 

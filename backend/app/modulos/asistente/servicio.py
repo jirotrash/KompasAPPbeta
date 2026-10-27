@@ -45,7 +45,12 @@ def tarjeta_guardada(mensaje: dict) -> dict | None:
     """Tarjeta mínima de un mensaje de herramienta guardado (sin datos de Google ni del GPS)."""
     ref = mensaje.get("resultado_ref") or {}
     if ref.get("tipo") == "ruta":
-        return {"tipo": "ruta", "titulo": f"{ref.get('origen')} → {ref.get('destino')}", "id_ruta": ref.get("id_ruta")}
+        return {
+            "tipo": "ruta",
+            "titulo": f"{ref.get('origen')} → {ref.get('destino')}",
+            "id_ruta": ref.get("id_ruta"),
+            "destino_texto": ref.get("destino"),
+        }
     if ref.get("tipo") == "plan" and ref.get("id_plan"):
         return {"tipo": "plan", "titulo": "Plan guardado", "subtitulo": f"Plan #{ref['id_plan']}", "id_plan": ref["id_plan"]}
     return None

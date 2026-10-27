@@ -10,6 +10,8 @@ import type { Coordenada } from '@/constants/zona';
 import type {
   ComparacionDistancias,
   ComparacionGeo,
+  Conversacion,
+  EstadoAsistente,
   Lugar,
   NuevoReporte,
   NuevoUsuario,
@@ -17,16 +19,21 @@ import type {
   PeticionPlan,
   PuntoPlano,
   RespuestaDFS,
+  RespuestaMensaje,
   RespuestaPlanes,
   RespuestaRutas,
+  ResumenConversacion,
   Sesion,
 } from '@/types/dominio';
 
 import * as mock from './mock';
+import * as mockAsistente from './mock/asistente';
 
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 export const USA_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false';
 const TIEMPO_LIMITE_MS = 15000;
+// El modelo local puede tardar (sobre todo la primera respuesta, mientras Ollama lo carga)
+const TIEMPO_LIMITE_ASISTENTE_MS = 120000;
 
 let token: string | null = null;
 /** Lo llama el contexto de sesión al iniciar o cerrar sesión. */
@@ -47,7 +54,12 @@ const punto = ({ lat, lng }: Coordenada) => `${lat},${lng}`;
 
 async function solicitud<T>(
   ruta: string,
-  { method = 'GET', params, body }: { method?: string; params?: Record<string, string | undefined>; body?: unknown } = {},
+  {
+    method = 'GET',
+    params,
+    body,
+    tiempoLimiteMs = TIEMPO_LIMITE_MS,
+  }: { method?: string; params?: Record<string, string | undefined>; body?: unknown; tiempoLimiteMs?: number } = {},
 ): Promise<T> {
   const consulta = new URLSearchParams(
     Object.entries(params ?? {}).filter((par): par is [string, string] => !!par[1]),
@@ -59,7 +71,7 @@ async function solicitud<T>(
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const control = new AbortController();
-  const temporizador = setTimeout(() => control.abort(), TIEMPO_LIMITE_MS);
+  const temporizador = setTimeout(() => control.abort(), tiempoLimiteMs);
   let respuesta: Response;
   try {
     respuesta = await fetch(url, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: control.signal });
@@ -79,7 +91,7 @@ async function solicitud<T>(
   return datos as T;
 }
 
-// ─────────────────────────── Autenticación (MySQL) ───────────────────────────
+// ─────────────────────────── Autenticación (MongoDB) ─────────────────────────
 
 /** POST /api/auth/login → { token, usuario } */
 export const login = (datos: { email: string; password: string }) =>
@@ -158,3 +170,37 @@ export const crearReporte = (reporte: NuevoReporte) => mock.crearReporte(reporte
 
 /** GET /api/reportes?ruta_id= → reportes vigentes (sin ruta_id: todos los de la zona) */
 export const obtenerReportes = (rutaId?: string) => mock.obtenerReportes(rutaId);
+
+// ─────────────────────── Asistente (Ollama, siempre a través de la API) ───────────────────────
+
+/** GET /api/asistente/estado → { disponible, modelo } (la API hace ping a Ollama) */
+export const estadoAsistente = () => (USA_MOCK ? mockAsistente.estado() : solicitud<EstadoAsistente>('/api/asistente/estado'));
+
+/** GET /api/asistente/conversaciones → conversaciones del usuario, de la más reciente a la más antigua */
+export const listarConversaciones = () =>
+  USA_MOCK ? mockAsistente.listar() : solicitud<ResumenConversacion[]>('/api/asistente/conversaciones');
+
+/** POST /api/asistente/conversaciones → conversación vacía */
+export const crearConversacion = () =>
+  USA_MOCK ? mockAsistente.crear() : solicitud<Conversacion>('/api/asistente/conversaciones', { method: 'POST' });
+
+/** GET /api/asistente/conversaciones/{id} → conversación completa (404 si no es del usuario) */
+export const obtenerConversacion = (id: string) =>
+  USA_MOCK ? mockAsistente.obtener(id) : solicitud<Conversacion>(`/api/asistente/conversaciones/${encodeURIComponent(id)}`);
+
+/**
+ * POST /api/asistente/conversaciones/{id}/mensajes → respuesta del asistente y tarjetas de rutas o planes.
+ * `ubicacion` sirve para "desde aquí" y para armar salidas; la API no la guarda. 503 si Ollama no responde.
+ */
+export const enviarMensaje = (id: string, texto: string, ubicacion?: Coordenada) =>
+  USA_MOCK
+    ? mockAsistente.enviar(id, texto, ubicacion)
+    : solicitud<RespuestaMensaje>(`/api/asistente/conversaciones/${encodeURIComponent(id)}/mensajes`, {
+        method: 'POST',
+        body: { texto, ubicacion },
+        tiempoLimiteMs: TIEMPO_LIMITE_ASISTENTE_MS,
+      });
+
+/** DELETE /api/asistente/conversaciones/{id} → borrado lógico */
+export const borrarConversacion = (id: string) =>
+  USA_MOCK ? mockAsistente.borrar(id) : solicitud<null>(`/api/asistente/conversaciones/${encodeURIComponent(id)}`, { method: 'DELETE' });

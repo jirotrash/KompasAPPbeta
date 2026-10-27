@@ -71,17 +71,25 @@ function TarjetaAlternativa({ a, onPress }: { a: Alternativa; onPress: () => voi
               <Texto tam="sm" peso="fuerte" color="$ok">
                 ↑ Sube en:{' '}
               </Texto>
-              {a.abordaje?.nombre}
+              {a.parada_subida?.nombre ?? a.abordaje?.nombre}
             </Texto>
+            {a.transbordos?.map((t) => (
+              <Texto key={`${t.linea}-${t.nombre}`} tam="sm">
+                <Texto tam="sm" peso="fuerte" color="$acento">
+                  ⇄ Transborda en:{' '}
+                </Texto>
+                {t.nombre} ({t.linea})
+              </Texto>
+            ))}
             <Texto tam="sm">
               <Texto tam="sm" peso="fuerte" color="$aviso">
                 ↓ Baja en:{' '}
               </Texto>
-              {a.descenso?.nombre}
+              {a.parada_bajada?.nombre ?? a.descenso?.nombre}
             </Texto>
             <Texto tam="xs" suave>
-              Caminata {formatoMinutos(a.tiempos.caminata)} · espera {formatoMinutos(a.tiempos.espera)} · trayecto{' '}
-              {formatoMinutos(a.tiempos.trayecto)} · tarifa {a.tarifa != null ? `$${a.tarifa}` : 'por confirmar'}
+              Caminata {formatoMinutos(a.tiempos.caminata)} · espera {a.tiempos.espera != null ? formatoMinutos(a.tiempos.espera) : 'sin dato'} ·
+              trayecto {formatoMinutos(a.tiempos.trayecto)} · tarifa {a.tarifa != null ? `$${a.tarifa}` : 'por confirmar'}
             </Texto>
           </YStack>
         )}
@@ -104,10 +112,11 @@ export default function Buscar() {
   const { paleta } = useTema();
   const { posicion } = useUbicacion();
   const { setRecorrido } = useViaje();
-  const params = useLocalSearchParams<{ lugar?: string }>();
+  // lugar: id de un lugar propio; q: texto para buscar (p. ej. el destino de una tarjeta del asistente)
+  const params = useLocalSearchParams<{ lugar?: string; q?: string }>();
 
   const [lugares, setLugares] = useState<Lugar[]>([]);
-  const [texto, setTexto] = useState('');
+  const [texto, setTexto] = useState(params.q ?? '');
   const [remoto, setRemoto] = useState<{ consulta: string; lista: Direccion[]; error: boolean }>({ consulta: '', lista: [], error: false });
   const [destino, setDestino] = useState<Destino | null>(null);
   const [rutas, setRutas] = useState<{ para: Destino; respuesta: RespuestaRutas } | null>(null);

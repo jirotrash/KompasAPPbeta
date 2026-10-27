@@ -50,7 +50,7 @@ function PasoTramo({ tramo }: { tramo: Tramo }) {
               {tramo.descenso?.nombre ?? '—'}
             </Texto>
             <Texto tam="xs" suave>
-              Incluye caminata a la parada y espera estimada.
+              {tramo.nota ?? 'Incluye caminata a la parada y espera estimada.'}
             </Texto>
           </>
         )}

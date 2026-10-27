@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.ia.metricas_distancia import comparar_distancias, distancia_euclidiana, distancia_manhattan
 from app.main import app
-from app.servicios.geo import distancia_euclidiana_km, distancia_km, distancia_manhattan_km, distancia_por_calles_km
+from app.compartido.geo import distancia_euclidiana_km, distancia_km, distancia_manhattan_km, distancia_por_calles_km
 
 cliente = TestClient(app)
 

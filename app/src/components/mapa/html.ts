@@ -22,6 +22,9 @@ export const HTML_MAPA = `<!doctype html>
   html, body, #mapa { margin: 0; height: 100%; width: 100%; }
   body { background: #eef1f2; font-family: system-ui, -apple-system, Roboto, sans-serif; }
   .marcador { background: transparent; border: 0; }
+  .nombre-parada { font: 600 12px system-ui, sans-serif; padding: 2px 6px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .oscuro .nombre-parada { background: #1f2a3d; color: #e8ecf3; border-color: #2b3750; }
+  .oscuro .nombre-parada::before { border-right-color: #1f2a3d; }
   .leaflet-control-attribution { font-size: 9px; }
   .leaflet-bar { border: 0 !important; box-shadow: 0 1px 5px rgba(0,0,0,.3); border-radius: 10px; overflow: hidden; }
   .leaflet-bar a { width: 40px !important; height: 40px !important; line-height: 40px !important; font-size: 20px !important; }
@@ -73,6 +76,21 @@ export const HTML_MAPA = `<!doctype html>
   }
 
   function icono(m, c) {
+    if (m.tipo === 'intermedia') {
+      return L.divIcon({
+        className: 'marcador', iconSize: [12, 12], iconAnchor: [6, 6],
+        html: '<div style="width:12px;height:12px;border-radius:50%;background:' + c.tarjeta + ';border:3px solid ' + c.ruta + ';box-sizing:border-box"></div>'
+      });
+    }
+    // Dónde subir (verde ↑), dónde bajar (dorado ↓, texto oscuro) y transbordo (rojo ⇄)
+    var parada = { subida: [c.ok, '↑', c.sobreColor], bajada: [c.aviso, '↓', c.sobreAviso], transbordo: [c.acento, '⇄', c.sobreColor] }[m.tipo];
+    if (parada) {
+      return L.divIcon({
+        className: 'marcador', iconSize: [30, 30], iconAnchor: [15, 15],
+        html: '<div style="width:30px;height:30px;border-radius:50%;background:' + parada[0] + ';color:' + parada[2] +
+          ';border:3px solid #fff;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:800 15px system-ui,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.35)">' + parada[1] + '</div>'
+      });
+    }
     var grande = m.tipo !== 'parada';
     var fondo = { destino: '#EA4335', seleccion: '#EA4335', reporte: c.peligro, parada: c.tarjeta, origen: c.primario, lugar: c.oscuro }[m.tipo] || c.primario;
     var color = m.tipo === 'lugar' ? c.sobreOscuro : m.tipo === 'parada' ? c.primario : '#fff';
@@ -103,7 +121,9 @@ export const HTML_MAPA = `<!doctype html>
     d.lineas.forEach(function (l) {
       var puntos = l.coordenadas.map(function (p) { return [p.lat, p.lng]; });
       if (puntos.length < 2) return;
-      if (l.color) {
+      if (l.tenue) {
+        L.polyline(puntos, { color: c.ruta, weight: 5, opacity: .3 }).addTo(dibujos);
+      } else if (l.color) {
         // Línea con color propio: borde blanco para que se vea sobre cualquier calle
         L.polyline(puntos, { color: '#ffffff', weight: 9, opacity: .9, dashArray: l.punteada ? '10 10' : null }).addTo(dibujos);
         L.polyline(puntos, { color: l.color, weight: 5, opacity: 1, dashArray: l.punteada ? '10 10' : null }).addTo(dibujos);
@@ -124,6 +144,7 @@ export const HTML_MAPA = `<!doctype html>
       var mk = L.marker([m.lat, m.lng], { icon: icono(m, c), title: m.titulo || '' }).addTo(dibujos);
       if (m.tocable) mk.on('click', function () { enviar({ tipo: 'marcador', id: m.id }); });
       else if (m.titulo) mk.bindPopup(m.titulo);
+      if (m.nombreVisible && m.titulo) mk.bindTooltip(m.titulo, { permanent: true, direction: 'right', offset: [14, 0], className: 'nombre-parada' });
     });
 
     // Los controles (zoom) suben para no quedar debajo del panel inferior

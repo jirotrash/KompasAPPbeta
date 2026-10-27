@@ -74,14 +74,19 @@ export default function PantallaMapa() {
     let numero = 0;
     return [
       ...lista,
-      ...recorrido.puntos.map((p, i) => ({
-        id: `punto_${i}`,
-        tipo: p.tipo,
-        etiqueta: p.tipo === 'lugar' ? String(++numero) : p.tipo === 'origen' ? '' : undefined,
-        lat: p.lat,
-        lng: p.lng,
-        titulo: p.nombre,
-      })),
+      ...(recorrido.intermedias ?? []).map((p, i): MarcadorMapa => ({ id: `intermedia_${i}`, tipo: 'intermedia', lat: p.lat, lng: p.lng, titulo: p.nombre })),
+      ...recorrido.puntos.map(
+        (p, i): MarcadorMapa => ({
+          id: `punto_${i}`,
+          // Dónde subir, bajar y transbordar se distinguen en el mapa y llevan su nombre a la vista
+          tipo: p.rol ?? p.tipo,
+          nombreVisible: !!p.rol,
+          etiqueta: p.tipo === 'lugar' ? String(++numero) : p.tipo === 'origen' ? '' : undefined,
+          lat: p.lat,
+          lng: p.lng,
+          titulo: p.rol === 'subida' ? `Sube: ${p.nombre}` : p.rol === 'bajada' ? `Baja: ${p.nombre}` : p.rol === 'transbordo' ? `Transbordo: ${p.nombre}` : p.nombre,
+        }),
+      ),
     ];
   }, [recorrido, lugares, reportes]);
 

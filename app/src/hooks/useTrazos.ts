@@ -13,6 +13,12 @@ import { desdeGeoJSON } from '@/utils/geo';
 export default function useTrazos(recorrido: Recorrido | null): LineaMapa[] {
   const [porCalles, setPorCalles] = useState<{ para: Recorrido | null; lineas: LineaMapa[] }>({ para: null, lineas: [] });
 
+  // El resto de cada ruta de autobús, tenue y debajo del tramo resaltado
+  const tenues = useMemo<LineaMapa[]>(
+    () => recorrido?.trazosRuta?.map((t, i) => ({ id: `ruta_${i}`, modo: 'autobus', tenue: true, coordenadas: t.coordinates.map(desdeGeoJSON) })) ?? [],
+    [recorrido],
+  );
+
   const rectas = useMemo<LineaMapa[]>(
     () =>
       recorrido?.tramos.map((t, i) => ({
@@ -43,5 +49,5 @@ export default function useTrazos(recorrido: Recorrido | null): LineaMapa[] {
     };
   }, [recorrido]);
 
-  return porCalles.para === recorrido ? porCalles.lineas : rectas;
+  return [...tenues, ...(porCalles.para === recorrido ? porCalles.lineas : rectas)];
 }

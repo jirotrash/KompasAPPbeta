@@ -13,8 +13,8 @@ from collections.abc import Callable
 from datetime import datetime, timedelta
 
 from app.ia.hechos import CONTEXTOS_CATEGORIAS, ESTANCIAS_MINUTOS, visita_en_horario
-from app.servicios.geo import distancia_km, distancia_por_calles_km, minutos_caminando, minutos_en_auto
-from app.servicios.traslados import DISTANCIA_CORTA_KM
+from app.compartido.geo import distancia_km, distancia_por_calles_km, minutos_caminando, minutos_en_auto
+from app.compartido.traslados import DISTANCIA_CORTA_KM
 
 MIN_VISITAS = 2
 MAX_VISITAS = 3

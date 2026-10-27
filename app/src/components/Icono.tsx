@@ -45,6 +45,10 @@ const ICONOS = {
   ojoTachado: { ios: 'eye.slash', android: 'visibility_off', web: 'visibility_off' },
   apple: { ios: 'apple.logo', android: 'phone_iphone', web: 'phone_iphone' },
   documento: { ios: 'doc.text', android: 'description', web: 'description' },
+  chat: { ios: 'bubble.left.and.bubble.right.fill', android: 'chat', web: 'chat' },
+  enviar: { ios: 'paperplane.fill', android: 'send', web: 'send' },
+  basura: { ios: 'trash', android: 'delete', web: 'delete' },
+  mas: { ios: 'plus', android: 'add', web: 'add' },
 } as const satisfies Record<string, SymbolViewProps['name']>;
 
 export type NombreIcono = keyof typeof ICONOS;

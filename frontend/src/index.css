@@ -117,6 +117,25 @@
   stroke-dasharray: 0 12;
   stroke-linecap: round;
 }
+/* Resto de la ruta fuera del tramo en autobús */
+.trazo-tenue {
+  stroke: var(--color-ruta);
+  stroke-opacity: 0.3;
+}
+
+/* Número de parada en el panel "Rutas y paradas" del dashboard (texto claro sobre el punto oscuro) */
+.leaflet-tooltip.numero-parada {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  color: var(--color-superficie);
+  font-size: 10px;
+  font-weight: 700;
+}
+.leaflet-tooltip.numero-parada::before {
+  display: none;
+}
 
 /* Punto azul de "mi ubicación" */
 .mi-posicion {
@@ -160,4 +179,13 @@
 }
 .leaflet-control-attribution a {
   color: var(--color-primario);
+}
+
+/* ───────── Gráficas (Recharts) ───────── */
+/* El texto de las leyendas usa tokens de texto; el color de la serie va solo en la muestra */
+.recharts-legend-item-text {
+  color: var(--color-texto-suave) !important;
+}
+.recharts-text {
+  font-family: inherit;
 }

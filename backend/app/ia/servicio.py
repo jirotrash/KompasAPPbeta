@@ -12,7 +12,7 @@ from datetime import datetime
 from app.ia import planificador
 from app.ia.hechos import construir_hechos
 from app.ia.motor import cargar_base, evaluar
-from app.servicios.geo import HORA_MEXICO, esta_dentro_de_zona, geo_punto
+from app.compartido.geo import HORA_MEXICO, esta_dentro_de_zona, geo_punto
 
 # Las reglas R01–R20 se leen y validan una sola vez al iniciar
 BASE = cargar_base()

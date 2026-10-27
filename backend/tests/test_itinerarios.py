@@ -1,7 +1,7 @@
 import pytest
 
-from app.servicios import google_places
-from app.servicios.geo import ahora_mexico
+from app.externos import google_places
+from app.compartido.geo import ahora_mexico
 from tests.conftest import encabezado, registrar
 
 PETICION = {
@@ -89,6 +89,11 @@ def test_crea_planes_con_el_motor_de_einar_y_los_guarda(cliente, google):
         assert len(plan["tramos"]) == len(plan["paradas"]) >= 2
         assert all(t["modo"] in ("pie", "taxi") and t["estimado"] for t in plan["tramos"])
         assert plan["duracion_horas"] <= PETICION["tiempo_horas"]
+        # El algoritmo genético deja las paradas en el orden más corto (nunca uno más largo)
+        orden = plan["orden_optimizado"]
+        assert orden["generaciones"] == 150
+        assert orden["distancia_despues_km"] <= orden["distancia_antes_km"]
+        assert plan["distancia_km"] == pytest.approx(orden["distancia_despues_km"], abs=0.11)
 
     assert any(d["estado"] == "pendiente_verificacion" and d["datos_faltantes"] for d in datos["descartados"])
 
@@ -97,6 +102,27 @@ def test_crea_planes_con_el_motor_de_einar_y_los_guarda(cliente, google):
     assert guardados[0]["no_acompanantes"] == 1 and guardados[0]["tiempo_disponible"] == 240
     assert guardados[0]["categoria"] == "Comer" and guardados[0]["transporte"] == "Caminando"
     assert guardados[0]["fecha_plan"].endswith("18:00:00")
+
+
+def test_el_genetico_reordena_las_paradas(cliente, bd, google):
+    """Lugares en zigzag: el orden más corto se aplica sin cambiar lo que decidió el sistema experto."""
+    antes = bd.bitacora_laboratorio.count_documents({"tipo": "genetico", "origen": "itinerario"})
+    google["lugares"] = [
+        lugar_google("cafe-lejos", "Café lejano", "cafe", 19.2990, -99.6640),
+        lugar_google("comida-cerca", "Comida cercana", "comer", 19.2930, -99.6560),
+        lugar_google("museo-medio", "Museo de en medio", "cultura", 19.2960, -99.6600),
+    ]
+    h = encabezado(registrar(cliente, "zigzag@ejemplo.mx")["token"])
+    datos = cliente.post("/api/itinerarios", json={**PETICION, "movilidad": ["caminando"]}, headers=h).json()
+    assert datos["planes"]
+    for plan in datos["planes"]:
+        orden = plan["orden_optimizado"]
+        assert orden["distancia_despues_km"] <= orden["distancia_antes_km"]
+        llegadas = [p["llegada_estimada"] for p in plan["paradas"]]
+        assert llegadas == sorted(llegadas)
+        assert [t["desde"] for t in plan["tramos"]][1:] == [p["nombre"] for p in plan["paradas"]][:-1]
+    assert bd.bitacora_laboratorio.count_documents({"tipo": "genetico", "origen": "itinerario"}) == antes + len(datos["planes"])
+    assert bd.planes.find_one(sort=[("_id", -1)])["origen_solicitud"] == "planificador"
 
 
 def test_sin_lugares_suficientes_no_inventa_planes(cliente, token_demo, google):

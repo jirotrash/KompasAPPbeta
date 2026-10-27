@@ -6,6 +6,7 @@ Arquitectura en capas por módulos (ARQUITECTURA.md): router → servicio → re
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.modulos.asistente import router as asistente
 from app.modulos.catalogos import router as catalogos
 from app.modulos.cuenta import router as cuenta
 from app.modulos.dashboard import router as dashboard
@@ -23,7 +24,7 @@ app = FastAPI(
     title="Kompás API",
     description="Movilidad y planes de salida en Toluca, Lerma y San Mateo Atenco. "
     "Los tiempos son estimaciones calculadas por distancia.",
-    version="0.5.0",
+    version="0.6.0",
 )
 
 app.add_middleware(
@@ -58,5 +59,6 @@ for router in (
     laboratorio.router_busqueda,
     laboratorio.router_genetico,
     dashboard.router,
+    asistente.router,
 ):
     app.include_router(router)

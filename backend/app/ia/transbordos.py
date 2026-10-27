@@ -128,4 +128,7 @@ def buscar_transbordo(rutas: list[dict[str, Any]], origen: Coordenada, destino: 
         else:
             salida.append({"modo": "pie", "km": t["km"], "desde": coords[t["desde"]], "hasta": coords[t["hasta"]]})
     usadas = list(dict.fromkeys(t["id_ruta"] for t in salida if t["modo"] == "autobus"))
+    if not usadas:
+        # Origen y destino junto a la misma parada: el camino es solo a pie (eso ya es la opción "a pie")
+        return base
     return {**base, "encontrado": True, "tramos": salida, "rutas_usadas": usadas}

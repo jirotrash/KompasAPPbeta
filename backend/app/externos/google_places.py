@@ -10,7 +10,7 @@ from datetime import datetime
 import httpx
 
 from app.nucleo.config import get_settings
-from app.compartido.geo import ahora_mexico
+from app.compartido.geo import ZONA, ahora_mexico
 
 URL_CERCANOS = "https://places.googleapis.com/v1/places:searchNearby"
 # Horario, precio y calificación son de la tarifa Enterprise: se piden solo para el planificador
@@ -130,3 +130,55 @@ def buscar_para_plan(
         if propio:
             cliente.close()
     return list(lugares.values())
+
+
+URL_TEXTO = "https://places.googleapis.com/v1/places:searchText"
+CAMPOS_TEXTO = "places.id,places.displayName,places.location,places.primaryType"
+
+
+def buscar_texto(texto: str, *, maximo: int = 5, cliente: httpx.Client | None = None) -> list[dict]:
+    """Text Search dentro de la zona piloto ("Cosmovitral", "terminal de Toluca"). Lo usa el asistente para
+    ubicar un origen o destino escrito por el usuario. Regresa [{place_id, nombre, lat, lng, fuente}];
+    no se guarda nada en la base (solo se puede conservar el place_id)."""
+    ajustes = get_settings()
+    if not ajustes.google_maps_api_key:
+        raise ErrorGooglePlaces("Falta configurar GOOGLE_MAPS_API_KEY en el servidor: no se pueden buscar lugares.")
+    lim = ZONA["limites"]
+    cuerpo = {
+        "textQuery": texto,
+        "maxResultCount": maximo,
+        "languageCode": ajustes.google_idioma,
+        "regionCode": ajustes.google_region,
+        "locationRestriction": {
+            "rectangle": {
+                "low": {"latitude": lim["sur"], "longitude": lim["oeste"]},
+                "high": {"latitude": lim["norte"], "longitude": lim["este"]},
+            }
+        },
+    }
+    encabezados = {"X-Goog-Api-Key": ajustes.google_maps_api_key, "X-Goog-FieldMask": CAMPOS_TEXTO, "Content-Type": "application/json"}
+    propio = cliente is None
+    cliente = cliente or httpx.Client(timeout=TIEMPO_LIMITE_S)
+    try:
+        respuesta = cliente.post(URL_TEXTO, json=cuerpo, headers=encabezados)
+    except httpx.HTTPError as error:
+        raise ErrorGooglePlaces("No se pudo conectar con Google Places; intenta de nuevo en un momento.") from error
+    finally:
+        if propio:
+            cliente.close()
+    if respuesta.status_code != 200:
+        raise ErrorGooglePlaces(f"Google Places respondió con error {respuesta.status_code}; no se inventan lugares.")
+    salida = []
+    for place in respuesta.json().get("places", []):
+        ubicacion = place.get("location") or {}
+        if place.get("id") and ubicacion.get("latitude") is not None and ubicacion.get("longitude") is not None:
+            salida.append(
+                {
+                    "place_id": place["id"],
+                    "nombre": (place.get("displayName") or {}).get("text") or "Lugar sin nombre",
+                    "lat": ubicacion["latitude"],
+                    "lng": ubicacion["longitude"],
+                    "fuente": "Google",
+                }
+            )
+    return salida

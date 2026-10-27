@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     google_maps_api_key: str | None = None
     google_idioma: str = "es"
     google_region: str = "mx"
+    # Asistente con LLM local (Ollama corre en la misma PC que la API). El modelo debe soportar tools
+    ollama_url: str = "http://localhost:11434"
+    ollama_modelo: str = "llama3.2:3b"
 
     @property
     def lista_cors(self) -> list[str]:

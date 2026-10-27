@@ -31,6 +31,13 @@ def test_con_una_sola_ruta_no_hay_combinacion():
     assert r["encontrado"] is False and r["tramos"] == []
 
 
+def test_un_camino_solo_a_pie_no_cuenta_como_transbordo():
+    # Origen y destino a menos de 400 m de la misma parada: A* puede llegar caminando, sin autobús
+    cerca = {"lat": 19.2905, "lng": -99.6505}
+    r = buscar_transbordo([RUTA_1, RUTA_2], ORIGEN, cerca)
+    assert r["encontrado"] is False and r["rutas_usadas"] == []
+
+
 def test_respeta_el_sentido_del_trazo():
     # Al revés (del final de la ruta 2 al inicio de la ruta 1) no hay forma de ir en el sentido de los trazos
     r = buscar_transbordo([RUTA_1, RUTA_2], DESTINO, ORIGEN)

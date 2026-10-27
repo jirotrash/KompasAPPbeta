@@ -84,6 +84,7 @@ VALIDADORES = {
             "transporte": _REFERENCIA,
             "fecha_plan": {"bsonType": "date"},
             "evaluacion": {"bsonType": "object"},
+            "origen_solicitud": {"enum": ["planificador", "asistente"]},
             "deleted_at": _FECHA_O_NULO,
         },
     },
@@ -100,6 +101,51 @@ VALIDADORES = {
             "estado": {"enum": ["pendiente", "verificado", "descartado"]},
             "comentario": _TEXTO,
         },
+    },
+}
+
+# Asistente (PLAN_V06.md §5.3). El _id es ObjectId
+VALIDADORES["conversaciones"] = {
+    "bsonType": "object",
+    "required": ["id_usuario", "mensajes", "created_at", "updated_at"],
+    "properties": {
+        "id_usuario": _ID_ENTERO,
+        "titulo": _TEXTO_O_NULO,
+        "modelo": _TEXTO,
+        "mensajes": {
+            "bsonType": "array",
+            "items": {
+                "bsonType": "object",
+                "required": ["rol", "creado_en"],
+                "properties": {
+                    "rol": {"enum": ["usuario", "asistente", "herramienta", "error"]},
+                    "contenido": _TEXTO_O_NULO,
+                    "nombre": _TEXTO,
+                    "argumentos": {"bsonType": "object"},
+                    "resultado_ref": {"bsonType": ["object", "null"]},
+                    "duracion_ms": {"bsonType": ["int", "long", "double"], "minimum": 0},
+                    "creado_en": {"bsonType": "date"},
+                },
+            },
+        },
+        "rutas_consultadas": {
+            "bsonType": "array",
+            "items": {
+                "bsonType": "object",
+                "required": ["origen", "destino", "transporte", "consultado_en"],
+                "properties": {
+                    "id_ruta": {"bsonType": ["int", "long", "null"]},
+                    "origen": _TEXTO,
+                    "destino": _TEXTO,
+                    "transporte": _TEXTO,
+                    "consultado_en": {"bsonType": "date"},
+                },
+            },
+        },
+        "planes_creados": {"bsonType": "array", "items": _ID_ENTERO},
+        "created_at": {"bsonType": "date"},
+        "updated_at": {"bsonType": "date"},
+        "deleted_at": _FECHA_O_NULO,
     },
 }
 
@@ -127,6 +173,10 @@ INDICES = {
         IndexModel([("ruta_id", ASCENDING)], name="ruta_id"),
     ],
     "bitacora_laboratorio": [IndexModel([("tipo", ASCENDING), ("creado_en", ASCENDING)], name="tipo_fecha")],
+    "conversaciones": [
+        IndexModel([("id_usuario", ASCENDING), ("updated_at", DESCENDING)], name="usuario_recientes"),
+        IndexModel([("created_at", ASCENDING)], name="created_at"),
+    ],
     "contadores": [],
 }
 

@@ -1,4 +1,4 @@
-# Manual técnico — Arquitectura de software (Kompás v0.5)
+# Manual técnico — Arquitectura de software (Kompás v0.6)
 
 > Fuente: `ARQUITECTURA.md` (raíz del repositorio). Los diagramas están en Mermaid: GitHub y VS Code
 > (extensión *Markdown Preview Mermaid Support*) los dibujan directamente.
@@ -21,8 +21,8 @@ vive en su propia carpeta con sus propias capas. Si un módulo crece, se puede s
 | **Presentación** | `router.py`, `esquemas.py` | Recibe la petición, valida con Pydantic (DTO), pide autenticación, llama al servicio y responde | Consultas a la base, reglas de negocio |
 | **Negocio** | `servicio.py` | Reglas del caso de uso: validaciones, orquesta repositorios, IA y servicios externos; lanza errores de negocio | Conocer HTTP (no usa `HTTPException`) ni la base |
 | **Acceso a datos** | `repositorio.py` | Lee y escribe en MongoDB; filtra el borrado lógico; convierte documentos a `dict` del dominio | Reglas de negocio, `HTTPException` |
-| **Dominio IA** | `app/ia/` | Sistema experto (R01–R20), DFS, métricas Euclidiana/Manhattan | Acceso a base o HTTP (es Python puro) |
-| **Infraestructura** | `app/nucleo/`, `app/externos/`, `app/compartido/` | Configuración, conexión a MongoDB, JWT/bcrypt, errores, cliente de Google Places, geografía | Lógica de un módulo en particular |
+| **Dominio IA** | `app/ia/` | Sistema experto (R01–R20), DFS, UCS, voraz y A\*, algoritmo genético, árbol binario de paradas, transbordos, métricas Euclidiana/Manhattan | Acceso a base o HTTP (es Python puro) |
+| **Infraestructura** | `app/nucleo/`, `app/externos/`, `app/compartido/` | Configuración, conexión a MongoDB, JWT/bcrypt, errores, clientes de Google Places y Ollama, geografía | Lógica de un módulo en particular |
 
 ### Regla de dependencias
 
@@ -30,7 +30,7 @@ vive en su propia carpeta con sus propias capas. Si un módulo crece, se puede s
 router  →  servicio  →  repositorio  →  nucleo.bd (MongoDB)
               │
               ├──→  app.ia (sin cambios de lógica)
-              ├──→  app.externos (Google Places)
+              ├──→  app.externos (Google Places, Ollama)
               └──→  servicio de OTRO módulo (nunca su repositorio)
 ```
 
@@ -50,10 +50,12 @@ router  →  servicio  →  repositorio  →  nucleo.bd (MongoDB)
 | **Inyección de dependencias** | `Depends(get_servicio)`, `Depends(get_usuario_actual)`, `Depends(requiere_admin)` | El router recibe el servicio ya construido; en pruebas se puede sustituir |
 | **DTO** | `modulos/*/esquemas.py` (Pydantic) | Valida la entrada y define exactamente qué sale en la respuesta (nunca la contraseña) |
 | **Fachada** | `app/ia/servicio.recomendar()` | Una sola función esconde hechos + planificador + motor de reglas |
-| **Adaptador** | `externos/google_places.py` | Convierte la respuesta de Google al formato de lugar que usa la IA |
+| **Adaptador** | `externos/google_places.py`, `externos/ollama.py` | Convierten la respuesta de Google al formato de lugar que usa la IA y la de Ollama (incluidas las *tool calls*) al formato del asistente |
 | **Singleton** | `get_settings()` con `lru_cache`, `nucleo.bd.cliente()` con `lru_cache` | Una sola configuración y un solo pool de conexiones a MongoDB |
 | **Middleware / cadena** | `CORSMiddleware`, manejadores de errores | Comportamiento transversal sin repetir código |
 | **Sistema experto (encadenamiento hacia adelante)** | `app/ia/motor.py` | Recomienda y explica cada plan con las reglas R01–R20 |
+| **Estrategia** | `app/ia/busqueda_informada.py` | UCS, voraz y A\* comparten la misma búsqueda; solo cambia la función f(n) y la heurística |
+| **Caché en memoria** | `app/ia/trazos.arbol_de_ruta()` | El árbol de paradas de cada ruta se construye una vez y se invalida si la ruta cambia |
 | Principios | Todo el backend | Responsabilidad única, bajo acoplamiento, alta cohesión por módulo |
 
 ## 3. Diagramas
@@ -84,13 +86,15 @@ flowchart TB
   API[API Kompás<br/>FastAPI + Uvicorn · Python]
   DB[(MongoDB<br/>local o Atlas)]
   G[Google Places API]
+  O[Ollama<br/>LLM local en la PC]
   M -- REST + JWT --> API
   W -- REST + JWT --> API
   API -- PyMongo --> DB
   API -- HTTPS --> G
+  API -- HTTP localhost:11434 --> O
 ```
 
-Hay cuatro piezas que se despliegan por separado. La app y la web son clientes "tontos": no calculan
+Hay cinco piezas que se despliegan por separado (Ollama corre en la misma PC que la API; la app nunca le habla directo). La app y la web son clientes "tontos": no calculan
 estadísticas ni reglas, todo lo hace la API. La API es un solo proceso (monolito modular). MongoDB puede ser
 local para desarrollo o Atlas en la nube; solo cambia la variable `MONGO_URI`.
 
@@ -107,14 +111,16 @@ flowchart LR
     P[Presentación<br/>routers + esquemas]
     N[Negocio<br/>servicios]
     D[Acceso a datos<br/>repositorios]
-    IA[Dominio IA<br/>sistema experto · DFS · métricas]
+    IA[Dominio IA<br/>sistema experto · búsquedas · genético · árbol]
   end
   DB[(MongoDB)]
   G[Google Places API]
+  O[Ollama]
   M & W -- HTTP/JSON + JWT --> P
   P --> N --> D --> DB
   N --> IA
   N --> G
+  N --> O
 ```
 
 Cada petición entra por la capa de presentación (router), que valida con Pydantic y delega en el servicio.
@@ -133,20 +139,28 @@ flowchart TB
     historial[historial]
     itinerarios[itinerarios]
     reportes[reportes]
-    laboratorio[laboratorio<br/>DFS + distancias]
+    laboratorio[laboratorio<br/>DFS · distancias · comparativo · genético]
     dashboard[dashboard]
+    asistente[asistente<br/>Ollama + herramientas]
   end
   nucleo[nucleo<br/>config · bd · seguridad · errores]
   compartido[compartido<br/>geo · traslados · texto]
-  externos[externos<br/>google_places]
-  ia[ia<br/>motor · hechos · planificador · DFS · métricas]
+  externos[externos<br/>google_places · ollama]
+  ia[ia<br/>motor · hechos · planificador · DFS · búsqueda informada<br/>genético · árbol de paradas · transbordos · métricas]
 
   historial -- ServicioRutas --> rutas
   historial -- ServicioCatalogos --> catalogos
   itinerarios -- ServicioCatalogos --> catalogos
   itinerarios --> externos
-  itinerarios -- recomendar --> ia
+  itinerarios -- recomendar + orden óptimo --> ia
+  itinerarios -- bitácora --> laboratorio
+  rutas -- árbol + A* --> ia
+  rutas -- bitácora --> laboratorio
   laboratorio --> ia
+  asistente -- ServicioLugares --> lugares
+  asistente -- ServicioRutas --> rutas
+  asistente -- ServicioItinerarios --> itinerarios
+  asistente --> externos
   dashboard -- ServicioCatalogos --> catalogos
   dashboard -- descripciones de reglas --> ia
   reportes --> compartido
@@ -264,19 +278,22 @@ backend/app/
 ├── modulos/
 │   ├── cuenta/                # router · esquemas · servicio · repositorio
 │   ├── catalogos/  lugares/  rutas/  historial/  itinerarios/
-│   ├── laboratorio/           # DFS y distancias + bitácora
+│   ├── laboratorio/           # DFS, distancias, comparativo de búsqueda y genético + bitácora
 │   ├── reportes/              # nuevo en v0.5
-│   └── dashboard/             # nuevo en v0.5 (solo agregaciones)
+│   ├── dashboard/             # nuevo en v0.5 (solo agregaciones)
+│   └── asistente/             # nuevo en v0.6: router · esquemas · servicio · repositorio · herramientas · prompt
 └── ia/                        # sistema experto, planificador, DFS, métricas (sin cambios de lógica)
+                               # v0.6 (archivos nuevos): busqueda_informada · algoritmo_genetico · orden_optimizado
+                               #                        arbol_binario · trazos · transbordos
 
-frontend/src/
-├── main.jsx
-├── app/                       # App.jsx · Layout.jsx · RutaPrivada.jsx · RutaAdmin.jsx
-├── compartido/                # api/ (cliente, lugares, mapas) · componentes/ · hooks/ · utils/ · config/
+frontend/src/                  # TypeScript desde la v0.6 (strict, sin any)
+├── main.tsx
+├── app/                       # App.tsx · Layout.tsx · RutaPrivada.tsx · RutaAdmin.tsx
+├── compartido/                # api/ (cliente, lugares, mapas) · tipos/dominio.ts · componentes/ · hooks/ · utils/ · config/
 ├── mock/                      # datos de ejemplo (VITE_USE_MOCK=true)
 └── modulos/
     ├── cuenta/  inicio/  rutas/  itinerarios/  reportes/
-    └── dashboard/             # api · mock · hooks · paginas · componentes · graficas (22 gráficas)
+    └── dashboard/             # api · tipos · mock · hooks · paginas · componentes · graficas (28 gráficas y paneles)
 ```
 
 ## 4. App móvil (`app/`)

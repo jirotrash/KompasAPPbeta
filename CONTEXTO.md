@@ -7,7 +7,9 @@
 
 **Kompás** (nombre académico en el documento autorizado: *Brújula Urbana*) es una **app móvil** que ayuda a planear salidas y traslados en **Toluca, Lerma y San Mateo Atenco**. El usuario indica con quién va, presupuesto, tiempo, intereses y cómo se mueve, y la app le propone **hasta 3 planes** con lugares reales y le **explica por qué** recomienda cada uno.
 
-La **IA** es un **sistema experto con lógica proposicional** (20 reglas, encadenamiento hacia adelante).
+La **IA** es un **sistema experto con lógica proposicional** (20 reglas, encadenamiento hacia adelante). Desde la v0.6, por dentro de
+las funciones también trabajan A\* (transbordos), un árbol binario de paradas (dónde subir y bajar) y un algoritmo genético
+(orden de las paradas), y la app tiene un **asistente** con LLM local (Ollama) que pasa siempre por la API.
 
 Proyecto escolar: *Formulación de proyectos de tecnología* · UTVT · ITIID-D71 · Docente: Héctor Pérez Paulín.
 
@@ -33,11 +35,12 @@ Proyecto escolar: *Formulación de proyectos de tecnología* · UTVT · ITIID-D7
 | Capa | Tecnología |
 |---|---|
 | App móvil | **React Native + Expo SDK 57** (Expo Router), estilos con **Tamagui**, mapa **Leaflet** en WebView, **expo-location** |
-| Web + dashboard | **React 19 + Vite**, Tailwind CSS 4, **Recharts** (gráficas), react-leaflet |
+| Web + dashboard | **React 19 + Vite + TypeScript**, Tailwind CSS 4, **Recharts** (gráficas), react-leaflet |
 | API | **FastAPI** (Python 3.11+), **PyMongo**, JWT, bcrypt. Arquitectura en capas por módulos |
 | Base de datos | **MongoDB** (local o **Atlas**), base `kompas`: usuarios, categorías, transportes, lugares, rutas, historial, planes, reportes, bitácora del laboratorio. Antes MySQL 8 (evidencia en `backend/database/mysql_legacy/`) |
 | Lugares | **Google Places API (New)**, consultada solo desde la API |
-| IA | Motor de reglas de Einar en Python (`backend/app/ia/`) |
+| IA | Motor de reglas de Einar en Python (`backend/app/ia/`); búsqueda informada, genético y árbol de paradas en archivos nuevos de `app/ia/` |
+| Asistente | **Ollama** (`llama3.2:3b`) en la PC de la API, con *tool calling* |
 
 ## 5. Arquitectura
 

@@ -215,14 +215,14 @@ const CONSTRUCTORES: { [E in EndpointDashboard]: (c: Contexto_, filtros: Filtros
       ['Centro Lerma → Centro Toluca', 8],
       ['San Mateo Atenco → Terminal Toluca', 6],
     ]
-    // Promedios reales de /api/busqueda/comparar sobre la red académica (todas las parejas con camino)
+    // Promedios reales de comparar_algoritmos() sobre las 64 parejas con camino de la red académica
     const algoritmos: [string, string | null, string, number, number, number][] = [
-      ['dfs', null, 'DFS', 20.3, 1.1358, 25],
-      ['costo_uniforme', null, 'UCS', 4.8, 1, 100],
-      ['voraz', 'euclidiana', 'Voraz (Euclidiana)', 3.1, 1.0487, 83],
-      ['voraz', 'manhattan', 'Voraz (Manhattan)', 3.1, 1.0415, 83],
-      ['a_estrella', 'euclidiana', 'A* (Euclidiana)', 2.7, 1, 100],
-      ['a_estrella', 'manhattan', 'A* (Manhattan)', 2.7, 1.021, 89],
+      ['dfs', null, 'DFS', 23.8, 1.683, 58],
+      ['costo_uniforme', null, 'UCS', 5.5, 1, 100],
+      ['voraz', 'euclidiana', 'Voraz (Euclidiana)', 3.4, 1.026, 88],
+      ['voraz', 'manhattan', 'Voraz (Manhattan)', 3.4, 1.025, 88],
+      ['a_estrella', 'euclidiana', 'A* (Euclidiana)', 3.4, 1, 100],
+      ['a_estrella', 'manhattan', 'A* (Manhattan)', 3.4, 1.005, 95],
     ]
     return {
       ...base,
@@ -347,7 +347,7 @@ export async function comparar(_origen: string, _destino: string): Promise<Compa
     camino,
     paradas: camino.map(nombre),
   })
-  const corto = ['TerminalToluca', 'CentroToluca', 'ParqueAlameda', 'PlazaSendero']
+  const corto = ['TerminalToluca', 'PinoSuarez', 'CentroMetepec', 'PlazaSendero']
   return {
     exito: true,
     fuente: 'Red académica de demostración (sin verificación operativa)',
@@ -357,12 +357,12 @@ export async function comparar(_origen: string, _destino: string): Promise<Compa
     costo_optimo_km: 13.608,
     alcanzable: true,
     filas: [
-      fila('dfs', 'DFS (profundidad)', null, null, 17.3433, 57, ['TerminalToluca', 'CentroToluca', 'PinoSuarez', 'CentroMetepec', 'PlazaSendero'], 0.19),
+      fila('dfs', 'DFS (profundidad)', null, null, 17.3433, 57, ['TerminalToluca', 'CentroToluca', 'PinoSuarez', 'CentroMetepec', 'Tecnologico', 'PlazaSendero'], 0.19),
       fila('costo_uniforme', 'Costo uniforme (UCS)', null, true, 13.608, 9, corto, 0.035),
       fila('voraz', 'Voraz (primero el mejor)', 'euclidiana', true, 13.608, 4, corto, 0.025),
       fila('voraz', 'Voraz (primero el mejor)', 'manhattan', false, 13.608, 4, corto, 0.024),
       fila('a_estrella', 'A*', 'euclidiana', true, 13.608, 4, corto, 0.024),
-      fila('a_estrella', 'A*', 'manhattan', false, 16.4044, 5, ['TerminalToluca', 'PinoSuarez', 'CentroMetepec', 'PlazaSendero'], 0.029),
+      fila('a_estrella', 'A*', 'manhattan', false, 16.4044, 5, ['TerminalToluca', 'CentroToluca', 'ParqueAlameda', 'PlazaSendero'], 0.029),
     ],
     heuristicas: {
       euclidiana: { es_admisible: true, nodos_sobreestimados: [] },
@@ -372,6 +372,7 @@ export async function comparar(_origen: string, _destino: string): Promise<Compa
           { nodo: 'CentroMetepec', h: 11.446, h_real: 8.4161, exceso_km: 3.0299 },
           { nodo: 'GaleriasMetepec', h: 13.5309, h_real: 10.8029, exceso_km: 2.728 },
           { nodo: 'Tecnologico', h: 8.6812, h_real: 6.2728, exceso_km: 2.4084 },
+          { nodo: 'CiudadUniversitaria', h: 15.4422, h_real: 14.9876, exceso_km: 0.4546 },
         ],
       },
     },

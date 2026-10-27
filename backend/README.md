@@ -30,6 +30,24 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
   Si el celular no conecta, abre el puerto 8000 en el firewall de Windows.
 - En la web (`frontend/.env`): `VITE_API_URL=http://localhost:8000` y `VITE_USE_MOCK=false`.
 
+### Asistente (Ollama)
+
+El asistente de la app usa un LLM local con [Ollama](https://ollama.com) en la **misma PC** que la API
+(la app nunca le habla directo; todo pasa por `/api/asistente`).
+
+```powershell
+ollama pull llama3.2:3b             # una vez; el modelo debe soportar tools
+# Ollama queda escuchando en http://localhost:11434 (ábrelo si no está corriendo)
+```
+
+- En `backend/.env`: `OLLAMA_URL=http://localhost:11434` y `OLLAMA_MODELO=llama3.2:3b`.
+  Para cambiar de modelo, descarga otro con soporte de *tools* (`ollama pull qwen2.5:3b`, por ejemplo) y cambia
+  `OLLAMA_MODELO`. Si ya tienes `llama3.2:latest`, es el mismo modelo de 3B: puedes usar `OLLAMA_MODELO=llama3.2:latest`.
+- Prueba: `GET http://localhost:8000/api/asistente/estado` (con token) → `{"disponible": true, "modelo": "llama3.2:3b", ...}`.
+  Si sale `modelo_instalado: false`, falta el `ollama pull`.
+- La primera respuesta tarda más (Ollama carga el modelo); si Ollama está cerrado la API responde `503`
+  "El asistente no está disponible en este momento." y el mensaje del usuario sí se guarda.
+
 ## 3. Scripts (`python -m scripts.<nombre>`, desde `backend/`)
 
 | Comando | Qué hace |
@@ -83,14 +101,15 @@ python -m app.ia.hechos --ejemplo                                               
 | `app/main.py` | Crea la app, CORS, manejadores de error y registra los routers |
 | `app/nucleo/` | `config.py` (Settings), `bd.py` (cliente MongoDB único, `siguiente_id`), `seguridad.py` (bcrypt, JWT, `get_usuario_actual`, `requiere_admin`), `errores.py` (errores de negocio → HTTP), `parametros.py`, `esquemas_comunes.py` |
 | `app/compartido/` | `geo.py` (distancias, zona piloto, horas), `traslados.py` (tramos a pie/taxi), `texto.py` (`clave()`) |
-| `app/externos/` | `google_places.py` (Adaptador de Google Places) |
+| `app/externos/` | `google_places.py` (Adaptador de Google Places, también Text Search) y `ollama.py` (Adaptador del LLM local) |
 | `app/modulos/<módulo>/` | `router.py` (presentación), `esquemas.py` (DTO Pydantic), `servicio.py` (negocio), `repositorio.py` (MongoDB) |
-| `app/ia/` | **Sistema experto** (`motor.py`, `hechos.py`), `planificador.py` y `servicio.py`; `busqueda_dfs.py` y `metricas_distancia.py` (laboratorios). No se cambia su lógica |
+| `app/ia/` | **Sistema experto** (`motor.py`, `hechos.py`), `planificador.py` y `servicio.py`; `busqueda_dfs.py` y `metricas_distancia.py` (laboratorios). No se cambia su lógica. v0.6 (archivos nuevos): `busqueda_informada.py` (UCS, voraz, A\*), `algoritmo_genetico.py` y `orden_optimizado.py`, `arbol_binario.py` y `trazos.py`, `transbordos.py` |
 | `database/` | `datos_desarrollo.json` y `mysql_legacy/` (dump y datos de MySQL) |
 | `scripts/` | Ver §3 |
 
 Módulos: `cuenta` (auth + residencia), `catalogos`, `lugares`, `rutas`, `historial`, `itinerarios` (+ `GET /api/planes`),
-`reportes`, `laboratorio` (DFS y distancias, escribe en `bitacora_laboratorio`) y `dashboard` (solo admin).
+`reportes`, `laboratorio` (DFS, distancias, comparativo de búsqueda y genético; escribe en `bitacora_laboratorio`),
+`dashboard` (solo admin) y `asistente` (v0.6, Ollama + herramientas).
 
 ## 6. Endpoints nuevos en v0.5
 
@@ -102,9 +121,28 @@ Módulos: `cuenta` (auth + residencia), `catalogos`, `lugares`, `rutas`, `histor
 
 `UsuarioSalida.rol` ahora sale de la base (`usuario` o `admin`). El resto del contrato no cambió.
 
+## 6b. Endpoints nuevos en v0.6
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/api/rutas?origen=&destino=` | Ahora también regresa opciones en **autobús** sobre los trazos de `rutas` (directas o `tipo: "combinado"` con transbordo por A\*), con `parada_subida`, `parada_bajada`, `tramo_en_ruta`, `paradas_intermedias` y `tramos` (campos opcionales) |
+| `GET` | `/api/rutas/{id}/arbol` 🔒 admin | Árbol binario de paradas de la ruta: `{raiz, altura, total_nodos, inorden, preorden, postorden}` |
+| `POST` | `/api/itinerarios` 🔒 | Cada plan trae `orden_optimizado` (km antes/después del algoritmo genético) |
+| `GET` | `/api/busqueda/comparar?origen=&destino=` 🔒 admin | DFS, UCS, voraz y A\* (Euclidiana y Manhattan) en una tabla |
+| `POST` | `/api/genetico/ordenar-paradas` 🔒 admin | Ejecuta el genético con los parámetros que se elijan |
+| `GET` | `/api/asistente/estado` 🔒 | `{disponible, modelo}` |
+| `GET/POST` | `/api/asistente/conversaciones` 🔒 | Lista o crea conversaciones |
+| `GET/DELETE` | `/api/asistente/conversaciones/{id}` 🔒 | Conversación completa / borrado lógico |
+| `POST` | `/api/asistente/conversaciones/{id}/mensajes` 🔒 | `{texto, ubicacion?}` → respuesta y tarjetas de rutas y planes |
+| `GET` | `/api/dashboard/asistente` 🔒 admin | Uso del asistente (solo datos agregados) |
+
+Detalle en `../DOCS/manual-tecnico/` (`ia-en-la-app.md`, `busqueda-y-heuristicas.md`, `algoritmo-genetico.md`,
+`arbol-binario.md`, `asistente-llm.md`).
+
 ## 7. Qué NO hay todavía
 
-Líneas y paradas de autobús (la app las sigue simulando).
+Paradas reales de las rutas: si una ruta no tiene `paradas` en la base se usan los puntos de su trazo ("Punto N").
+Horarios y tarifas de autobús: las opciones en autobús no incluyen la espera ni la tarifa (no se inventan).
 `POST /api/itinerarios` usa **Google Places**: sin `GOOGLE_MAPS_API_KEY` responde `503` (no se inventan lugares).
 La app móvil todavía usa sus reportes de ejemplo aunque `/api/reportes` ya existe (`app/src/services/api.ts`).
 

@@ -1,4 +1,4 @@
-# Manual técnico — Modelo de datos en MongoDB (Kompás v0.5)
+# Manual técnico — Modelo de datos en MongoDB (Kompás v0.6)
 
 > Fuente: `MIGRACION_MONGODB.md`. Código: `backend/scripts/preparar_bd.py` (colecciones, validadores e índices),
 > `backend/app/modulos/*/repositorio.py` (lectura y escritura) y `backend/scripts/migrar_mysql_a_mongo.py`.
@@ -99,6 +99,8 @@ erDiagram
   usuarios ||--o{ reportes : "id_usuario"
   usuarios ||--o{ lugares : "id_usuario"
   rutas ||--o{ historial_rutas : "id_ruta"
+  usuarios ||--o{ conversaciones : "id_usuario"
+  conversaciones }o--o{ planes : "planes_creados"
 
   usuarios { int _id PK
     string correo UK
@@ -116,7 +118,9 @@ erDiagram
     object ubicacion "GeoJSON Point"
     object categoria "ref. extendida {id, nombre}" }
   rutas { int _id PK
-    object trazo "GeoJSON LineString" }
+    object trazo "GeoJSON LineString"
+    string nombre "opcional"
+    array paradas "opcional [{nombre, ubicacion}]" }
   historial_rutas { int _id PK
     int id_usuario
     int id_ruta
@@ -131,14 +135,22 @@ erDiagram
     object categoria "ref. extendida"
     object transporte "ref. extendida"
     date fecha_plan
-    object evaluacion "subdocumento del sistema experto" }
+    object evaluacion "subdocumento del sistema experto"
+    string origen_solicitud "planificador | asistente" }
   reportes { ObjectId _id PK
     string tipo
     object ubicacion "GeoJSON Point"
     date vigente_hasta
     string estado }
   bitacora_laboratorio { ObjectId _id PK
-    string tipo "dfs | distancia (polimórfica)" }
+    string tipo "dfs | distancia | busqueda | genetico | transbordo | abordaje" }
+  conversaciones { ObjectId _id PK
+    int id_usuario
+    string titulo
+    string modelo
+    array mensajes "EMBEBIDOS {rol, contenido, ...}"
+    array rutas_consultadas
+    array planes_creados }
   contadores { string _id PK "nombre de colección"
     int seq }
 ```
@@ -219,6 +231,7 @@ además `demo: true`.
 | `hora_salida` | string | no | `HH:MM` | `"18:00"` |
 | `fecha_plan` | date | sí | Día y hora de salida | `2026-10-28T18:00-06:00` |
 | `evaluacion` | object | no* | `{version_reglas, datos_suficientes, candidatos: [{tipo, estado, puntuacion, reglas}]}` tal como lo regresó el motor | ver abajo |
+| `origen_solicitud` | string | no | `planificador` o `asistente` (v0.6; los anteriores cuentan como planificador) | `"asistente"` |
 
 \* Obligatorios para los planes creados desde v0.5; los migrados de MySQL no los tienen (MySQL no los guardaba y no se inventan).
 
@@ -256,7 +269,7 @@ Sin índice TTL a propósito: los reportes vencidos se conservan para las estad�
 | Campo | Tipo BSON | Oblig. | Descripción | Ejemplo |
 |---|---|---|---|---|
 | `_id` | ObjectId | sí | | |
-| `tipo` | string | sí | `dfs` o `distancia` | `"dfs"` |
+| `tipo` | string | sí | `dfs`, `distancia`, `busqueda`, `genetico`, `transbordo` o `abordaje` | `"dfs"` |
 | `creado_en` | date | sí | Momento de la consulta | |
 | `origen`, `destino` | string | dfs | Paradas del grafo académico | `"TerminalToluca"` |
 | `limite_profundidad` | int | dfs | Límite pedido | `5` |
@@ -264,6 +277,36 @@ Sin índice TTL a propósito: los reportes vencidos se conservan para las estad�
 | `total_nodos_explorados`, `total_rutas`, `profundidad_maxima` | int | dfs | Resultado de la búsqueda | `8`, `2`, `4` |
 | `modo` | string | distancia | `plano` o `geo` | `"geo"` |
 | `euclidiana`, `manhattan` | double | distancia | Resultado (unidades del plano o km) | `3.21`, `4.10` |
+| `costo_optimo_km`, `algoritmos` | double, array | busqueda | Costo de UCS y, por algoritmo: `{algoritmo, heuristica, costo_km, nodos_explorados, longitud_camino, optimo, ms}` | `13.608` |
+| `origen` | string | genetico | `itinerario` (plan real) o `endpoint` | `"itinerario"` |
+| `tipo_plan`, `paradas`, `aplicado` | string, int, bool | genetico | Tipo de plan, número de paradas y si se cambió el orden | `"rapido"`, `2`, `true` |
+| `km_antes`, `km_despues`, `generaciones`, `generacion_mejor`, `brecha_vs_optimo_pct` | double, int | genetico | Resultado del genético | `3.1`, `2.4`, `150`, `3`, `0` |
+| `historial_mejor`, `historial_promedio` | array\<double> | genetico | Aptitud por generación (gráfica de convergencia) | |
+| `encontrado`, `rutas_usadas`, `nodos_explorados`, `total_nodos` | bool, array, int | transbordo | Resultado de A\* para combinar rutas | `true`, `[2, 5]`, `240`, `519` |
+| `tipo_opcion`, `id_ruta`, `subida`, `bajada` | string, int, object | abordaje | Paradas `{nombre, lat, lng, km}` de cada opción en autobús ofrecida (mapa de calor) | |
+| `ms` | double | busqueda, genetico, transbordo | Milisegundos | `1.7` |
+
+### `conversaciones` (v0.6, asistente)
+
+| Campo | Tipo BSON | Oblig. | Descripción | Ejemplo |
+|---|---|---|---|---|
+| `_id` | ObjectId | sí | La API lo regresa como texto | `"671b…"` |
+| `id_usuario` | int | sí | Dueño de la conversación (otro usuario recibe 404) | `2` |
+| `titulo` | string \| null | no | Primeras 6 palabras del primer mensaje (sin LLM) | `"¿Cómo llego al Cosmovitral…"` |
+| `modelo` | string | no | Modelo de Ollama con el que se creó | `"llama3.2:3b"` |
+| `mensajes` | array\<object> | sí | Embebidos, se agregan con `$push`: `{rol: usuario \| asistente \| herramienta \| error, contenido?, nombre?, argumentos?, resultado_ref?, duracion_ms?, creado_en}` | ver `asistente-llm.md` |
+| `rutas_consultadas` | array\<object> | no | `{id_ruta, origen, destino, transporte, consultado_en}` sin repetir | |
+| `planes_creados` | array\<int> | no | Ids de `planes` creados desde el asistente (`$addToSet`) | `[31]` |
+| `created_at`, `updated_at` | date | sí | | |
+| `deleted_at` | date \| null | no | Borrado lógico | `null` |
+
+No se guarda la ubicación del usuario ni datos de Google: `origen` y `destino` son los textos que escribió el usuario.
+
+### `rutas`: campos opcionales que lee la v0.6
+
+`nombre` (nombre de la línea) y `paradas: [{nombre, ubicacion: GeoJSON Point}]`. Si una ruta no tiene paradas,
+"¿Cómo llego?" usa los puntos de su trazo como "Punto N" (no se inventan nombres). **Pendiente con Sebas:** capturar
+las paradas reales de cada ruta y agregarlas al validador si se aprueban.
 
 ### `contadores`
 
@@ -288,11 +331,13 @@ Sin índice TTL a propósito: los reportes vencidos se conservan para las estad�
 | `reportes` | `ubicacion` | 2dsphere | Reportes cercanos |
 | `reportes` | `vigente_hasta` | simple | `GET /api/reportes` (solo vigentes) |
 | `reportes` | `ruta_id` | simple | Reportes de una ruta |
-| `bitacora_laboratorio` | `tipo` + `creado_en` | compuesto | Dashboard, pestaña Laboratorio IA |
+| `bitacora_laboratorio` | `tipo` + `creado_en` | compuesto | Dashboard, pestañas Laboratorio IA y Movilidad |
+| `conversaciones` | `id_usuario` + `updated_at` desc | compuesto | Lista de conversaciones del usuario |
+| `conversaciones` | `created_at` | simple | Dashboard, pestaña Asistente |
 
 ## 5. Validadores `$jsonSchema`
 
-`preparar_bd.py` crea `usuarios`, `lugares`, `planes` y `reportes` con `validator: {$jsonSchema: …}` y
+`preparar_bd.py` crea `usuarios`, `lugares`, `planes`, `reportes` y `conversaciones` (v0.6) con `validator: {$jsonSchema: …}` y
 `validationLevel: "moderate"` (los documentos que ya existían no se bloquean, los nuevos sí se validan).
 Resumen (el detalle completo está en `VALIDADORES` dentro del script):
 

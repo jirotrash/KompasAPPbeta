@@ -1,4 +1,4 @@
-# Manual técnico — Dashboard de estadísticas (Kompás v0.5)
+# Manual técnico — Dashboard de estadísticas (Kompás v0.6)
 
 > Fuente: `DASHBOARD.md`. Backend: `backend/app/modulos/dashboard/`. Web: `frontend/src/modulos/dashboard/`.
 
@@ -201,3 +201,22 @@ Cada gráfica tiene título, una línea que explica qué se ve, tooltip en espa�
 y **Descargar CSV** (mismos datos, generado en el navegador). Colores solo de `COLORIMETRIA.md` vía los tokens de
 `index.css` (funcionan en claro y oscuro); el color nunca es el único medio para distinguir series: hay leyenda,
 etiquetas y la tabla. Con `VITE_USE_MOCK=true` el dashboard usa `mock.js` (misma forma que la API).
+
+## 7. Ampliación v0.6
+
+| Pestaña | Panel | Datos |
+|---|---|---|
+| Laboratorio IA | Nodos explorados por algoritmo (barras agrupadas DFS / UCS / voraz / A\*, una barra por heurística) | En vivo de `GET /api/busqueda/comparar` con el par que elija el administrador |
+| Laboratorio IA | Costo del camino vs. óptimo (costo ÷ óptimo, línea en 1) | `busqueda_algoritmos` de `/api/dashboard/laboratorio` (corridas guardadas) |
+| Laboratorio IA | Convergencia del genético (mejor y promedio de aptitud por generación) | `genetico_convergencia`: `$unwind` de `historial_mejor` con `includeArrayIndex` |
+| Laboratorio IA | Km ahorrados por el genético (antes y después, por tipo de plan) | `genetico_ahorro`: planes reales (`origen: "itinerario"`) |
+| Laboratorio IA | Transbordos con A\* (búsquedas, encontrados, nodos explorados y ms promedio) | `transbordos` |
+| Movilidad | **Rutas y paradas**: trazo de la ruta elegida con sus paradas numeradas en orden (inorden del árbol) y círculos de las paradas donde más se sube y se baja | `GET /api/rutas`, `GET /api/rutas/{id}/arbol` y `paradas_uso` de `/api/dashboard/movilidad` (registros `abordaje`) |
+| Asistente (nueva) | Conversaciones y mensajes por día, herramientas más usadas, tiempo de respuesta (promedio y p90), % sin respuesta y planes por origen (dona) | `GET /api/dashboard/asistente`; **nunca** el contenido de los mensajes |
+
+Todos los campos nuevos de `laboratorio` y `movilidad` son opcionales: la respuesta de la v0.5 no cambia. El p90
+se calcula en el servicio (interpolación lineal) sobre las últimas 5000 duraciones. `scripts/sembrar_actividad_demo.py`
+también genera corridas reales del comparativo, del genético sobre los planes demo, de "¿Cómo llego?" (subidas,
+bajadas y transbordos con el servicio real) y conversaciones con texto genérico, todo con `demo: true`.
+
+La web del dashboard está en **TypeScript** (`tipos.ts` tiene la forma de cada respuesta de `/api/dashboard/*`).

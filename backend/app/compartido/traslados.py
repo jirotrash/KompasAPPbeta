@@ -4,11 +4,24 @@ No hay tramos en autobús: la base todavía no tiene líneas ni paradas (BACKEND
 Todos los tiempos son ESTIMACIONES por distancia.
 """
 
-from app.compartido.geo import Coordenada, distancia_por_calles_km, minutos_caminando, minutos_en_auto
+from app.compartido.geo import MIN_POR_KM_A_PIE, Coordenada, distancia_por_calles_km, minutos_caminando, minutos_en_auto, redondear
 
 DISTANCIA_CORTA_KM = 1.5
 RADIO_A_PIE_KM = 2  # BACKEND.md §7: caminando ≈ 2 km
 RADIO_TAXI_KM = 8  # taxi/app ≈ 8 km
+
+# Autobús: la misma velocidad que usa la app (src/utils/geo.ts → VELOCIDAD_KMH.autobus).
+# Solo para estimar el trayecto sobre un trazo registrado; no incluye la espera (no hay frecuencias).
+VELOCIDAD_AUTOBUS_KMH = 18
+MIN_POR_KM_AUTOBUS = 60 / VELOCIDAD_AUTOBUS_KMH
+# Factores de costo (minutos por km) para la búsqueda de transbordos
+FACTOR_CAMINATA = MIN_POR_KM_A_PIE
+FACTOR_AUTOBUS = MIN_POR_KM_AUTOBUS
+
+
+def minutos_en_autobus(km: float) -> int:
+    """Trayecto estimado sobre el trazo de la ruta (sin espera ni tráfico)."""
+    return max(1, redondear(km * MIN_POR_KM_AUTOBUS))
 
 AVISO_TAXI = "El tiempo no considera el tráfico. La tarifa la define el proveedor."
 AVISO_SIN_AUTOBUS = "No tenemos líneas de autobús registradas: este tramo se estima caminando."

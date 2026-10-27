@@ -304,3 +304,151 @@ class RepositorioDashboard:
             ).sort("creado_en", -1).limit(LIMITE_PUNTOS)
         )
         return resultado
+
+    # ───────────────────── Laboratorio: búsqueda, genético y transbordos ─────────────────────
+
+    def busqueda_algoritmos(self, filtro: dict) -> list[dict]:
+        """Promedios por algoritmo y heurística de las corridas de /api/busqueda/comparar."""
+        pipeline = [
+            {"$match": filtro},
+            {"$unwind": "$algoritmos"},
+            {
+                "$group": {
+                    "_id": {"algoritmo": "$algoritmos.algoritmo", "heuristica": "$algoritmos.heuristica"},
+                    "consultas": {"$sum": 1},
+                    "nodos": {"$avg": "$algoritmos.nodos_explorados"},
+                    "costo": {"$avg": "$algoritmos.costo_km"},
+                    "optimo": {"$avg": "$costo_optimo_km"},
+                    "optimos": {"$sum": {"$cond": ["$algoritmos.optimo", 1, 0]}},
+                    "ms": {"$avg": "$algoritmos.ms"},
+                    # Cuánto más largo que el óptimo (1 = igual): solo donde hubo camino
+                    "razon": {
+                        "$avg": {
+                            "$cond": [
+                                {"$and": [{"$gt": ["$costo_optimo_km", 0]}, {"$ne": ["$algoritmos.costo_km", None]}]},
+                                {"$divide": ["$algoritmos.costo_km", "$costo_optimo_km"]},
+                                None,
+                            ]
+                        }
+                    },
+                }
+            },
+        ]
+        return list(self.bd.bitacora_laboratorio.aggregate(pipeline))
+
+    def genetico_convergencia(self, filtro: dict, maximo: int = 300) -> list[dict]:
+        """Mejor y promedio de aptitud por generación, promediados entre todas las ejecuciones."""
+        pipeline = [
+            {"$match": {**filtro, "historial_mejor": {"$type": "array"}}},
+            {"$project": {"mejor": "$historial_mejor", "promedio": "$historial_promedio"}},
+            {"$unwind": {"path": "$mejor", "includeArrayIndex": "generacion"}},
+            {"$match": {"generacion": {"$lt": maximo}}},
+            {
+                "$group": {
+                    "_id": "$generacion",
+                    "mejor": {"$avg": "$mejor"},
+                    "promedio": {"$avg": {"$arrayElemAt": ["$promedio", "$generacion"]}},
+                    "ejecuciones": {"$sum": 1},
+                }
+            },
+            {"$sort": {"_id": 1}},
+        ]
+        return list(self.bd.bitacora_laboratorio.aggregate(pipeline))
+
+    def genetico_ahorro(self, filtro: dict) -> list[dict]:
+        """km antes y después del genético en los planes reales, por tipo de plan."""
+        pipeline = [
+            {"$match": {**filtro, "origen": "itinerario"}},
+            {
+                "$group": {
+                    "_id": "$tipo_plan",
+                    "planes": {"$sum": 1},
+                    "reordenados": {"$sum": {"$cond": ["$aplicado", 1, 0]}},
+                    "km_antes": {"$sum": "$km_antes"},
+                    "km_despues": {"$sum": "$km_despues"},
+                }
+            },
+            {"$sort": {"_id": 1}},
+        ]
+        return list(self.bd.bitacora_laboratorio.aggregate(pipeline))
+
+    def transbordos(self, filtro: dict) -> dict:
+        resultado = list(
+            self.bd.bitacora_laboratorio.aggregate(
+                [
+                    {"$match": filtro},
+                    {
+                        "$group": {
+                            "_id": None,
+                            "consultas": {"$sum": 1},
+                            "encontrados": {"$sum": {"$cond": ["$encontrado", 1, 0]}},
+                            "nodos": {"$avg": "$nodos_explorados"},
+                            "total_nodos": {"$avg": "$total_nodos"},
+                            "ms": {"$avg": "$ms"},
+                        }
+                    },
+                ]
+            )
+        )
+        return resultado[0] if resultado else {"consultas": 0, "encontrados": 0, "nodos": None, "total_nodos": None, "ms": None}
+
+    def paradas_uso(self, filtro: dict) -> list[dict]:
+        """Paradas donde más se sube y se baja (registros `abordaje` de ¿Cómo llego?)."""
+        pipeline = [
+            {"$match": filtro},
+            {"$project": {"_id": 0, "id_ruta": 1, "puntos": [{"p": "$subida", "tipo": "subida"}, {"p": "$bajada", "tipo": "bajada"}]}},
+            {"$unwind": "$puntos"},
+            {
+                "$group": {
+                    "_id": {"id_ruta": "$id_ruta", "nombre": "$puntos.p.nombre", "lat": "$puntos.p.lat", "lng": "$puntos.p.lng"},
+                    "subidas": {"$sum": {"$cond": [{"$eq": ["$puntos.tipo", "subida"]}, 1, 0]}},
+                    "bajadas": {"$sum": {"$cond": [{"$eq": ["$puntos.tipo", "bajada"]}, 1, 0]}},
+                }
+            },
+            {"$sort": {"subidas": -1}},
+            {"$limit": LIMITE_PUNTOS},
+        ]
+        return list(self.bd.bitacora_laboratorio.aggregate(pipeline))
+
+    # ──────────────────────────────────── Asistente ────────────────────────────────
+
+    def asistente(self, filtro: dict, inicio: datetime, fin: datetime) -> dict:
+        """Solo datos agregados de `conversaciones`: nunca el contenido de los mensajes."""
+        en_periodo = {"mensajes.creado_en": {"$gte": inicio, "$lt": fin}}
+        dia = {"$dateTrunc": {"date": "$mensajes.creado_en", "unit": "day", "timezone": TZ}}
+        pipeline = [
+            {"$match": {k: v for k, v in filtro.items() if k != "created_at"}},
+            {"$unwind": "$mensajes"},
+            {"$match": en_periodo},
+            {
+                "$facet": {
+                    "mensajes_por_dia": [
+                        {"$match": {"mensajes.rol": "usuario"}},
+                        {"$group": {"_id": dia, "total": {"$sum": 1}}},
+                    ],
+                    "herramientas": [
+                        {"$match": {"mensajes.rol": "herramienta"}},
+                        {"$group": {"_id": "$mensajes.nombre", "total": {"$sum": 1}}},
+                        {"$sort": {"total": -1}},
+                    ],
+                    "duraciones": [
+                        {"$match": {"mensajes.rol": "asistente", "mensajes.duracion_ms": {"$type": "number"}}},
+                        {"$sort": {"mensajes.creado_en": -1}},
+                        {"$limit": 5000},
+                        {"$project": {"_id": 0, "ms": "$mensajes.duracion_ms"}},
+                    ],
+                    "por_rol": [{"$group": {"_id": "$mensajes.rol", "total": {"$sum": 1}}}],
+                }
+            },
+        ]
+        resultado = next(self.bd.conversaciones.aggregate(pipeline))
+        resultado["conversaciones_por_dia"] = self.serie("conversaciones", filtro, "day")
+        resultado["planes_por_origen"] = list(
+            self.bd.planes.aggregate(
+                [
+                    {"$match": {k: v for k, v in filtro.items()}},
+                    {"$group": {"_id": {"$ifNull": ["$origen_solicitud", "planificador"]}, "total": {"$sum": 1}}},
+                ]
+            )
+        )
+        return resultado

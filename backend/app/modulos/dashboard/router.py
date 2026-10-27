@@ -59,7 +59,8 @@ def sistema_experto(rango: Rango = Depends(get_rango), servicio: ServicioDashboa
 
 @router.get("/movilidad", response_model=esquemas.Movilidad)
 def movilidad(rango: Rango = Depends(get_rango), servicio: ServicioDashboard = Depends(get_servicio)):
-    """Recorridos por transporte (total, promedio, mínimo y máximo de minutos) y rutas más usadas."""
+    """Recorridos por transporte (total, promedio, mínimo y máximo de minutos), rutas más usadas y paradas
+    donde más se sube y se baja (de "¿Cómo llego?")."""
     return servicio.movilidad(rango)
 
 
@@ -77,5 +78,13 @@ def lugares(rango: Rango = Depends(get_rango), servicio: ServicioDashboard = Dep
 
 @router.get("/laboratorio", response_model=esquemas.Laboratorio)
 def laboratorio(rango: Rango = Depends(get_rango), servicio: ServicioDashboard = Depends(get_servicio)):
-    """Uso de las demostraciones académicas: DFS (nodos vs. límite) y distancias Euclidiana vs. Manhattan."""
+    """Uso de las demostraciones académicas: DFS (nodos vs. límite), distancias Euclidiana vs. Manhattan,
+    comparativo de búsqueda informada, convergencia y km ahorrados por el genético y transbordos con A*."""
     return servicio.laboratorio(rango)
+
+
+@router.get("/asistente", response_model=esquemas.Asistente)
+def asistente(rango: Rango = Depends(get_rango), servicio: ServicioDashboard = Depends(get_servicio)):
+    """Uso del asistente (solo datos agregados, nunca el contenido de los mensajes): conversaciones y mensajes
+    por día, herramientas más usadas, tiempo de respuesta (promedio y p90), % de errores y planes por origen."""
+    return servicio.asistente(rango)

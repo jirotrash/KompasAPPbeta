@@ -134,6 +134,17 @@ class SistemaExperto(SalidaDashboard):
     por_version: list[ConteoVersion]
 
 
+class ParadaUso(BaseModel):
+    id_ruta: int | None
+    nombre: str
+    lat: float
+    lng: float
+    subidas: int
+    bajadas: int
+    total: int
+
+
+
 class TiemposTransporte(BaseModel):
     transporte: str
     clave: str
@@ -153,6 +164,7 @@ class RutaUsada(BaseModel):
 class Movilidad(SalidaDashboard):
     por_transporte: list[TiemposTransporte]
     rutas_top: list[RutaUsada]
+    paradas_uso: list[ParadaUso] = Field(default=[], description="Paradas donde más se sube y se baja (mapa de calor)")
 
 
 class ReportesTipo(BaseModel):
@@ -199,6 +211,44 @@ class Lugares(SalidaDashboard):
     puntos: list[PuntoLugar]
 
 
+class AlgoritmoBusqueda(BaseModel):
+    algoritmo: str
+    heuristica: str | None
+    etiqueta: str = Field(description="Nombre para la gráfica, p. ej. A* (Manhattan)")
+    consultas: int
+    nodos_promedio: float | None
+    costo_promedio_km: float | None
+    costo_optimo_promedio_km: float | None
+    razon_vs_optimo: float | None = Field(description="Costo del camino ÷ costo óptimo (1 = óptimo)")
+    porcentaje_optimo: float | None
+    ms_promedio: float | None
+
+
+class PuntoConvergencia(BaseModel):
+    generacion: int
+    mejor: float = Field(description="Mejor aptitud promedio entre ejecuciones")
+    promedio: float | None = Field(description="Aptitud promedio de la población, promediada entre ejecuciones")
+    ejecuciones: int
+
+
+class AhorroGenetico(BaseModel):
+    tipo_plan: str
+    planes: int
+    reordenados: int
+    km_antes: float
+    km_despues: float
+    km_ahorrados: float
+
+
+class ResumenTransbordos(BaseModel):
+    consultas: int
+    encontrados: int
+    nodos_explorados_promedio: float | None
+    nodos_grafo_promedio: float | None
+    ms_promedio: float | None
+
+
+
 class BurbujaDFS(BaseModel):
     limite_profundidad: int
     nodos: int = Field(description="Nodos explorados")
@@ -221,3 +271,43 @@ class Laboratorio(SalidaDashboard):
     dfs_puntos: list[BurbujaDFS]
     dfs_pares_top: list[ParDFS]
     distancias_puntos: list[PuntoDistancia]
+    busqueda_algoritmos: list[AlgoritmoBusqueda] = []
+    genetico_convergencia: list[PuntoConvergencia] = []
+    genetico_ahorro: list[AhorroGenetico] = []
+    transbordos: ResumenTransbordos | None = None
+
+
+class ConteoDia(BaseModel):
+    fecha: date
+    conversaciones: int
+    mensajes: int
+
+
+class ConteoHerramienta(BaseModel):
+    herramienta: str
+    total: int
+
+
+class TiempoRespuesta(BaseModel):
+    respuestas: int
+    promedio_ms: float | None
+    p90_ms: float | None
+
+
+class ErroresAsistente(BaseModel):
+    respuestas: int
+    errores: int
+    porcentaje_error: float
+
+
+class ConteoOrigen(BaseModel):
+    origen: str
+    total: int
+
+
+class Asistente(SalidaDashboard):
+    por_dia: list[ConteoDia]
+    herramientas: list[ConteoHerramienta]
+    tiempo_respuesta: TiempoRespuesta
+    errores: ErroresAsistente
+    planes_por_origen: list[ConteoOrigen]

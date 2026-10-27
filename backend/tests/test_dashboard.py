@@ -11,10 +11,14 @@ ENDPOINTS = {
     "series": {"serie", "planes_por_interes"},
     "planes": {"por_interes", "por_movilidad", "por_contexto", "presupuesto", "tiempo_disponible", "dia_hora", "interes_por_contexto"},
     "sistema-experto": {"por_estado", "reglas_top", "puntuacion_por_tipo", "sin_datos_suficientes", "por_version"},
-    "movilidad": {"por_transporte", "rutas_top"},
+    "movilidad": {"por_transporte", "rutas_top", "paradas_uso"},
     "reportes": {"por_tipo_estado", "vigentes_vs_vencidos", "puntos"},
     "lugares": {"por_categoria", "puntos"},
-    "laboratorio": {"dfs_puntos", "dfs_pares_top", "distancias_puntos"},
+    "laboratorio": {
+        "dfs_puntos", "dfs_pares_top", "distancias_puntos",
+        "busqueda_algoritmos", "genetico_convergencia", "genetico_ahorro", "transbordos",
+    },
+    "asistente": {"por_dia", "herramientas", "tiempo_respuesta", "errores", "planes_por_origen"},
 }
 
 
@@ -106,3 +110,60 @@ def test_reglas_con_descripcion(cliente, token_demo, plan_demo):
 def test_rango_invertido_da_422(cliente, token_demo):
     respuesta = cliente.get("/api/dashboard/kpis", params={"desde": "2026-10-10", "hasta": "2026-10-01"}, headers=encabezado(token_demo))
     assert respuesta.status_code == 422
+
+
+def test_laboratorio_con_busqueda_y_genetico(cliente, token_demo):
+    h = encabezado(token_demo)
+    cliente.get("/api/busqueda/comparar", params={"origen": "TerminalToluca", "destino": "PlazaSendero"}, headers=h)
+    cuerpo = {"paradas": [{"lat": 19.289, "lng": -99.664}, {"lat": 19.2785, "lng": -99.6455}, {"lat": 19.2838, "lng": -99.6765}], "generaciones": 10}
+    cliente.post("/api/genetico/ordenar-paradas", json=cuerpo, headers=h)
+    datos = cliente.get("/api/dashboard/laboratorio", headers=h).json()
+    etiquetas = [a["etiqueta"] for a in datos["busqueda_algoritmos"]]
+    assert etiquetas[:6] == ["DFS", "UCS", "Voraz (Euclidiana)", "Voraz (Manhattan)", "A* (Euclidiana)", "A* (Manhattan)"]
+    a_euclidiana = datos["busqueda_algoritmos"][4]
+    assert a_euclidiana["porcentaje_optimo"] == 100 and a_euclidiana["razon_vs_optimo"] == 1
+    assert datos["genetico_convergencia"][0]["generacion"] == 1
+    assert all(p["mejor"] >= p["promedio"] for p in datos["genetico_convergencia"])
+
+
+def test_asistente_sin_contenido_de_mensajes(cliente, bd, token_demo):
+    from app.nucleo.bd import ahora
+
+    momento = ahora()
+    bd.conversaciones.insert_one(
+        {
+            "id_usuario": 1,
+            "titulo": "Secreto",
+            "modelo": "llama3.2:3b",
+            "mensajes": [
+                {"rol": "usuario", "contenido": "texto privado", "creado_en": momento},
+                {"rol": "herramienta", "nombre": "como_llegar", "argumentos": {}, "resultado_ref": None, "creado_en": momento},
+                {"rol": "asistente", "contenido": "respuesta", "duracion_ms": 1000, "creado_en": momento},
+                {"rol": "usuario", "contenido": "otro", "creado_en": momento},
+                {"rol": "error", "contenido": "El asistente no está disponible en este momento.", "creado_en": momento},
+            ],
+            "rutas_consultadas": [],
+            "planes_creados": [],
+            "created_at": momento,
+            "updated_at": momento,
+            "deleted_at": None,
+        }
+    )
+    respuesta = cliente.get("/api/dashboard/asistente", headers=encabezado(token_demo))
+    assert respuesta.status_code == 200, respuesta.text
+    datos = respuesta.json()
+    assert "texto privado" not in respuesta.text and "Secreto" not in respuesta.text
+    hoy = datos["por_dia"][-1]
+    assert hoy["conversaciones"] >= 1 and hoy["mensajes"] >= 2
+    assert {"herramienta": "como_llegar", "total": 1} in datos["herramientas"] or datos["herramientas"][0]["total"] >= 1
+    assert datos["errores"]["errores"] >= 1 and 0 < datos["errores"]["porcentaje_error"] <= 100
+    assert datos["tiempo_respuesta"]["p90_ms"] is not None
+    assert [o["origen"] for o in datos["planes_por_origen"]] == ["planificador", "asistente"]
+
+
+def test_percentil():
+    from app.modulos.dashboard.servicio import percentil
+
+    assert percentil([], 90) is None
+    assert percentil([10], 90) == 10
+    assert percentil(list(range(1, 11)), 90) == 9.1

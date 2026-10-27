@@ -10,6 +10,8 @@ Uso (desde backend/, con el venv activo y la base ya preparada con scripts.prepa
   backend/ejemplos/entrada_hechos.json (no se eligen reglas a mano).
 - Recorridos sobre rutas existentes; si la base no tiene rutas, crea unas rutas demo entre lugares de ejemplo.
 - Reportes dentro de la zona piloto y consultas de DFS y distancias en bitacora_laboratorio.
+- v0.6: corridas reales de /api/busqueda/comparar, del genético sobre los planes demo, de "¿Cómo llego?"
+  (opciones en autobús y transbordos con A*) y conversaciones del asistente con texto genérico.
 - Semilla fija (random.seed(28)): la demo es reproducible.
 """
 
@@ -25,15 +27,21 @@ from pymongo.database import Database
 
 from app.compartido.geo import ZONA, distancia_euclidiana_km, distancia_manhattan_km, distancia_por_calles_km, esta_dentro_de_zona
 from app.ia.busqueda_dfs import PARADAS_KOMPAS, planificar_rutas_dfs
+from app.ia.busqueda_informada import comparar_algoritmos
+from app.ia.orden_optimizado import optimizar_orden
 from app.ia.servicio import recomendar
 from app.modulos.itinerarios.servicio import ACOMPANANTES, evaluacion_de
+from app.modulos.rutas.repositorio import RepositorioRutas
+from app.modulos.rutas.servicio import ServicioRutas
 from app.nucleo.bd import ZONA_HORARIA, ahora, get_bd, siguiente_id
 from app.nucleo.seguridad import hash_password
 from scripts.preparar_bd import ajustar_contadores
 
 SEMILLA = 28
 EJEMPLO = Path(__file__).resolve().parent.parent / "ejemplos" / "entrada_hechos.json"
-COLECCIONES_DEMO = ("usuarios", "planes", "historial_rutas", "rutas", "reportes", "bitacora_laboratorio")
+COLECCIONES_DEMO = ("usuarios", "planes", "historial_rutas", "rutas", "reportes", "bitacora_laboratorio", "conversaciones")
+HERRAMIENTAS = {"como_llegar": 6, "buscar_lugares": 4, "armar_salida": 2, "mis_planes": 1}
+PASO_TRAZO_KM = 0.15
 
 NOMBRES = ["Ana", "Luis", "María", "José", "Fernanda", "Diego", "Sofía", "Carlos", "Valeria", "Jorge", "Paola", "Iván"]
 APELLIDOS = ["García", "Hernández", "López", "Martínez", "González", "Pérez", "Sánchez", "Ramírez", "Flores", "Cruz"]
@@ -46,6 +54,27 @@ PESO_HORA = [1, 1, 2, 3, 4, 3, 3, 3, 4, 6, 7, 6, 4, 2]  # más salidas por la ta
 TIPOS_REPORTE = {"manifestacion": 3, "accidente": 3, "afluencia": 5, "cierre_total": 2}
 VIGENCIA_H = {"cierre_total": 6, "accidente": 2, "manifestacion": 3, "afluencia": 1}
 MIN_POR_KM = {"Caminando": 12, "Transporte público": 5, "Taxi/App": 2.6, "Combinado": 4}
+
+
+class BitacoraDemo:
+    """Hace las veces de ServicioLaboratorio: guarda con demo: true y una fecha del periodo."""
+
+    def __init__(self, bd: Database, inicio: datetime, fin: datetime, conteo: dict):
+        self.bd, self.inicio, self.fin, self.conteo = bd, inicio, fin, conteo
+
+    def registrar(self, tipo: str, datos: dict) -> None:
+        self.bd.bitacora_laboratorio.insert_one({"tipo": tipo, "creado_en": momento_aleatorio(self.inicio, self.fin), **datos, "demo": True})
+        self.conteo["bitacora_laboratorio"] += 1
+
+
+def densificar(puntos: list[list[float]]) -> list[list[float]]:
+    """Puntos intermedios cada ~150 m sobre el mismo trazo (como un trazo grabado con GPS)."""
+    salida = [puntos[0]]
+    for a, b in zip(puntos, puntos[1:]):
+        km = distancia_euclidiana_km({"lat": a[1], "lng": a[0]}, {"lat": b[1], "lng": b[0]})
+        pasos = max(1, round(km / PASO_TRAZO_KM))
+        salida += [[round(a[0] + (b[0] - a[0]) * i / pasos, 6), round(a[1] + (b[1] - a[1]) * i / pasos, 6)] for i in range(1, pasos + 1)]
+    return salida
 
 
 def elegir(pesos: dict) -> str:
@@ -164,7 +193,11 @@ def sembrar(bd: Database, dias: int, usuarios: int, planes: int) -> dict:
             "hora_salida": hora_salida,
         }
         reloj = creado.replace(hour=max(0, hora - 1), minute=random.randint(0, 59))
-        respuesta = recomendar(peticion, con_precios(lugares, reloj), reloj)
+        vistos = con_precios(lugares, reloj)
+        respuesta = recomendar(peticion, vistos, reloj)
+        for ejecucion in optimizar_orden(respuesta, peticion, vistos, reloj):
+            bd.bitacora_laboratorio.insert_one({"tipo": "genetico", "creado_en": creado, **ejecucion, "demo": True})
+            conteo["bitacora_laboratorio"] += 1
 
         categoria = categorias.get(nombre_interes[peticion["intereses"][0]])
         transporte = transportes.get(nombre_movilidad[peticion["movilidad"][0]])
@@ -186,6 +219,7 @@ def sembrar(bd: Database, dias: int, usuarios: int, planes: int) -> dict:
                 "hora_salida": hora_salida,
                 "fecha_plan": creado.astimezone(ZONA_HORARIA).replace(hour=h, minute=m, second=0, microsecond=0),
                 "evaluacion": evaluacion_de(respuesta),
+                "origen_solicitud": random.choices(["planificador", "asistente"], weights=[5, 1])[0],
                 "demo": True,
                 "created_at": creado,
                 "updated_at": creado,
@@ -200,7 +234,7 @@ def sembrar(bd: Database, dias: int, usuarios: int, planes: int) -> dict:
         for a, b in [(0, 5), (1, 6), (2, 7), (3, 8), (4, 9), (0, 4)]:
             if b >= len(lugares):
                 continue
-            puntos = [[lugares[a]["lng"], lugares[a]["lat"]], [lugares[b]["lng"], lugares[a]["lat"]], [lugares[b]["lng"], lugares[b]["lat"]]]
+            puntos = densificar([[lugares[a]["lng"], lugares[a]["lat"]], [lugares[b]["lng"], lugares[a]["lat"]], [lugares[b]["lng"], lugares[b]["lat"]]])
             doc = {"_id": siguiente_id(bd, "rutas"), "trazo": {"type": "LineString", "coordinates": puntos}, "demo": True, "created_at": fin, "updated_at": fin, "deleted_at": None}
             bd.rutas.insert_one(doc)
             rutas.append(doc)
@@ -292,6 +326,69 @@ def sembrar(bd: Database, dias: int, usuarios: int, planes: int) -> dict:
             }
         )
         conteo["bitacora_laboratorio"] += 1
+
+    # ── Comparativo de búsqueda informada (resultados reales sobre la red académica) ──
+    for _ in range(round(planes * 0.15)):
+        origen, destino = random.sample(paradas, 2)
+        r = comparar_algoritmos(origen, destino)
+        campos = ("algoritmo", "heuristica", "costo_km", "nodos_explorados", "longitud_camino", "optimo", "ms")
+        bd.bitacora_laboratorio.insert_one(
+            {
+                "tipo": "busqueda",
+                "creado_en": momento_aleatorio(inicio, fin),
+                "origen": origen,
+                "destino": destino,
+                "costo_optimo_km": r["costo_optimo_km"],
+                "algoritmos": [{k: f[k] for k in campos} for f in r["filas"]],
+                "demo": True,
+            }
+        )
+        conteo["bitacora_laboratorio"] += 1
+
+    # ── ¿Cómo llego? sobre las rutas de la base: subidas, bajadas y transbordos con A* (servicio real) ──
+    servicio_rutas = ServicioRutas(RepositorioRutas(bd), BitacoraDemo(bd, inicio, fin, conteo))
+    trazos = [r["trazo"]["coordinates"] for r in rutas if len(r["trazo"]["coordinates"]) >= 2]
+    for _ in range(round(planes * 0.3) if trazos else 0):
+        trazo_a, trazo_b = random.choice(trazos), random.choice(trazos)
+        i = random.randrange(0, max(1, len(trazo_a) // 2))
+        j = random.randrange(len(trazo_b) // 2, len(trazo_b))
+        a = {"lat": trazo_a[i][1] + random.uniform(-0.001, 0.001), "lng": trazo_a[i][0] + random.uniform(-0.001, 0.001)}
+        b = {"lat": trazo_b[j][1] + random.uniform(-0.001, 0.001), "lng": trazo_b[j][0] + random.uniform(-0.001, 0.001)}
+        if esta_dentro_de_zona(a) and esta_dentro_de_zona(b):
+            servicio_rutas.alternativas(a, b)
+
+    # ── Conversaciones del asistente (texto genérico: nunca mensajes reales) ──
+    for _ in range(round(planes * 0.25)):
+        id_usuario, alta = random.choice(ids_usuarios)
+        creado = momento_aleatorio(alta, fin)
+        reloj = creado
+        mensajes = []
+        for _ in range(random.randint(1, 4)):
+            reloj += timedelta(minutes=random.randint(1, 20))
+            mensajes.append({"rol": "usuario", "contenido": "Mensaje de demostración", "creado_en": reloj})
+            if random.random() < 0.06:
+                mensajes.append({"rol": "error", "contenido": "El asistente no está disponible en este momento.", "creado_en": reloj})
+                continue
+            if random.random() < 0.7:
+                mensajes.append({"rol": "herramienta", "nombre": elegir(HERRAMIENTAS), "argumentos": {}, "resultado_ref": None, "creado_en": reloj})
+            duracion = round(random.lognormvariate(8.3, 0.5))  # ~4 s de mediana, como llama3.2:3b en una PC
+            reloj += timedelta(milliseconds=duracion)
+            mensajes.append({"rol": "asistente", "contenido": "Respuesta de demostración", "duracion_ms": duracion, "creado_en": reloj})
+        bd.conversaciones.insert_one(
+            {
+                "id_usuario": id_usuario,
+                "titulo": "Conversación de demostración",
+                "modelo": "llama3.2:3b",
+                "mensajes": mensajes,
+                "rutas_consultadas": [],
+                "planes_creados": [],
+                "demo": True,
+                "created_at": creado,
+                "updated_at": reloj,
+                "deleted_at": None,
+            }
+        )
+        conteo["conversaciones"] += 1
 
     ajustar_contadores(bd)
     return conteo

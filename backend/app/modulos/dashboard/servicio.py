@@ -8,6 +8,7 @@ from functools import lru_cache
 
 from app.compartido.texto import INTERESES, MOVILIDADES, clave
 from app.ia.busqueda_dfs import PARADAS_KOMPAS
+from app.ia.busqueda_informada import NOMBRES as NOMBRES_BUSQUEDA
 from app.ia.motor import cargar_base
 from app.modulos.catalogos.servicio import ServicioCatalogos
 from app.modulos.dashboard.repositorio import LIMITES_PRESUPUESTO, LIMITES_TIEMPO, RepositorioDashboard
@@ -19,6 +20,24 @@ CONTEXTOS = ("solo", "pareja", "amigos", "familia")
 TIPOS_REPORTE = ("cierre_total", "accidente", "manifestacion", "afluencia")
 ESTADOS_REPORTE = ("pendiente", "verificado", "descartado")
 UNIDADES = {"dia": "day", "semana": "week", "mes": "month"}
+ORDEN_ALGORITMOS = [("dfs", None), ("costo_uniforme", None), ("voraz", "euclidiana"), ("voraz", "manhattan"), ("a_estrella", "euclidiana"), ("a_estrella", "manhattan")]
+TIPOS_PLAN = ("equilibrado", "rapido", "cercano")
+HERRAMIENTAS = ("como_llegar", "buscar_lugares", "armar_salida", "mis_planes")
+
+
+def _etiqueta_algoritmo(algoritmo: str, heuristica: str | None) -> str:
+    base = {"dfs": "DFS", "costo_uniforme": "UCS", "voraz": "Voraz", "a_estrella": "A*"}.get(algoritmo, NOMBRES_BUSQUEDA.get(algoritmo, algoritmo))
+    return f"{base} ({heuristica.capitalize()})" if heuristica else base
+
+
+def percentil(valores: list[float], p: float) -> float | None:
+    """Percentil con interpolación lineal (p entre 0 y 100)."""
+    if not valores:
+        return None
+    orden = sorted(valores)
+    k = (len(orden) - 1) * p / 100
+    abajo, arriba = int(k), min(int(k) + 1, len(orden) - 1)
+    return orden[abajo] + (orden[arriba] - orden[abajo]) * (k - abajo)
 
 
 @lru_cache
@@ -230,6 +249,11 @@ class ServicioDashboard:
                 {"id_ruta": g["_id"], "ruta": f"Ruta {g['_id']}", "total": g["total"], "promedio": _r1(g["promedio"])}
                 for g in datos["rutas_top"]
             ],
+            "paradas_uso": [
+                {**g["_id"], "subidas": g["subidas"], "bajadas": g["bajadas"], "total": g["subidas"] + g["bajadas"]}
+                for g in self.repo.paradas_uso({**rango.filtro("creado_en", borrado_logico=False), "tipo": "abordaje"})
+                if g["_id"].get("lat") is not None
+            ],
             "incluye_demo": self._hay_demo(rango, "historial_rutas"),
         }
 
@@ -275,5 +299,95 @@ class ServicioDashboard:
             "distancias_puntos": [
                 {"modo": d.get("modo"), "euclidiana": d["euclidiana"], "manhattan": d["manhattan"]} for d in datos["distancias_puntos"]
             ],
+            **self._laboratorio_v06(base),
             "incluye_demo": self._hay_demo(rango, "bitacora_laboratorio", campo_fecha="creado_en"),
+        }
+
+    def _laboratorio_v06(self, base: dict) -> dict:
+        """Comparativo de búsqueda, convergencia y ahorro del genético, y transbordos con A*."""
+        grupos = {(g["_id"]["algoritmo"], g["_id"]["heuristica"]): g for g in self.repo.busqueda_algoritmos({**base, "tipo": "busqueda"})}
+        claves = ORDEN_ALGORITMOS + [k for k in grupos if k not in ORDEN_ALGORITMOS]
+        busqueda = []
+        for algoritmo, heuristica in claves:
+            g = grupos.get((algoritmo, heuristica))
+            if g is None:
+                continue
+            busqueda.append(
+                {
+                    "algoritmo": algoritmo,
+                    "heuristica": heuristica,
+                    "etiqueta": _etiqueta_algoritmo(algoritmo, heuristica),
+                    "consultas": g["consultas"],
+                    "nodos_promedio": _r1(g["nodos"]),
+                    "costo_promedio_km": round(g["costo"], 3) if g["costo"] is not None else None,
+                    "costo_optimo_promedio_km": round(g["optimo"], 3) if g["optimo"] is not None else None,
+                    "razon_vs_optimo": round(g["razon"], 4) if g["razon"] is not None else None,
+                    "porcentaje_optimo": _r1(100 * g["optimos"] / g["consultas"]) if g["consultas"] else None,
+                    "ms_promedio": round(g["ms"], 3) if g["ms"] is not None else None,
+                }
+            )
+        genetico = {**base, "tipo": "genetico"}
+        ahorro = {g["_id"]: g for g in self.repo.genetico_ahorro(genetico)}
+        t = self.repo.transbordos({**base, "tipo": "transbordo"})
+        return {
+            "busqueda_algoritmos": busqueda,
+            "genetico_convergencia": [
+                {"generacion": g["_id"] + 1, "mejor": round(g["mejor"], 6), "promedio": round(g["promedio"], 6) if g["promedio"] is not None else None, "ejecuciones": g["ejecuciones"]}
+                for g in self.repo.genetico_convergencia(genetico)
+            ],
+            "genetico_ahorro": [
+                {
+                    "tipo_plan": tipo,
+                    "planes": ahorro[tipo]["planes"],
+                    "reordenados": ahorro[tipo]["reordenados"],
+                    "km_antes": round(ahorro[tipo]["km_antes"], 2),
+                    "km_despues": round(ahorro[tipo]["km_despues"], 2),
+                    "km_ahorrados": round(ahorro[tipo]["km_antes"] - ahorro[tipo]["km_despues"], 2),
+                }
+                for tipo in [*TIPOS_PLAN, *(k for k in ahorro if k not in TIPOS_PLAN)]
+                if tipo in ahorro
+            ],
+            "transbordos": {
+                "consultas": t["consultas"],
+                "encontrados": t["encontrados"],
+                "nodos_explorados_promedio": _r1(t["nodos"]),
+                "nodos_grafo_promedio": _r1(t["total_nodos"]),
+                "ms_promedio": round(t["ms"], 3) if t["ms"] is not None else None,
+            },
+        }
+
+    def asistente(self, rango: Rango) -> dict:
+        """Uso del asistente con datos agregados (nunca el contenido de los mensajes)."""
+        datos = self.repo.asistente(rango.filtro(), rango.inicio, rango.fin)
+        mensajes = {_clave_fecha(g["_id"]): g["total"] for g in datos["mensajes_por_dia"]}
+        conversaciones = {_clave_fecha(f): t for f, t in datos["conversaciones_por_dia"].items()}
+        por_dia, dia = [], rango.desde
+        while dia <= rango.hasta:
+            fecha = dia.isoformat()
+            por_dia.append({"fecha": fecha, "conversaciones": conversaciones.get(fecha, 0), "mensajes": mensajes.get(fecha, 0)})
+            dia += timedelta(days=1)
+        usadas = {g["_id"]: g["total"] for g in datos["herramientas"] if g["_id"]}
+        herramientas = [{"herramienta": h, "total": usadas.pop(h, 0)} for h in HERRAMIENTAS] + [
+            {"herramienta": h, "total": t} for h, t in usadas.items()
+        ]
+        duraciones = [d["ms"] for d in datos["duraciones"]]
+        roles = {g["_id"]: g["total"] for g in datos["por_rol"]}
+        respuestas = roles.get("asistente", 0) + roles.get("error", 0)
+        origenes = {g["_id"]: g["total"] for g in datos["planes_por_origen"]}
+        return {
+            "periodo": rango.periodo(),
+            "por_dia": por_dia,
+            "herramientas": sorted(herramientas, key=lambda h: -h["total"]),
+            "tiempo_respuesta": {
+                "respuestas": len(duraciones),
+                "promedio_ms": _r1(sum(duraciones) / len(duraciones)) if duraciones else None,
+                "p90_ms": _r1(percentil(duraciones, 90)),
+            },
+            "errores": {
+                "respuestas": respuestas,
+                "errores": roles.get("error", 0),
+                "porcentaje_error": _r1(100 * roles.get("error", 0) / respuestas) if respuestas else 0.0,
+            },
+            "planes_por_origen": [{"origen": o, "total": origenes.get(o, 0)} for o in ("planificador", "asistente")],
+            "incluye_demo": self._hay_demo(rango, "conversaciones", "planes"),
         }

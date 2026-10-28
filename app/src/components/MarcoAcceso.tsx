@@ -1,8 +1,6 @@
-import { useState, type ReactNode } from 'react';
-import { Separator, XStack, YStack } from 'tamagui';
+import type { ReactNode } from 'react';
+import { XStack, YStack } from 'tamagui';
 
-import { MensajeInfo } from './Avisos';
-import { BotonSecundario } from './Botones';
 import Logo from './Logo';
 import Pantalla from './Pantalla';
 import { Subtitulo, Texto, Titulo } from './ui';
@@ -28,35 +26,3 @@ export default function MarcoAcceso({ titulo, subtitulo, children }: { titulo: s
   );
 }
 
-/** "o continúa con" + botones de Google y Apple. Todavía no hay inicio de sesión con terceros: se avisa. */
-export function AccesoSocial() {
-  const [aviso, setAviso] = useState('');
-  const pendiente = (proveedor: string) =>
-    setAviso(`El inicio de sesión con ${proveedor} todavía no está disponible. Usa tu correo por ahora.`);
-
-  return (
-    <YStack gap={16}>
-      <XStack items="center" gap={12}>
-        <Separator borderColor="$borde" />
-        <Texto tam="sm" suave>
-          o continúa con
-        </Texto>
-        <Separator borderColor="$borde" />
-      </XStack>
-      <XStack gap={12}>
-        <BotonSecundario
-          flex
-          texto="Google"
-          onPress={() => pendiente('Google')}
-          prefijo={
-            <Texto peso="fuerte" tam="lg" color="#4285F4">
-              G
-            </Texto>
-          }
-        />
-        <BotonSecundario flex texto="Apple" icono="apple" onPress={() => pendiente('Apple')} />
-      </XStack>
-      <MensajeInfo>{aviso}</MensajeInfo>
-    </YStack>
-  );
-}

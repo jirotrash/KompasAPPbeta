@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from app.compartido.geo import ZONA, esta_dentro_de_zona
 from app.modulos.reportes.repositorio import RepositorioReportes
 from app.nucleo.bd import ZONA_HORARIA, ahora
-from app.nucleo.errores import DatosInvalidos
+from app.nucleo.errores import DatosInvalidos, NoEncontrado
 
 VIGENCIA_H = {"cierre_total": 6, "accidente": 2, "manifestacion": 3, "afluencia": 1}
 
@@ -37,3 +37,22 @@ class ServicioReportes:
 
     def vigentes(self, ruta_id: str | None = None) -> list[dict]:
         return self.repo.vigentes(ahora(), ruta_id)
+
+    # ─────────────────────────── Panel de administración ───────────────────────────
+
+    @staticmethod
+    def _con_vigencia(reporte: dict) -> dict:
+        return {**reporte, "vigente": reporte["vigente_hasta"] > ahora()}
+
+    def recientes(self, limite: int, estado: str | None = None) -> list[dict]:
+        return [self._con_vigencia(r) for r in self.repo.recientes(limite, estado)]
+
+    def cambiar_estado(self, id_reporte: str, estado: str) -> dict:
+        reporte = self.repo.cambiar_estado(id_reporte, estado)
+        if reporte is None:
+            raise NoEncontrado("No encontramos ese reporte.")
+        return self._con_vigencia(reporte)
+
+    def borrar(self, id_reporte: str) -> None:
+        if not self.repo.borrar(id_reporte):
+            raise NoEncontrado("No encontramos ese reporte.")

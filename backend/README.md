@@ -4,7 +4,29 @@ Especificación de endpoints en `../BACKEND.md`. Contrato de datos: `src/service
 Arquitectura en capas por módulos (`../ARQUITECTURA.md`): **router → servicio → repositorio → MongoDB**.
 Modelo de datos: `../MIGRACION_MONGODB.md` y `../DOCS/manual-tecnico/modelo-datos-mongodb.md`.
 
-## 1. MongoDB (elige una)
+## 1. MongoDB (local, Atlas o las dos)
+
+El `.env` guarda las dos conexiones y `MONGO_DESTINO` elige con cuál trabaja la API:
+
+```env
+MONGO_DESTINO=local                 # local o atlas
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB=kompas
+MONGO_URI_ATLAS=mongodb+srv://USUARIO:PASSWORD@kompass.xxxxx.mongodb.net/?retryWrites=true&w=majority
+MONGO_DB_ATLAS=kompasbd
+```
+
+Para tener **las dos a la vez** se levantan dos APIs (cada una con su base; no se sincronizan solas):
+
+```powershell
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000                         # la del .env (local)
+$env:MONGO_DESTINO="atlas"; uvicorn app.main:app --host 0.0.0.0 --port 8001      # Atlas, en otra terminal
+```
+
+`/api/salud` dice a cuál está conectada: `{"ok": true, "bd": true, "base": "atlas/kompasbd"}`. Para pasar a Atlas lo
+que hay en la local: `python -m scripts.copiar_a_atlas` (ver §3).
+
+Instalación de cada una:
 
 - **Local**: instala MongoDB Community Server (deja activado el servicio de Windows) → `mongodb://localhost:27017`.
 - **Docker**: `docker run -d --name kompas-mongo -p 27017:27017 mongo:8.0` → `mongodb://localhost:27017`.
@@ -60,10 +82,11 @@ ollama pull llama3.2:3b             # una vez; el modelo debe soportar tools
 | `sembrar_actividad_demo --dias 60 --usuarios 40 --planes 300` | Actividad sintética con `demo: true` para el dashboard (semilla fija) |
 | `sembrar_actividad_demo --borrar` | Borra todo lo que tenga `demo: true` |
 | `migrar_mysql_a_mongo [--limpiar]` | Copia una sola vez los datos del esquema MySQL anterior (ver abajo) |
+| `copiar_a_atlas` | Copia la base local a Atlas (por `_id`: reemplaza lo que ya exista, no duplica ni borra lo que solo esté en Atlas). Se puede repetir |
 | `distancias_clic` | Gráfica de escritorio de Euclidiana vs. Manhattan (requiere `pip install matplotlib`) |
 
-Todos usan `MONGO_URI` y `MONGO_DB` del `.env`, así que sirven igual para local, Atlas o una base de pruebas
-(`$env:MONGO_DB="otra_base"`).
+Todos usan la base de `MONGO_DESTINO` (local por defecto), así que sirven igual para local o Atlas
+(`$env:MONGO_DESTINO="atlas"`) o una base de pruebas (`$env:MONGO_DB="otra_base"`).
 
 ### Migración desde MySQL (una vez)
 
@@ -138,6 +161,30 @@ Módulos: `cuenta` (auth + residencia), `catalogos`, `lugares`, `rutas`, `histor
 
 Detalle en `../DOCS/manual-tecnico/` (`ia-en-la-app.md`, `busqueda-y-heuristicas.md`, `algoritmo-genetico.md`,
 `arbol-binario.md`, `asistente-llm.md`).
+
+## 6c. Panel de administración y lo que piden los usuarios (v0.7)
+
+Todo lo de `/api/admin/...` es 🔒 admin (401 sin token, 403 con rol `usuario`). Lo usa la web en **Administración**.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET/POST` | `/api/admin/rutas` | Lista o crea una ruta `{nombre, trazo: [[lng, lat], ...], paradas: [{nombre, ubicacion}]}`. 422 fuera de la zona piloto |
+| `PUT/DELETE` | `/api/admin/rutas/{id}` | Reemplaza o borra (lógico) la ruta |
+| `GET/POST` | `/api/admin/lugares` | `{nombre, id_categoria, ubicacion}` |
+| `PUT/DELETE` | `/api/admin/lugares/{id}` | |
+| `GET/POST` | `/api/admin/categorias`, `/api/admin/transportes` | Con `protegida: true` las que usan la app y R01–R20 |
+| `PUT/DELETE` | `/api/admin/categorias/{id}`, `/api/admin/transportes/{id}` | 409 si está protegida (no se borra ni cambia de clave) o si la categoría todavía tiene lugares |
+| `GET` | `/api/admin/reportes?estado=` | Todos los reportes (vigentes y vencidos) con `vigente` e `id_usuario` |
+| `PATCH/DELETE` | `/api/admin/reportes/{id}` | `{estado: pendiente \| verificado \| descartado}` o borrarlo |
+| `GET` | `/api/admin/busquedas?sin_autobus=` | Búsquedas de "¿Cómo llego?" (colección `busquedas`) |
+| `GET` | `/api/admin/solicitudes-rutas?estado=` | Rutas que pidió la gente |
+| `PATCH/DELETE` | `/api/admin/solicitudes-rutas/{id}` | `{estado: pendiente \| atendida \| descartada, nota_admin}` |
+| `POST` | `/api/solicitudes-rutas` 🔒 | La app pide una ruta que falta `{origen, destino, comentario?}` |
+| `GET` | `/api/solicitudes-rutas` 🔒 | Solicitudes del usuario con su estado y la nota del equipo |
+
+Cambios en lo que ya existía (solo se agregan campos): `GET /api/rutas?origen=&destino=` ahora guarda cada búsqueda
+en `busquedas` (con el usuario si manda su token; sin token sigue funcionando), `GET /api/lugares` trae `id_categoria`
+y `/api/salud` trae `base`.
 
 ## 7. Qué NO hay todavía
 

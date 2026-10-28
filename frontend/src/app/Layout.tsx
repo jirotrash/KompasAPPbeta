@@ -1,17 +1,55 @@
-import { Link, Outlet, useSearchParams } from 'react-router-dom'
+import type { ComponentType } from 'react'
+import { Link, Outlet, useLocation, useSearchParams } from 'react-router-dom'
 import { USA_MOCK } from '../compartido/api/cliente.ts'
-import { IconoSalir } from '../compartido/componentes/Iconos.tsx'
+import { IconoSalir, type PropsIcono } from '../compartido/componentes/Iconos.tsx'
 import Logo from '../compartido/componentes/Logo.tsx'
 import { BotonTema, SelectorTema } from '../compartido/componentes/SelectorTema.tsx'
+import { SECCIONES_ADMIN, seccionAdminDe } from '../modulos/administracion'
 import { useAuth } from '../modulos/cuenta'
 import { SECCIONES, seccionDe } from '../modulos/dashboard'
 
 const inicial = (texto = '') => texto.trim().charAt(0).toUpperCase() || '?'
 
+type Enlace = { id: string; texto: string; Icono: ComponentType<PropsIcono>; ruta: string }
+
+const DASHBOARD: Enlace[] = SECCIONES.map((s) => ({ ...s, ruta: s.id === 'resumen' ? '/' : `/?seccion=${s.id}` }))
+const ADMINISTRACION: Enlace[] = SECCIONES_ADMIN.map((s) => ({ ...s, ruta: `/administrar?seccion=${s.id}` }))
+
+function GrupoNav({ titulo, enlaces, activa }: { titulo: string; enlaces: Enlace[]; activa: string | null }) {
+  return (
+    <>
+      <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-texto-suave">{titulo}</p>
+      <ul className="space-y-0.5">
+        {enlaces.map(({ id, texto, Icono, ruta }) => {
+          const actual = id === activa
+          return (
+            <li key={id}>
+              <Link
+                to={ruta}
+                aria-current={actual ? 'page' : undefined}
+                className={`relative flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${
+                  actual ? 'bg-primario-claro text-primario-oscuro' : 'text-texto-suave hover:bg-fondo hover:text-texto'
+                }`}
+              >
+                {actual && <span aria-hidden="true" className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-primario" />}
+                <Icono className="size-[18px]" />
+                {texto}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </>
+  )
+}
+
 export default function Layout() {
   const { usuario, logout } = useAuth()
   const [params] = useSearchParams()
-  const activa = seccionDe(params.get('seccion')).id
+  const enAdministracion = useLocation().pathname.startsWith('/administrar')
+  const seccion = params.get('seccion')
+  const activaDashboard = enAdministracion ? null : seccionDe(seccion).id
+  const activaAdmin = enAdministracion ? seccionAdminDe(seccion).id : null
 
   return (
     <div className="flex min-h-dvh flex-col md:pl-64">
@@ -25,28 +63,13 @@ export default function Layout() {
           </div>
         </div>
 
-        <nav aria-label="Secciones del dashboard" className="flex-1 overflow-y-auto px-3 py-4">
-          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-texto-suave">Dashboard</p>
-          <ul className="space-y-0.5">
-            {SECCIONES.map(({ id, texto, Icono }) => {
-              const actual = id === activa
-              return (
-                <li key={id}>
-                  <Link
-                    to={id === 'resumen' ? '/' : `/?seccion=${id}`}
-                    aria-current={actual ? 'page' : undefined}
-                    className={`relative flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${
-                      actual ? 'bg-primario-claro text-primario-oscuro' : 'text-texto-suave hover:bg-fondo hover:text-texto'
-                    }`}
-                  >
-                    {actual && <span aria-hidden="true" className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-primario" />}
-                    <Icono className="size-[18px]" />
-                    {texto}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+        <nav aria-label="Secciones del panel" className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+          <div>
+            <GrupoNav titulo="Dashboard" enlaces={DASHBOARD} activa={activaDashboard} />
+          </div>
+          <div>
+            <GrupoNav titulo="Administración" enlaces={ADMINISTRACION} activa={activaAdmin} />
+          </div>
         </nav>
 
         <div className="space-y-3 border-t border-borde p-4">
@@ -84,6 +107,25 @@ export default function Layout() {
           <IconoSalir className="size-5" />
         </button>
       </header>
+
+      {/* Celular: cambia entre el dashboard y la administración (las secciones van como pestañas en cada página) */}
+      <nav aria-label="Áreas del panel" className="flex gap-1 border-b border-borde bg-superficie px-4 py-2 md:hidden">
+        {[
+          { texto: 'Dashboard', ruta: '/', actual: !enAdministracion },
+          { texto: 'Administración', ruta: '/administrar', actual: enAdministracion },
+        ].map((a) => (
+          <Link
+            key={a.ruta}
+            to={a.ruta}
+            aria-current={a.actual ? 'page' : undefined}
+            className={`flex min-h-9 flex-1 items-center justify-center rounded-lg text-sm font-semibold transition ${
+              a.actual ? 'bg-primario-claro text-primario-oscuro' : 'text-texto-suave hover:bg-fondo'
+            }`}
+          >
+            {a.texto}
+          </Link>
+        ))}
+      </nav>
 
       {USA_MOCK && (
         <p className="bg-aviso-fondo px-4 py-1.5 text-center text-xs font-medium text-texto">

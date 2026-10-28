@@ -308,6 +308,41 @@ No se guarda la ubicación del usuario ni datos de Google: `origen` y `destino` 
 "¿Cómo llego?" usa los puntos de su trazo como "Punto N" (no se inventan nombres). **Pendiente con Sebas:** capturar
 las paradas reales de cada ruta y agregarlas al validador si se aprueban.
 
+Desde la v0.7 el equipo las captura en el panel web (**Administración → Rutas**): el trazo se dibuja haciendo clic en
+el mapa en el sentido en que circula la ruta y las paradas se marcan aparte. Borrar una ruta es borrado lógico
+(`deleted_at`), así que el historial que la usa se conserva.
+
+### `busquedas` (v0.7, lo que la gente busca en "¿Cómo llego?")
+
+Un documento por cada `GET /api/rutas?origen=&destino=` dentro de la zona piloto. Sirve para ver qué rutas faltan
+(búsquedas con `datos_suficientes: false`). Las del asistente no se guardan aquí: ya quedan en `conversaciones`.
+
+| Campo | Tipo BSON | Oblig. | Descripción | Ejemplo |
+|---|---|---|---|---|
+| `_id` | ObjectId | sí | La API lo regresa como texto en `id` | `"671b…"` |
+| `id_usuario` | int \| null | no | `null` si se buscó sin sesión o con un token vencido | `12` |
+| `origen`, `destino` | object (GeoJSON Point) | sí | Puntos de la búsqueda | `{"type": "Point", "coordinates": [-99.6, 19.33]}` |
+| `datos_suficientes` | bool | sí | `false`: ninguna ruta de Kompás conectaba los dos puntos | `false` |
+| `opciones_autobus` | int | no | Cuántas opciones en autobús se ofrecieron | `0` |
+| `rutas` | array\<int> | no | Ids de las rutas sugeridas | `[3, 5]` |
+| `distancia_km` | double \| null | no | Estimación por calles | `7.4` |
+| `created_at` | date | sí | | |
+
+### `solicitudes_rutas` (v0.7, rutas que pide la gente)
+
+Cuando "¿Cómo llego?" no encuentra camión, la app ofrece **Pedir esta ruta** (`POST /api/solicitudes-rutas` 🔒). El
+equipo las atiende en **Administración → Solicitudes de rutas** y la persona ve el estado con `GET /api/solicitudes-rutas`.
+
+| Campo | Tipo BSON | Oblig. | Descripción | Ejemplo |
+|---|---|---|---|---|
+| `_id` | ObjectId | sí | La API lo regresa como texto en `id` | `"671b…"` |
+| `id_usuario` | int | sí | Quién la pidió | `12` |
+| `origen`, `destino` | object (GeoJSON Point) | sí | Dentro de la zona piloto | |
+| `comentario` | string \| null | no | Lo que escribió la persona (máx. 500) | `"Pasa una combi por Tollocan"` |
+| `estado` | string | sí | `pendiente`, `atendida`, `descartada` | `"pendiente"` |
+| `nota_admin` | string \| null | no | Respuesta del equipo | `"Se agregó la ruta 7"` |
+| `created_at`, `updated_at` | date | sí | | |
+
 ### `contadores`
 
 | Campo | Tipo BSON | Oblig. | Descripción | Ejemplo |
@@ -334,10 +369,14 @@ las paradas reales de cada ruta y agregarlas al validador si se aprueban.
 | `bitacora_laboratorio` | `tipo` + `creado_en` | compuesto | Dashboard, pestañas Laboratorio IA y Movilidad |
 | `conversaciones` | `id_usuario` + `updated_at` desc | compuesto | Lista de conversaciones del usuario |
 | `conversaciones` | `created_at` | simple | Dashboard, pestaña Asistente |
+| `busquedas` | `created_at` desc | simple | Administración → Búsquedas |
+| `busquedas` | `datos_suficientes` + `created_at` desc | compuesto | Filtro "Solo sin camión" |
+| `solicitudes_rutas` | `estado` + `created_at` desc | compuesto | Administración → Solicitudes (filtro por estado) |
+| `solicitudes_rutas` | `id_usuario` + `created_at` desc | compuesto | `GET /api/solicitudes-rutas` (las del usuario) |
 
 ## 5. Validadores `$jsonSchema`
 
-`preparar_bd.py` crea `usuarios`, `lugares`, `planes`, `reportes` y `conversaciones` (v0.6) con `validator: {$jsonSchema: …}` y
+`preparar_bd.py` crea `usuarios`, `lugares`, `planes`, `reportes`, `conversaciones` (v0.6), `busquedas` y `solicitudes_rutas` (v0.7) con `validator: {$jsonSchema: …}` y
 `validationLevel: "moderate"` (los documentos que ya existían no se bloquean, los nuevos sí se validan).
 Resumen (el detalle completo está en `VALIDADORES` dentro del script):
 

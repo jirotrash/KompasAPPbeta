@@ -4,6 +4,8 @@ from datetime import datetime
 from functools import lru_cache
 from zoneinfo import ZoneInfo
 
+from bson import ObjectId
+from bson.errors import InvalidId
 from pymongo import MongoClient, ReturnDocument
 from pymongo.database import Database
 
@@ -15,13 +17,14 @@ ZONA_HORARIA = ZoneInfo("America/Mexico_City")
 @lru_cache
 def cliente() -> MongoClient:
     s = get_settings()
-    # tz_aware + tzinfo: las fechas que se leen regresan en hora de Toluca
-    return MongoClient(s.mongo_uri, tz_aware=True, tzinfo=ZONA_HORARIA, serverSelectionTimeoutMS=3000)
+    # tz_aware + tzinfo: las fechas que se leen regresan en hora de Toluca. Atlas tarda más en la primera conexión
+    espera_ms = 10000 if s.mongo_destino == "atlas" else 3000
+    return MongoClient(s.uri_activa, tz_aware=True, tzinfo=ZONA_HORARIA, serverSelectionTimeoutMS=espera_ms)
 
 
 def get_bd() -> Database:
     """Dependencia de FastAPI: `bd: Database = Depends(get_bd)`."""
-    return cliente()[get_settings().mongo_db]
+    return cliente()[get_settings().bd_activa]
 
 
 def bd_disponible() -> bool:
@@ -38,6 +41,14 @@ def siguiente_id(bd: Database, coleccion: str) -> int:
         {"_id": coleccion}, {"$inc": {"seq": 1}}, upsert=True, return_document=ReturnDocument.AFTER
     )
     return doc["seq"]
+
+
+def object_id(texto: str) -> ObjectId | None:
+    """Id de texto que llega en la URL → ObjectId, o None si no tiene el formato (se responde 404, no 500)."""
+    try:
+        return ObjectId(texto)
+    except (InvalidId, TypeError):
+        return None
 
 
 def ahora() -> datetime:

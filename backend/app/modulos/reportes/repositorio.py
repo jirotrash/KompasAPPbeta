@@ -2,9 +2,10 @@
 
 from datetime import datetime
 
+from pymongo import ReturnDocument
 from pymongo.database import Database
 
-from app.nucleo.bd import ahora
+from app.nucleo.bd import ahora, object_id
 
 CAMPOS_OPCIONALES = ("nivel_afluencia", "ruta_id", "lugar_id", "comentario")
 
@@ -48,3 +49,21 @@ class RepositorioReportes:
         if ruta_id:
             filtro["ruta_id"] = ruta_id
         return [_reporte(d) for d in self.bd.reportes.find(filtro).sort("observado_en", -1)]
+
+    # ─────────────────────────── Panel de administración ───────────────────────────
+    # Los reportes no tienen borrado lógico: el dashboard cuenta todos los que existen.
+
+    def recientes(self, limite: int, estado: str | None = None) -> list[dict]:
+        filtro = {"estado": estado} if estado else {}
+        return [_reporte(d) | {"id_usuario": d.get("id_usuario")} for d in self.bd.reportes.find(filtro).sort("observado_en", -1).limit(limite)]
+
+    def cambiar_estado(self, id_reporte: str, estado: str) -> dict | None:
+        oid = object_id(id_reporte)
+        doc = oid and self.bd.reportes.find_one_and_update(
+            {"_id": oid}, {"$set": {"estado": estado, "updated_at": ahora()}}, return_document=ReturnDocument.AFTER
+        )
+        return _reporte(doc) | {"id_usuario": doc.get("id_usuario")} if doc else None
+
+    def borrar(self, id_reporte: str) -> bool:
+        oid = object_id(id_reporte)
+        return bool(oid) and self.bd.reportes.delete_one({"_id": oid}).deleted_count == 1

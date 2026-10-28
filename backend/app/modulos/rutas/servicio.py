@@ -10,6 +10,7 @@ Opciones en autobús (por dentro, sin mostrar el algoritmo):
 from app.compartido.geo import (
     ESPERA_TAXI_MIN,
     VELOCIDAD_AUTO_KMH,
+    ZONA,
     Coordenada,
     distancia_por_calles_km,
     esta_dentro_de_zona,
@@ -22,9 +23,10 @@ from app.ia.arbol_binario import NodoParada
 from app.ia.busqueda_informada import distancia_plano_km
 from app.ia.transbordos import RADIO_TRANSBORDO_KM, buscar_transbordo
 from app.ia.trazos import arbol_de_ruta, km_acumulados, proyectar, tramo_del_trazo
+from app.modulos.busquedas.servicio import ServicioBusquedas
 from app.modulos.laboratorio.servicio import ServicioLaboratorio
 from app.modulos.rutas.repositorio import RepositorioRutas
-from app.nucleo.errores import NoEncontrado
+from app.nucleo.errores import DatosInvalidos, NoEncontrado
 
 FUENTE_ESTIMACION = "Estimación por distancia"
 FUENTE_TRAZO = "Trazo registrado por el equipo Kompás · tiempos estimados por distancia"
@@ -49,9 +51,15 @@ def _a_parada_app(p: dict) -> dict:
 
 
 class ServicioRutas:
-    def __init__(self, repo: RepositorioRutas, bitacora: ServicioLaboratorio | None = None):
+    def __init__(
+        self,
+        repo: RepositorioRutas,
+        bitacora: ServicioLaboratorio | None = None,
+        busquedas: ServicioBusquedas | None = None,
+    ):
         self.repo = repo
         self.bitacora = bitacora
+        self.busquedas = busquedas
 
     def listar(self) -> list[dict]:
         return self.repo.listar()
@@ -64,6 +72,38 @@ class ServicioRutas:
 
     def existe(self, id_ruta: int) -> bool:
         return self.repo.por_id(id_ruta) is not None
+
+    # ─────────────────────────── Panel de administración ───────────────────────────
+
+    @staticmethod
+    def _validar(datos: dict) -> tuple[list, str, list[dict]]:
+        """Trazo y paradas dentro de la zona piloto. Regresa (trazo, nombre, paradas) listos para guardar."""
+        nombre = datos["nombre"].strip()
+        if not nombre:
+            raise DatosInvalidos("Escribe el nombre de la ruta.")
+        puntos = [{"lat": lat, "lng": lng} for lng, lat in datos["trazo"]]
+        puntos += [{"lat": p["ubicacion"]["coordinates"][1], "lng": p["ubicacion"]["coordinates"][0]} for p in datos["paradas"]]
+        if not all(esta_dentro_de_zona(p) for p in puntos):
+            raise DatosInvalidos(f"Hay puntos fuera de la zona piloto ({ZONA['nombre']}).")
+        paradas = [{"nombre": p["nombre"].strip(), "ubicacion": p["ubicacion"]} for p in datos["paradas"]]
+        if any(not p["nombre"] for p in paradas):
+            raise DatosInvalidos("Cada parada necesita un nombre.")
+        return datos["trazo"], nombre, paradas
+
+    def crear(self, datos: dict) -> dict:
+        trazo, nombre, paradas = self._validar(datos)
+        return self.repo.crear(trazo, nombre, paradas)
+
+    def actualizar(self, id_ruta: int, datos: dict) -> dict:
+        trazo, nombre, paradas = self._validar(datos)
+        ruta = self.repo.actualizar(id_ruta, trazo, nombre, paradas)
+        if ruta is None:
+            raise NoEncontrado("No encontramos esa ruta.")
+        return ruta
+
+    def borrar(self, id_ruta: int) -> None:
+        if not self.repo.borrar(id_ruta):
+            raise NoEncontrado("No encontramos esa ruta.")
 
     def arbol(self, id_ruta: int) -> dict:
         """Árbol binario de paradas de la ruta (endpoint de apoyo para pruebas y el manual técnico)."""
@@ -204,8 +244,9 @@ class ServicioRutas:
                     )
         return opciones
 
-    def alternativas(self, a: Coordenada, b: Coordenada) -> dict:
-        """En autobús (si hay rutas que conecten), a pie y en taxi/app estimadas por distancia."""
+    def alternativas(self, a: Coordenada, b: Coordenada, usuario: dict | None = None) -> dict:
+        """En autobús (si hay rutas que conecten), a pie y en taxi/app estimadas por distancia.
+        Con `busquedas`, la consulta se guarda para el panel (las de fuera de la zona no)."""
         if not (esta_dentro_de_zona(a) and esta_dentro_de_zona(b)):
             return {
                 "datos_suficientes": False,
@@ -234,8 +275,11 @@ class ServicioRutas:
             }
 
         buses = self._autobuses(a, b)
-        return {
+        resultado = {
             "datos_suficientes": bool(buses),
             "mensaje": None if buses else SIN_AUTOBUS,
             "alternativas": [*buses, pie, auto("taxi"), auto("app")],
         }
+        if self.busquedas:
+            self.busquedas.registrar(usuario, a, b, resultado)
+        return resultado

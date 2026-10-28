@@ -57,6 +57,19 @@ def get_usuario_actual(
     return usuario
 
 
+def get_usuario_opcional(
+    credenciales: HTTPAuthorizationCredentials | None = Depends(_bearer),
+    bd: Database = Depends(get_bd),
+) -> dict | None:
+    """Para endpoints públicos que guardan quién consultó: sin token (o con uno vencido) regresa None, no 401."""
+    if credenciales is None:
+        return None
+    try:
+        return get_usuario_actual(credenciales, bd)
+    except NoAutorizado:
+        return None
+
+
 def requiere_admin(usuario: dict = Depends(get_usuario_actual)) -> dict:
     if usuario.get("rol") != "admin":
         raise Prohibido("Solo un administrador puede ver el dashboard.")

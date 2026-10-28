@@ -1,4 +1,4 @@
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from app.nucleo.esquemas_comunes import GeoPunto, Salida
 
@@ -11,6 +11,7 @@ class LugarSalida(Salida):
     lng: float
     ubicacion: GeoPunto
     categoria: str | None = Field(description="Nombre de la categoría (colección categorias)")
+    id_categoria: int | None = Field(default=None, description="Id en la colección categorias")
     interes: str | None = Field(description="Valor de la app: comer, cafe, cultura, entretenimiento, aire_libre")
     distancia_km: float | None = Field(default=None, description="En línea recta desde lat/lng o `cerca`")
     minutos_caminando: int | None = Field(default=None, description="Estimación: ≈ 12 min por km")
@@ -20,3 +21,11 @@ class LugarSalida(Salida):
     afluencia: None = None
     foto_url: None = Field(default=None, description="Sin dato: la base aún no lo tiene")
     contextos: list[str] = []
+
+
+class LugarEntrada(BaseModel):
+    """Alta o edición de un lugar desde el panel 🔒 admin."""
+
+    nombre: str = Field(min_length=1, max_length=120)
+    id_categoria: int
+    ubicacion: GeoPunto = Field(description="GeoJSON Point [longitud, latitud] dentro de la zona piloto")

@@ -255,6 +255,19 @@ export type Reporte = {
 
 export type NuevoReporte = Omit<Reporte, '_id' | 'vigente_hasta' | 'confirmaciones' | 'estado'>;
 
+// ───────────── Solicitudes de rutas ─────────────
+
+/** La persona pide una ruta que falta cuando "¿Cómo llego?" no encontró camión. El equipo la atiende en el panel. */
+export type SolicitudRuta = {
+  id: string;
+  origen: GeoPunto;
+  destino: GeoPunto;
+  comentario: string | null;
+  estado: 'pendiente' | 'atendida' | 'descartada';
+  nota_admin: string | null;
+  creado_en: string;
+};
+
 // ───────────── Sesión ─────────────
 
 export type Usuario = {

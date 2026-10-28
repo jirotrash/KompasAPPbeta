@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.modulos.asistente import router as asistente
+from app.modulos.busquedas import router as busquedas
 from app.modulos.catalogos import router as catalogos
 from app.modulos.cuenta import router as cuenta
 from app.modulos.dashboard import router as dashboard
@@ -16,6 +17,7 @@ from app.modulos.laboratorio import router as laboratorio
 from app.modulos.lugares import router as lugares
 from app.modulos.reportes import router as reportes
 from app.modulos.rutas import router as rutas
+from app.modulos.solicitudes import router as solicitudes
 from app.nucleo.bd import bd_disponible
 from app.nucleo.config import get_settings
 from app.nucleo.errores import registrar_manejadores
@@ -41,8 +43,9 @@ registrar_manejadores(app)
 
 @app.get("/api/salud", tags=["Salud"])
 def salud() -> dict:
-    """Prueba de conexión para la app. `bd` indica si MongoDB responde."""
-    return {"ok": True, "bd": bd_disponible()}
+    """Prueba de conexión para la app. `bd` indica si MongoDB responde; `base`, a cuál está conectada la API."""
+    ajustes = get_settings()
+    return {"ok": True, "bd": bd_disponible(), "base": f"{ajustes.mongo_destino}/{ajustes.bd_activa}"}
 
 
 for router in (
@@ -60,5 +63,13 @@ for router in (
     laboratorio.router_genetico,
     dashboard.router,
     asistente.router,
+    solicitudes.router,
+    # Panel de administración (CRUD) 🔒 admin: /api/admin/...
+    rutas.router_admin,
+    lugares.router_admin,
+    catalogos.router_admin,
+    reportes.router_admin,
+    busquedas.router_admin,
+    solicitudes.router_admin,
 ):
     app.include_router(router)

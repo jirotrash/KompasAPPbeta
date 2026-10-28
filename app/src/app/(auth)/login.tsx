@@ -6,7 +6,7 @@ import { XStack, YStack } from 'tamagui';
 import { MensajeError, MensajeInfo } from '@/components/Avisos';
 import { BotonPrimario, Enlace } from '@/components/Botones';
 import CampoTexto from '@/components/CampoTexto';
-import MarcoAcceso, { AccesoSocial } from '@/components/MarcoAcceso';
+import MarcoAcceso from '@/components/MarcoAcceso';
 import { Texto } from '@/components/ui';
 import { useSesion } from '@/context/Sesion';
 import { USA_MOCK } from '@/services/api';
@@ -74,8 +74,6 @@ export default function Login() {
           </Texto>
         )}
       </YStack>
-
-      <AccesoSocial />
 
       <XStack justify="center" flexWrap="wrap" gap={4}>
         <Texto tam="sm" suave>

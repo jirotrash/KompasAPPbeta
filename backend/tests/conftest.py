@@ -1,5 +1,5 @@
 """Las pruebas usan la base `kompas_test` (mismo servidor que MONGO_URI), que se recrea en cada corrida.
-Nunca tocan la base `kompas`. Si MongoDB no responde, las pruebas con BD se omiten."""
+Nunca tocan la base `kompas` ni Atlas. Si MongoDB no responde, las pruebas con BD se omiten."""
 
 import os
 
@@ -7,6 +7,7 @@ import pytest
 
 # Debe ir antes de importar app.nucleo.config / app.main (la configuración se lee una sola vez)
 os.environ["MONGO_DB"] = "kompas_test"
+os.environ["MONGO_DESTINO"] = "local"  # aunque backend/.env apunte a Atlas
 if os.environ.get("TEST_MONGO_URI"):
     os.environ["MONGO_URI"] = os.environ["TEST_MONGO_URI"]
 

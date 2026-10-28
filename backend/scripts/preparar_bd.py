@@ -149,6 +149,36 @@ VALIDADORES["conversaciones"] = {
     },
 }
 
+# Panel de administración y "¿Cómo llego?" (v0.7). El _id es ObjectId
+VALIDADORES["busquedas"] = {
+    "bsonType": "object",
+    "required": ["origen", "destino", "datos_suficientes", "created_at"],
+    "properties": {
+        "id_usuario": {"bsonType": ["int", "long", "null"]},
+        "origen": _PUNTO,
+        "destino": _PUNTO,
+        "datos_suficientes": {"bsonType": "bool"},
+        "opciones_autobus": {"bsonType": ["int", "long"], "minimum": 0},
+        "rutas": {"bsonType": "array", "items": _ID_ENTERO},
+        "distancia_km": {"bsonType": ["double", "int", "long", "null"]},
+        "created_at": {"bsonType": "date"},
+    },
+}
+VALIDADORES["solicitudes_rutas"] = {
+    "bsonType": "object",
+    "required": ["id_usuario", "origen", "destino", "estado", "created_at", "updated_at"],
+    "properties": {
+        "id_usuario": _ID_ENTERO,
+        "origen": _PUNTO,
+        "destino": _PUNTO,
+        "comentario": _TEXTO_O_NULO,
+        "estado": {"enum": ["pendiente", "atendida", "descartada"]},
+        "nota_admin": _TEXTO_O_NULO,
+        "created_at": {"bsonType": "date"},
+        "updated_at": {"bsonType": "date"},
+    },
+}
+
 INDICES = {
     "usuarios": [IndexModel([("correo", ASCENDING)], unique=True, name="correo_unico")],
     "categorias": [IndexModel([("nombre", ASCENDING)], unique=True, name="nombre_unico")],
@@ -176,6 +206,14 @@ INDICES = {
     "conversaciones": [
         IndexModel([("id_usuario", ASCENDING), ("updated_at", DESCENDING)], name="usuario_recientes"),
         IndexModel([("created_at", ASCENDING)], name="created_at"),
+    ],
+    "busquedas": [
+        IndexModel([("created_at", DESCENDING)], name="recientes"),
+        IndexModel([("datos_suficientes", ASCENDING), ("created_at", DESCENDING)], name="sin_autobus_recientes"),
+    ],
+    "solicitudes_rutas": [
+        IndexModel([("estado", ASCENDING), ("created_at", DESCENDING)], name="estado_recientes"),
+        IndexModel([("id_usuario", ASCENDING), ("created_at", DESCENDING)], name="usuario_recientes"),
     ],
     "contadores": [],
 }
@@ -232,7 +270,7 @@ def preparar(recrear: bool = False, con_datos: bool = True, silencioso: bool = F
             print(mensaje)
 
     if bd is None:
-        nombre = get_settings().mongo_db
+        nombre = get_settings().bd_activa
         cli = cliente()
         cli.admin.command("ping")
         if recrear:

@@ -46,3 +46,15 @@ class ReporteSalida(Salida):
     confirmaciones: int
     estado: Literal["pendiente", "verificado", "descartado"]
     comentario: str | None = None
+
+
+EstadoReporte = Literal["pendiente", "verificado", "descartado"]
+
+
+class CambioEstadoReporte(BaseModel):
+    estado: EstadoReporte
+
+
+class ReporteAdmin(ReporteSalida):
+    id_usuario: int | None = Field(default=None, description="Quién lo reportó")
+    vigente: bool = Field(description="vigente_hasta todavía no pasa")

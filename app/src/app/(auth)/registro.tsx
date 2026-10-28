@@ -6,7 +6,7 @@ import { MensajeError } from '@/components/Avisos';
 import { BotonPrimario, Enlace } from '@/components/Botones';
 import CampoTexto from '@/components/CampoTexto';
 import Icono from '@/components/Icono';
-import MarcoAcceso, { AccesoSocial } from '@/components/MarcoAcceso';
+import MarcoAcceso from '@/components/MarcoAcceso';
 import { Texto } from '@/components/ui';
 import { useSesion } from '@/context/Sesion';
 import { useTema } from '@/context/Tema';
@@ -186,8 +186,6 @@ export default function Registro() {
         <MensajeError>{error}</MensajeError>
         <BotonPrimario texto="Crear cuenta" onPress={crear} cargando={enviando} />
       </YStack>
-
-      <AccesoSocial />
 
       <XStack justify="center" flexWrap="wrap" gap={4}>
         <Texto tam="sm" suave>

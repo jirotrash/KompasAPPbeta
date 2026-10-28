@@ -2,13 +2,38 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.nucleo.esquemas_comunes import Salida
+from app.nucleo.esquemas_comunes import GeoPunto, Salida
 
 
 class RutaSalida(Salida):
     id: int
     id_texto: str = Field(alias="_id")
     trazo: list[tuple[float, float]] = Field(description="[[longitud, latitud], ...]")
+
+
+class ParadaEntrada(BaseModel):
+    nombre: str = Field(min_length=1, max_length=120)
+    ubicacion: GeoPunto
+
+
+class RutaEntrada(BaseModel):
+    """Alta o edición de una ruta desde el panel 🔒 admin. El trazo va en el sentido en que circula la ruta."""
+
+    nombre: str = Field(min_length=1, max_length=120, description="Nombre de la línea, como la conoce la gente")
+    trazo: list[tuple[float, float]] = Field(min_length=2, description="[[longitud, latitud], ...] en orden de recorrido")
+    paradas: list[ParadaEntrada] = Field(default=[], description="Paradas reales; sin paradas se usan los puntos del trazo")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "nombre": "Lerma – Toluca por Tollocan",
+                    "trazo": [[-99.511, 19.2847], [-99.527, 19.2815], [-99.6557, 19.2926]],
+                    "paradas": [{"nombre": "Centro de Lerma", "ubicacion": {"type": "Point", "coordinates": [-99.511, 19.2847]}}],
+                }
+            ]
+        }
+    }
 
 
 class Tiempos(Salida):

@@ -8,6 +8,7 @@ import { BotonSecundario } from '@/components/Botones';
 import ExplicacionReglas from '@/components/ExplicacionReglas';
 import Icono from '@/components/Icono';
 import Pantalla from '@/components/Pantalla';
+import PedirRuta from '@/components/PedirRuta';
 import { Tarjeta, Texto } from '@/components/ui';
 import { CATEGORIAS, iconoDeInteres, MODOS } from '@/constants/catalogos';
 import { PUNTOS_REFERENCIA, type Coordenada } from '@/constants/zona';
@@ -310,6 +311,10 @@ export default function Buscar() {
               Cómo llegar
             </Texto>
             {!rutas.respuesta.datos_suficientes && <AvisoSinInformacion mensaje={rutas.respuesta.mensaje} />}
+            {/* Sin camión dentro de la zona (fuera de ella no hay alternativas): se puede pedir la ruta al equipo */}
+            {!rutas.respuesta.datos_suficientes && rutas.respuesta.alternativas.length > 0 && (
+              <PedirRuta key={`${rutas.para.id}-${posicion.lat},${posicion.lng}`} origen={posicion} destino={rutas.para} />
+            )}
             {rutas.respuesta.alternativas.map((a) => (
               <TarjetaAlternativa key={a.id} a={a} onPress={() => verEnMapa(a)} />
             ))}

@@ -1,6 +1,6 @@
 // Implementación de ejemplo de cada endpoint (misma forma de respuesta que la API real).
 import { estaDentroDeZona, type Coordenada } from '@/constants/zona';
-import type { Alternativa, Lugar, NuevoReporte, NuevoUsuario, PeticionPlan, RespuestaRutas, Sesion } from '@/types/dominio';
+import type { Alternativa, Lugar, NuevoReporte, NuevoUsuario, PeticionPlan, RespuestaRutas, Sesion, SolicitudRuta } from '@/types/dominio';
 import { desdeGeoJSON, distanciaKm, distanciaPorCallesKm, VELOCIDAD_KMH } from '@/utils/geo';
 
 import { trazarPorCalles } from '../mapas';
@@ -109,6 +109,24 @@ export async function buscarLugares({ cerca, categoria }: { cerca?: Coordenada; 
 export async function generarPlanes(peticion: PeticionPlan) {
   await esperar(700);
   return inferirPlanes(LUGARES, peticion);
+}
+
+// ─────────────── Solicitudes de rutas ───────────────
+
+export async function pedirRuta(origen: Coordenada, destino: Coordenada, comentario?: string): Promise<SolicitudRuta> {
+  await esperar();
+  if (!estaDentroDeZona(origen) || !estaDentroDeZona(destino)) {
+    throw new ErrorMock('El origen o el destino está fuera de la zona piloto (Toluca · Lerma · San Mateo Atenco).', 422);
+  }
+  return {
+    id: `solicitud_${Date.now()}`,
+    origen: { type: 'Point', coordinates: [origen.lng, origen.lat] },
+    destino: { type: 'Point', coordinates: [destino.lng, destino.lat] },
+    comentario: comentario?.trim() || null,
+    estado: 'pendiente',
+    nota_admin: null,
+    creado_en: new Date().toISOString(),
+  };
 }
 
 // ─────────────── Reportes ───────────────

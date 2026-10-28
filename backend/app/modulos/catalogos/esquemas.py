@@ -12,3 +12,20 @@ class TransporteSalida(BaseModel):
     id: int
     nombre: str
     clave: str = Field(description="Valor que usa la app: caminando, transporte_publico, taxi_app, combinado")
+
+
+class CategoriaEntrada(BaseModel):
+    nombre: str = Field(min_length=1, max_length=60)
+    descripcion: str | None = Field(default=None, max_length=300)
+
+
+class TransporteEntrada(BaseModel):
+    nombre: str = Field(min_length=1, max_length=60)
+
+
+class CategoriaAdmin(CategoriaSalida):
+    protegida: bool = Field(description="La usan la app y el sistema experto: no se borra ni cambia de clave")
+
+
+class TransporteAdmin(TransporteSalida):
+    protegida: bool = Field(description="La usan la app y el sistema experto: no se borra ni cambia de clave")

@@ -24,6 +24,7 @@ import type {
   RespuestaRutas,
   ResumenConversacion,
   Sesion,
+  SolicitudRuta,
 } from '@/types/dominio';
 
 import * as mock from './mock';
@@ -111,6 +112,22 @@ export const buscarRutas = (c: { origen: Coordenada; destino: Coordenada; hora: 
   USA_MOCK
     ? mock.buscarRutas(c)
     : solicitud<RespuestaRutas>('/api/rutas', { params: { origen: punto(c.origen), destino: punto(c.destino), hora: c.hora } });
+
+/**
+ * POST /api/solicitudes-rutas 🔒 → pide al equipo una ruta que falta (cuando "¿Cómo llego?" no encontró camión).
+ * La API la guarda en `solicitudes_rutas` como "pendiente"; el equipo la atiende en el panel web.
+ */
+export const pedirRuta = (origen: Coordenada, destino: Coordenada, comentario?: string) =>
+  USA_MOCK
+    ? mock.pedirRuta(origen, destino, comentario)
+    : solicitud<SolicitudRuta>('/api/solicitudes-rutas', {
+        method: 'POST',
+        body: {
+          origen: { type: 'Point', coordinates: [origen.lng, origen.lat] },
+          destino: { type: 'Point', coordinates: [destino.lng, destino.lat] },
+          comentario: comentario?.trim() || null,
+        },
+      });
 
 // ───────────────── Demostración académica DFS ─────────────────
 

@@ -78,17 +78,25 @@ export async function trazarPorCalles(
   modo: keyof typeof PERFILES,
 ): Promise<{ trazo: GeoLinea; distancia_km: number; duracion_min: number } | null> {
   const puntos = `${origen.lng},${origen.lat};${destino.lng},${destino.lat}`;
+  const control = new AbortController();
+  const limite = setTimeout(() => control.abort(), 8000);
   try {
-    const respuesta = await fetch(`${ROUTER_URL}/${PERFILES[modo]}/route/v1/driving/${puntos}?overview=full&geometries=geojson`);
+    const respuesta = await fetch(`${ROUTER_URL}/${PERFILES[modo]}/route/v1/driving/${puntos}?overview=full&geometries=geojson`, { signal: control.signal });
     if (!respuesta.ok) return null;
     const { code, routes } = await respuesta.json();
     if (code !== 'Ok' || !routes?.length) return null;
+    const ruta = routes[0];
+    if (!Number.isFinite(ruta.distance) || ruta.distance < 0 || !Number.isFinite(ruta.duration) || ruta.duration < 0
+      || ruta.geometry?.type !== 'LineString' || !Array.isArray(ruta.geometry.coordinates) || ruta.geometry.coordinates.length < 2
+      || !ruta.geometry.coordinates.every((p: unknown) => Array.isArray(p) && p.length >= 2 && Number.isFinite(p[0]) && Number.isFinite(p[1]) && Math.abs(p[0]) <= 180 && Math.abs(p[1]) <= 90)) return null;
     return {
-      trazo: routes[0].geometry,
-      distancia_km: routes[0].distance / 1000,
-      duracion_min: Math.round(routes[0].duration / 60),
+      trazo: ruta.geometry,
+      distancia_km: ruta.distance / 1000,
+      duracion_min: Math.round(ruta.duration / 60),
     };
   } catch {
     return null;
+  } finally {
+    clearTimeout(limite);
   }
 }

@@ -5,6 +5,7 @@ import type { Coordenada } from '@/constants/zona';
 import type { Alternativa, ParadaRuta, Plan, PuntoRecorrido, Recorrido, Tramo, TramoOpcion } from '@/types/dominio';
 
 import { aHora, aMinutosDelDia, desdeGeoJSON, distanciaKm, FACTOR_CALLES, VELOCIDAD_KMH } from './geo';
+import { resumenTiempo } from './transporte';
 
 const NOTA_SIN_ESPERA = 'Tiempo de trayecto estimado; no incluye la espera (la ruta no tiene horario verificado).';
 
@@ -41,7 +42,8 @@ export function recorridoDesdeAlternativa(
   horaSalida: string,
 ): Recorrido {
   const salida = aMinutosDelDia(horaSalida);
-  const base = { avisos: a.avisos, fuente: a.fuente, ejemplo: a.ejemplo };
+  const resumen = resumenTiempo(a);
+  const base = { avisos: a.avisos, fuente: a.fuente, ejemplo: a.ejemplo, tiempo_incompleto: !resumen.completo, nota_tiempo: resumen.nota };
 
   // Opciones de la API v0.6: tramos con subida, bajada (del árbol de paradas), tramo en ruta e intermedias
   const buses = (a.tramos ?? []).filter((t) => t.modo === 'autobus' && t.parada_subida && t.parada_bajada);
@@ -59,35 +61,38 @@ export function recorridoDesdeAlternativa(
     return {
       ...base,
       titulo: `${a.linea ?? 'Autobús'} · ${destino.nombre}`,
+      espera_total_min: a.tiempos.espera,
       puntos: [
         { ...origen, tipo: 'origen', hora: horaSalida },
         { ...sube, nombre: a.abordaje.nombre, tipo: 'parada', hora: aHora(enParada) },
-        { ...baja, nombre: a.descenso.nombre, tipo: 'parada', hora: aHora(enDescenso) },
-        { ...destino, tipo: 'destino', hora: aHora(enDescenso + caminaVuelta) },
+        { ...baja, nombre: a.descenso.nombre, tipo: 'parada', hora: resumen.completo ? aHora(enDescenso) : undefined },
+        { ...destino, tipo: 'destino', hora: resumen.completo ? aHora(enDescenso + caminaVuelta) : undefined },
       ],
       tramos: [
         { modo: 'pie', duracion_min: caminaIda, distancia_km: kmIda },
         {
           modo: 'autobus',
-          duracion_min: (a.tiempos.espera ?? 0) + (a.tiempos.trayecto ?? 0),
+          duracion_min: a.tiempos.trayecto,
           linea: a.linea,
           sentido: a.sentido,
           abordaje: a.abordaje,
           descenso: a.descenso,
           trazo: a.trazo,
+          paradas_reales: a.paradas_reales,
+          nota: a.tiempos.espera == null ? NOTA_SIN_ESPERA : 'La espera estimada se suma por separado al total.',
         },
         { modo: 'pie', duracion_min: caminaVuelta, distancia_km: kmVuelta },
       ],
     };
   }
 
-  const total = (a.tiempos.caminata ?? 0) + (a.tiempos.espera ?? 0) + (a.tiempos.trayecto ?? 0);
+  const total = resumen.minutos;
   return {
     ...base,
     titulo: destino.nombre,
     puntos: [
       { ...origen, tipo: 'origen', hora: horaSalida },
-      { ...destino, tipo: 'destino', hora: aHora(salida + total) },
+      { ...destino, tipo: 'destino', hora: resumen.completo && total != null ? aHora(salida + total) : undefined },
     ],
     tramos: [{ modo: a.modo, duracion_min: total, distancia_km: a.distancia_km, trazo: a.trazo }],
   };
@@ -100,11 +105,11 @@ function recorridoEnAutobus(
   origen: Origen,
   destino: Origen,
   salida: number,
-  base: Pick<Recorrido, 'avisos' | 'fuente' | 'ejemplo'>,
+  base: Pick<Recorrido, 'avisos' | 'fuente' | 'ejemplo' | 'tiempo_incompleto' | 'nota_tiempo'>,
 ): Recorrido {
   const caminar = (desde: Coordenada, hasta: Coordenada): Tramo => {
     const km = distanciaKm(desde, hasta) * FACTOR_CALLES;
-    return { modo: 'pie', duracion_min: Math.max(1, Math.round((km / VELOCIDAD_KMH.pie) * 60)), distancia_km: km };
+    return { modo: 'pie', duracion_min: km > 0 ? Math.max(1, Math.round((km / VELOCIDAD_KMH.pie) * 60)) : 0, distancia_km: km };
   };
   // Caminatas que manda la API, en orden (antes del primer autobús, entre autobuses y al final)
   const caminatas = (a.tramos ?? []).filter((t) => t.modo === 'pie');
@@ -112,6 +117,7 @@ function recorridoEnAutobus(
     caminatas[i] ? { modo: 'pie', duracion_min: caminatas[i].duracion_min, distancia_km: caminatas[i].distancia_km } : caminar(desde, hasta);
 
   let reloj = salida;
+  let horaConocida = true;
   const puntos: PuntoRecorrido[] = [{ ...origen, tipo: 'origen', hora: aHora(reloj) }];
   const tramos: Tramo[] = [];
   let anterior: Coordenada = origen;
@@ -121,7 +127,7 @@ function recorridoEnAutobus(
     const caminata = pie(i, anterior, sube);
     tramos.push(caminata);
     reloj += caminata.duracion_min ?? 0;
-    puntos.push({ lat: sube.lat, lng: sube.lng, nombre: sube.nombre, tipo: 'parada', rol: i === 0 ? 'subida' : 'transbordo', hora: aHora(reloj) });
+    puntos.push({ lat: sube.lat, lng: sube.lng, nombre: sube.nombre, tipo: 'parada', rol: i === 0 ? 'subida' : 'transbordo', hora: horaConocida ? aHora(reloj) : undefined });
     tramos.push({
       modo: 'autobus',
       duracion_min: t.duracion_min,
@@ -130,25 +136,31 @@ function recorridoEnAutobus(
       abordaje: { nombre: sube.nombre, ubicacion: { type: 'Point', coordinates: [sube.lng, sube.lat] } },
       descenso: { nombre: baja.nombre, ubicacion: { type: 'Point', coordinates: [baja.lng, baja.lat] } },
       trazo: t.tramo_en_ruta?.length ? { type: 'LineString', coordinates: t.tramo_en_ruta } : undefined,
-      nota: a.tiempos.espera == null ? NOTA_SIN_ESPERA : undefined,
+      nota: a.tiempos.espera == null ? NOTA_SIN_ESPERA : 'Solo tiempo en vehículo; la espera se suma por separado al total.',
+      paradas_reales: t.paradas_reales ?? a.paradas_reales,
     });
     reloj += t.duracion_min;
-    puntos.push({ lat: baja.lat, lng: baja.lng, nombre: baja.nombre, tipo: 'parada', rol: i === buses.length - 1 ? 'bajada' : 'transbordo', hora: aHora(reloj) });
+    // Una espera agregada de varios autobuses no indica cuánto se espera en cada parada.
+    if (buses.length === 1 && a.tiempos.espera != null) reloj += a.tiempos.espera;
+    else horaConocida = false;
+    puntos.push({ lat: baja.lat, lng: baja.lng, nombre: baja.nombre, tipo: 'parada', rol: i === buses.length - 1 ? 'bajada' : 'transbordo', hora: horaConocida ? aHora(reloj) : undefined });
     anterior = baja;
   });
   const final = pie(buses.length, anterior, destino);
   tramos.push(final);
-  puntos.push({ ...destino, tipo: 'destino', hora: aHora(reloj + (final.duracion_min ?? 0)) });
+  const resumen = resumenTiempo(a);
+  puntos.push({ ...destino, tipo: 'destino', hora: resumen.completo && resumen.minutos != null ? aHora(salida + resumen.minutos) : undefined });
 
   return {
     ...base,
     titulo: `${a.linea ?? 'Autobús'} · ${destino.nombre}`,
     puntos,
     tramos,
+    espera_total_min: a.tiempos.espera,
     trazosRuta: buses.flatMap((t) => (t.trazo_ruta?.length ? [{ type: 'LineString' as const, coordinates: t.trazo_ruta }] : [])),
     intermedias: buses.flatMap((t) => (t.paradas_intermedias ?? []).map((p) => ({ lat: p.lat, lng: p.lng, nombre: p.nombre }))),
   };
 }
 
-export const duracionTotal = (r: Recorrido) => r.tramos.reduce((s, t) => s + (t.duracion_min ?? 0), 0);
+export const duracionTotal = (r: Recorrido) => r.tramos.reduce((s, t) => s + (t.duracion_min ?? 0), 0) + (r.espera_total_min ?? 0);
 export const distanciaTotal = (r: Recorrido) => r.tramos.reduce((s, t) => s + (t.distancia_km ?? 0), 0);

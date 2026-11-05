@@ -1,6 +1,6 @@
 // SIMULACIÓN de traslados con las rutas de ejemplo (lo real lo calcula la API con las rutas de MongoDB).
 import type { Coordenada } from '@/constants/zona';
-import type { Alternativa, Movilidad, ParadaRuta, Tramo } from '@/types/dominio';
+import type { Alternativa, Movilidad, ParadaRuta, Tramo, TramoOpcion } from '@/types/dominio';
 import { aMinutosDelDia, desdeGeoJSON, distanciaKm, distanciaPorCallesKm, FACTOR_CALLES, VELOCIDAD_KMH } from '@/utils/geo';
 
 import { RUTAS } from './datos';
@@ -36,6 +36,12 @@ export function alternativaAutobus(
   const paradaRuta = (i: number): ParadaRuta => ({ nombre: ruta.paradas[i].nombre, ...desdeGeoJSON(ruta.paradas[i].ubicacion.coordinates), km: acumulado[i] });
   const intermedias = tramo.slice(1, -1).map((_, j) => paradaRuta(sube.i + 1 + j));
   const minutosTrayecto = Math.round(((kmTramo * FACTOR_CALLES) / VELOCIDAD_KMH.autobus) * 60);
+  const caminata = (desde: Coordenada, hasta: Coordenada): TramoOpcion => {
+    const km = distanciaPorCallesKm(desde, hasta);
+    return { modo: 'pie', desde, hasta, distancia_km: km, duracion_min: Math.round(km / VELOCIDAD_KMH.pie * 60) };
+  };
+  const ida = caminata(origen, paradaRuta(sube.i));
+  const vuelta = caminata(paradaRuta(baja.i), destino);
 
   const avisos: string[] = [];
   const min = aMinutosDelDia(hora);
@@ -63,7 +69,10 @@ export function alternativaAutobus(
     paradas_intermedias: intermedias,
     tramo_en_ruta: tramo.map((p) => p.ubicacion.coordinates),
     numero_transbordos: 0,
+    paradas_reales: true, // Capturadas en el ejemplo, no verificadas en la calle.
+    caminata_km: ida.distancia_km + vuelta.distancia_km,
     tramos: [
+      ida,
       {
         modo: 'autobus',
         linea: ruta.linea,
@@ -74,21 +83,23 @@ export function alternativaAutobus(
         paradas_intermedias: intermedias,
         tramo_en_ruta: tramo.map((p) => p.ubicacion.coordinates),
         trazo_ruta: ruta.paradas.map((p) => p.ubicacion.coordinates),
+        paradas_reales: true,
       },
+      vuelta,
     ],
     transbordos: [],
     tiempos: {
-      caminata: Math.round(((sube.km + baja.km) * FACTOR_CALLES * 60) / VELOCIDAD_KMH.pie),
+      caminata: ida.duracion_min + vuelta.duracion_min,
       espera: Math.round(ruta.horario.frecuencia_min / 2),
       trayecto: minutosTrayecto,
       transbordos: 0,
     },
-    distancia_km: kmTramo * FACTOR_CALLES + sube.km + baja.km,
+    distancia_km: kmTramo * FACTOR_CALLES + ida.distancia_km + vuelta.distancia_km,
     tipo_horario: ruta.horario.tipo,
     trazo: { type: 'LineString', coordinates: tramo.map((p) => p.ubicacion.coordinates) },
     fuente: ruta.fuente,
     fecha_verificacion: ruta.fecha_verificacion,
-    reglas_cumplidas: ['R13'],
+    reglas_cumplidas: ruta.verificada ? ['R13'] : [],
     avisos,
     ejemplo: true,
   };

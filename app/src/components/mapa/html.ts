@@ -17,7 +17,6 @@ export const HTML_MAPA = `<!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   html, body, #mapa { margin: 0; height: 100%; width: 100%; }
   body { background: #eef1f2; font-family: system-ui, -apple-system, Roboto, sans-serif; }
@@ -31,11 +30,22 @@ export const HTML_MAPA = `<!doctype html>
   .oscuro .leaflet-bar a { background: #16252d; color: #e6eef1; border-color: #263943; }
   .oscuro .leaflet-control-attribution { background: rgba(22,37,45,.8); color: #93a6af; }
   .oscuro .leaflet-control-attribution a { color: #2bc4bc; }
+  #estado-mapa { position: absolute; z-index: 1000; top: 14px; left: 14px; right: 14px; max-width: 360px; margin: auto; padding: 14px; background: #FFFFFF; color: #1B1F27; border: 1px solid #E2E6EC; border-radius: 12px; font-size: 14px; }
+  #estado-mapa[hidden] { display: none; }
+  #estado-mapa p { margin: 0 0 10px; }
+  #reintentar { min-height: 44px; padding: 8px 14px; border: 0; border-radius: 8px; background: #1A62A5; color: #FFFFFF; font: 600 14px system-ui, sans-serif; cursor: pointer; }
 </style>
 </head>
 <body>
 <div id="mapa"></div>
+<div id="estado-mapa" role="status" aria-live="polite">
+  <p id="mensaje-mapa">Cargando el mapa…</p>
+  <button id="reintentar" type="button" hidden>Reintentar mapa</button>
+</div>
 <script>
+  // El botón de ubicación puede usarse antes de que llegue la biblioteca.
+  window.centrar = function () {};
+  function iniciarMapa() {
   var ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
   var ATRIB = 'Mapa &copy; Esri · datos &copy; OpenStreetMap';
   var MOSAICOS = {
@@ -179,6 +189,42 @@ export const HTML_MAPA = `<!doctype html>
   });
 
   enviar({ tipo: 'listo' });
+  }
+
+  var estadoMapa = document.getElementById('estado-mapa');
+  var mensajeMapa = document.getElementById('mensaje-mapa');
+  var reintentar = document.getElementById('reintentar');
+  var biblioteca = null;
+
+  function cargarMapa() {
+    estadoMapa.hidden = false;
+    mensajeMapa.textContent = 'Cargando el mapa…';
+    reintentar.hidden = true;
+    var terminado = false;
+    var limite;
+    function terminar(correcto) {
+      if (terminado) return;
+      terminado = true;
+      clearTimeout(limite);
+      if (correcto && window.L) {
+        iniciarMapa();
+        estadoMapa.hidden = true;
+      } else {
+        mensajeMapa.textContent = 'No se pudo cargar el mapa. Revisa tu conexión y reintenta. Los pasos del viaje siguen disponibles.';
+        reintentar.hidden = false;
+      }
+    }
+    if (window.L) { terminar(true); return; }
+    if (biblioteca) biblioteca.remove();
+    biblioteca = document.createElement('script');
+    biblioteca.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+    biblioteca.onload = function () { terminar(true); };
+    biblioteca.onerror = function () { terminar(false); };
+    limite = setTimeout(function () { terminar(false); }, 8000);
+    document.head.appendChild(biblioteca);
+  }
+  reintentar.addEventListener('click', cargarMapa);
+  cargarMapa();
 </script>
 </body>
 </html>`;

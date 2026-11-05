@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.nucleo.esquemas_comunes import GeoPunto, ReglaSalida, Salida
 
@@ -133,6 +133,7 @@ class Descartado(Salida):
 
 
 class RespuestaPlanes(Salida):
+    id_plan: int | None = None
     datos_suficientes: bool
     mensaje: str | None = None
     aviso: str | None = None
@@ -143,7 +144,7 @@ class RespuestaPlanes(Salida):
 
 
 class PlanGuardado(BaseModel):
-    """Documento de la colección `planes` (mismos campos que antes)."""
+    """Ficha pública del plan, compatible con los resúmenes anteriores."""
 
     id: int
     no_acompanantes: int
@@ -152,3 +153,44 @@ class PlanGuardado(BaseModel):
     transporte: str
     fecha_plan: datetime | None
     creado_en: datetime | None
+    titulo: str = "Plan de salida"
+    estado_usuario: Literal["borrador", "guardado", "realizado"] = "borrador"
+    tipo_seleccionado: Literal["equilibrado", "rapido", "cercano"] | None = None
+    tiene_detalle: bool = False
+    alternativas: list["AlternativaGuardada"] = []
+    actualizado_en: datetime | None = None
+
+
+class AlternativaGuardada(BaseModel):
+    tipo: Literal["equilibrado", "rapido", "cercano"]
+    numero_paradas: int
+
+
+class CambioPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    titulo: str | None = Field(default=None, min_length=1, max_length=80)
+    tipo_seleccionado: Literal["equilibrado", "rapido", "cercano"] | None = None
+    estado_usuario: Literal["guardado", "realizado"] | None = None
+
+    @field_validator("titulo", mode="before")
+    @classmethod
+    def _titulo(cls, valor):
+        return " ".join(valor.split()) if isinstance(valor, str) else valor
+
+    @model_validator(mode="after")
+    def _cambio_valido(self):
+        if not self.model_fields_set or any(getattr(self, campo) is None for campo in self.model_fields_set):
+            raise ValueError("envía al menos un cambio y no uses valores nulos")
+        return self
+
+
+class RecuperarPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    origen: Punto
+    hora_salida: str = Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+
+
+class PlanRecuperado(BaseModel):
+    peticion: PeticionPlan
+    respuesta: RespuestaPlanes

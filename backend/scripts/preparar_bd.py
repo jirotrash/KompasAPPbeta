@@ -85,6 +85,28 @@ VALIDADORES = {
             "fecha_plan": {"bsonType": "date"},
             "evaluacion": {"bsonType": "object"},
             "origen_solicitud": {"enum": ["planificador", "asistente"]},
+            "titulo": {"bsonType": "string", "minLength": 1, "maxLength": 80},
+            "estado_usuario": {"enum": ["borrador", "guardado", "realizado"]},
+            "tipo_seleccionado": {"enum": ["equilibrado", "rapido", "cercano"]},
+            "opciones_guardadas": {
+                "bsonType": "array", "maxItems": 3,
+                "items": {
+                    "bsonType": "object", "required": ["tipo", "paradas"], "additionalProperties": False,
+                    "properties": {
+                        "tipo": {"enum": ["equilibrado", "rapido", "cercano"]},
+                        "paradas": {
+                            "bsonType": "array", "minItems": 2, "maxItems": 3,
+                            "items": {
+                                "bsonType": "object", "required": ["place_id", "categoria"], "additionalProperties": False,
+                                "properties": {
+                                    "place_id": {"bsonType": "string", "minLength": 1},
+                                    "categoria": {"enum": ["comer", "cafe", "cultura", "entretenimiento", "aire_libre"]},
+                                },
+                            },
+                        },
+                    },
+                },
+            },
             "deleted_at": _FECHA_O_NULO,
         },
     },

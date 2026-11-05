@@ -106,6 +106,9 @@ export default function Perfil() {
       </XStack>
 
       <YStack mt={32} gap={24}>
+        <Seccion titulo="Mis salidas">
+          <Fila icono="planificar" texto="Mis planes" detalle="Retoma, organiza o elimina tus salidas" onPress={() => router.push('/mis-planes')} />
+        </Seccion>
         <Seccion titulo="Apariencia">
           <XStack gap={8} p={8}>
             {TEMAS.map((t) => {

@@ -6,6 +6,7 @@ Si Google falla o no hay llave, se lanza ErrorGooglePlaces (la API responde 503)
 """
 
 from datetime import datetime
+from urllib.parse import quote
 
 import httpx
 
@@ -182,3 +183,40 @@ def buscar_texto(texto: str, *, maximo: int = 5, cliente: httpx.Client | None = 
                 }
             )
     return salida
+
+
+def consultar_paradas(referencias: list[dict], *, cliente: httpx.Client | None = None) -> list[dict]:
+    """Place Details por los IDs guardados. Conserva el orden, sin almacenar contenido de Google."""
+    ajustes = get_settings()
+    if not ajustes.google_maps_api_key:
+        raise ErrorGooglePlaces("Falta configurar GOOGLE_MAPS_API_KEY para recuperar los lugares del plan.")
+    encabezados = {
+        "X-Goog-Api-Key": ajustes.google_maps_api_key,
+        "X-Goog-FieldMask": CAMPOS.replace("places.", "") + ",businessStatus",
+    }
+    propio = cliente is None
+    cliente = cliente or httpx.Client(timeout=TIEMPO_LIMITE_S)
+    lugares = []
+    try:
+        for ref in referencias:
+            url = "https://places.googleapis.com/v1/places/" + quote(ref["place_id"], safe="")
+            respuesta = cliente.get(url, headers=encabezados, params={"languageCode": ajustes.google_idioma, "regionCode": ajustes.google_region})
+            if respuesta.status_code in (404, 410):
+                raise ErrorGooglePlaces("Un lugar del plan ya no está disponible. Tu plan sigue guardado; puedes crear otra salida.")
+            if respuesta.status_code != 200:
+                raise ErrorGooglePlaces("No se pudieron actualizar los lugares del plan. Intenta de nuevo más tarde.")
+            datos = respuesta.json()
+            if not isinstance(datos, dict):
+                raise ErrorGooglePlaces("Google Places devolvió una respuesta incompleta. Tu plan sigue guardado.")
+            if datos.get("businessStatus") in ("CLOSED_PERMANENTLY", "CLOSED_TEMPORARILY"):
+                raise ErrorGooglePlaces("Un lugar del plan figura como cerrado. Tu plan sigue guardado; revisa otra salida.")
+            lugar = normalizar(datos, ref["categoria"], ahora_mexico())
+            if lugar is None:
+                raise ErrorGooglePlaces("Faltan datos de un lugar para recuperar el recorrido. Intenta más tarde.")
+            lugares.append(lugar)
+    except (httpx.HTTPError, ValueError) as error:
+        raise ErrorGooglePlaces("No se pudieron actualizar los lugares del plan. Revisa la conexión e intenta de nuevo.") from error
+    finally:
+        if propio:
+            cliente.close()
+    return lugares

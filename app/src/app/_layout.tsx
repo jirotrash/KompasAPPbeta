@@ -35,7 +35,7 @@ function Navegacion() {
   return (
     <ThemeProvider value={temaNavegacion}>
       <ProveedorUbicacion activo={!!usuario}>
-        <ProveedorViaje>
+        <ProveedorViaje key={usuario ? `${usuario.id}:${usuario.email}` : 'sin-sesion'}>
           <StatusBar style={esquema === 'oscuro' ? 'light' : 'dark'} />
           <Stack
             screenOptions={{
@@ -54,6 +54,8 @@ function Navegacion() {
             <Stack.Protected guard={!!usuario}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="planes" options={{ headerShown: true, title: '' }} />
+              <Stack.Screen name="mis-planes/index" options={{ headerShown: true, title: 'Mis planes' }} />
+              <Stack.Screen name="mis-planes/[id]" options={{ headerShown: true, title: 'Plan guardado' }} />
               <Stack.Screen name="buscar" options={{ headerShown: true, title: '¿A dónde vas?' }} />
               <Stack.Screen name="dfs" options={{ headerShown: true, title: 'Demostración DFS' }} />
               <Stack.Screen name="distancias" options={{ headerShown: true, title: 'Distancias' }} />

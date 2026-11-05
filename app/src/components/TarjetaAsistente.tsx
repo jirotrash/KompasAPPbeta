@@ -39,6 +39,10 @@ export default function TarjetaAsistente({ tarjeta }: { tarjeta: Datos }) {
   };
 
   const verPlan = () => {
+    if (tarjeta.id_plan != null && !tarjeta.ejemplo) {
+      router.push({ pathname: '/mis-planes/[id]', params: { id: String(tarjeta.id_plan) } });
+      return;
+    }
     if (!tarjeta.plan) return;
     setRecorrido(recorridoDesdePlan(tarjeta.plan, posicion, salidaDe(tarjeta.plan)));
     router.navigate('/mapa');
@@ -85,7 +89,7 @@ export default function TarjetaAsistente({ tarjeta }: { tarjeta: Datos }) {
       {tarjeta.ejemplo && <EtiquetaEjemplo />}
       {esRuta ? (
         <BotonSecundario texto="Ver ruta" icono="mapa" onPress={verRuta} />
-      ) : tarjeta.plan ? (
+      ) : tarjeta.plan || (tarjeta.id_plan != null && !tarjeta.ejemplo) ? (
         <BotonSecundario texto="Ver plan" icono="mapa" onPress={verPlan} />
       ) : (
         <Texto tam="xs" suave>

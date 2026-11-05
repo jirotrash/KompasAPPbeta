@@ -10,6 +10,7 @@ import type { Coordenada } from '@/constants/zona';
 import type {
   ComparacionDistancias,
   ComparacionGeo,
+  CambioPlan,
   Conversacion,
   EstadoAsistente,
   Lugar,
@@ -17,6 +18,8 @@ import type {
   NuevoUsuario,
   ParadaDFS,
   PeticionPlan,
+  PlanGuardado,
+  PlanRecuperado,
   PuntoPlano,
   RespuestaDFS,
   RespuestaMensaje,
@@ -29,6 +32,7 @@ import type {
 
 import * as mock from './mock';
 import * as mockAsistente from './mock/asistente';
+import * as mockPlanes from './mock/planes';
 
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 export const USA_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false';
@@ -174,6 +178,27 @@ export const buscarLugares = (c: { cerca?: Coordenada; categoria?: string } = {}
  */
 export const generarPlanes = (peticion: PeticionPlan) =>
   USA_MOCK ? mock.generarPlanes(peticion) : solicitud<RespuestaPlanes>('/api/itinerarios', { method: 'POST', body: peticion });
+
+/** Fichas propias; el cursor es el último ID de la página anterior. */
+export const listarPlanes = (antesDe?: number) =>
+  USA_MOCK ? mockPlanes.listar(antesDe) : solicitud<PlanGuardado[]>('/api/planes', {
+    params: { limite: '20', antes_de: antesDe == null ? undefined : String(antesDe) },
+  });
+
+export const obtenerPlan = (id: number) =>
+  USA_MOCK ? mockPlanes.detalle(id) : solicitud<PlanGuardado>(`/api/planes/${id}`);
+
+export const cambiarPlan = (id: number, cambios: CambioPlan) =>
+  USA_MOCK ? mockPlanes.cambiar(id, cambios) : solicitud<PlanGuardado>(`/api/planes/${id}`, { method: 'PATCH', body: cambios });
+
+export const eliminarPlan = (id: number) =>
+  USA_MOCK ? mockPlanes.borrar(id) : solicitud<void>(`/api/planes/${id}`, { method: 'DELETE' });
+
+/** Reconsulta las mismas paradas; deja tiempo para hasta tres llamadas a Place Details. */
+export const recuperarPlan = (id: number, origen: Coordenada, horaSalida: string) =>
+  USA_MOCK ? mockPlanes.recuperar(id, origen, horaSalida) : solicitud<PlanRecuperado>(`/api/planes/${id}/recuperar`, {
+    method: 'POST', body: { origen, hora_salida: horaSalida }, tiempoLimiteMs: 45000,
+  });
 
 // ─────────────────────────── Reportes comunitarios ────────────────────────────
 

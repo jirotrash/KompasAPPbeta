@@ -47,6 +47,7 @@ export type Tramo = {
   aviso?: string;
   /** Texto bajo el tramo en autobús (si no viene: "Incluye caminata a la parada y espera estimada."). */
   nota?: string;
+  paradas_reales?: boolean | null;
 };
 
 /** Parada de una ruta de Kompás: real o "Punto N" del trazo (no se inventan nombres). km = desde el inicio de la ruta. */
@@ -68,6 +69,7 @@ export type TramoOpcion = {
   paradas_intermedias?: ParadaRuta[];
   /** Trazo completo de la ruta [[lng, lat], ...] (se dibuja tenue) */
   trazo_ruta?: ParGeoJSON[];
+  paradas_reales?: boolean | null;
 };
 
 /** Respuesta de GET /api/rutas: una alternativa para ir de A a B. */
@@ -99,6 +101,8 @@ export type Alternativa = {
   paradas_intermedias?: ParadaRuta[];
   numero_transbordos?: number;
   tramos?: TramoOpcion[];
+  paradas_reales?: boolean | null;
+  caminata_km?: number | null;
 };
 
 export type RespuestaRutas = { datos_suficientes: boolean; mensaje?: string; alternativas: Alternativa[] };
@@ -226,6 +230,7 @@ export type Descartado = {
 };
 
 export type RespuestaPlanes = {
+  id_plan?: number | null;
   datos_suficientes?: boolean;
   mensaje?: string | null;
   /** Advertencias del motor y de los hechos (p. ej. R13: no se verifican cierres) */
@@ -234,6 +239,30 @@ export type RespuestaPlanes = {
   planes: Plan[];
   descartados?: Descartado[];
 };
+
+export type PlanGuardado = {
+  id: number;
+  titulo: string;
+  estado_usuario: 'borrador' | 'guardado' | 'realizado';
+  tipo_seleccionado: Plan['tipo'] | null;
+  tiene_detalle: boolean;
+  alternativas: { tipo: Plan['tipo']; numero_paradas: number }[];
+  no_acompanantes: number;
+  tiempo_disponible: number;
+  categoria: string;
+  transporte: string;
+  fecha_plan: string | null;
+  creado_en: string | null;
+  actualizado_en: string | null;
+};
+
+export type CambioPlan = {
+  titulo?: string;
+  tipo_seleccionado?: Plan['tipo'];
+  estado_usuario?: 'guardado' | 'realizado';
+};
+
+export type PlanRecuperado = { peticion: PeticionPlan; respuesta: RespuestaPlanes };
 
 // ───────────── Reportes ─────────────
 
@@ -316,6 +345,10 @@ export type Recorrido = {
   avisos?: string[];
   fuente?: string;
   ejemplo?: boolean;
+  /** La espera de autobús se cuenta una vez en el total, separada del movimiento. */
+  espera_total_min?: number | null;
+  tiempo_incompleto?: boolean;
+  nota_tiempo?: string;
 };
 
 // ───────────── Asistente (Ollama, a través de la API) ─────────────

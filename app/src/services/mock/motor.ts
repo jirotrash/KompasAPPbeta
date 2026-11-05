@@ -162,3 +162,24 @@ export function inferirPlanes(lugares: Lugar[], p: PeticionPlan): RespuestaPlane
 
   return { datos_suficientes: true, planes, descartados };
 }
+
+/** Recuperación de ejemplo: evalúa la selección guardada sin sustituir ni reordenar lugares. */
+export function reconstruirEjemplo(lugares: Lugar[], p: PeticionPlan, tipo: Plan['tipo']): RespuestaPlanes {
+  const seleccion = lugares.map((l) => evaluar(l, p));
+  const datos = armarPlan(seleccion, p);
+  const descartados = seleccion.filter((s) => s.descartes.length).map((s) => ({ lugar: s.lugar, reglas: s.descartes }));
+  const cabe = datos.duracion <= p.tiempo_horas * 60 && datos.costo <= p.presupuesto.max;
+  if (!lugares.length || descartados.length || !cabe) return {
+    datos_suficientes: false, planes: [], descartados,
+    mensaje: 'El plan sigue guardado, pero ahora no cumple todas las condiciones para recomendarlo.',
+  };
+  return {
+    datos_suficientes: true, descartados: [],
+    planes: [{
+      tipo, mejor_opcion: false, costo: datos.costo, duracion_horas: Math.round(datos.duracion / 6) / 10,
+      distancia_km: Math.round(datos.distancia * 10) / 10, paradas: datos.paradas, tramos: datos.tramos,
+      explicacion: 'Recorrido de ejemplo revisado para tu punto de partida y hora actuales.',
+      reglas_cumplidas: seleccion.flatMap((s) => s.cumplidas),
+    }],
+  };
+}

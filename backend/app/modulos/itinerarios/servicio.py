@@ -15,7 +15,8 @@ from app.ia.servicio import recomendar
 from app.modulos.catalogos.servicio import ServicioCatalogos
 from app.modulos.laboratorio.servicio import ServicioLaboratorio
 from app.modulos.itinerarios.repositorio import RepositorioPlanes
-from app.nucleo.errores import DatosInvalidos, ErrorDeDatos, ServicioExterno
+from app.modulos.itinerarios.recuperacion import reconstruir
+from app.nucleo.errores import Conflicto, DatosInvalidos, ErrorDeDatos, NoEncontrado, ServicioExterno
 
 # BACKEND.md §4: contexto → no_acompanantes
 ACOMPANANTES = {"solo": 0, "pareja": 1, "amigos": 3, "familia": 3}
@@ -61,7 +62,7 @@ class ServicioItinerarios:
         categoria = self.catalogos.categoria_por_clave(peticion["intereses"][0])
         transporte = self.catalogos.transporte_por_clave(peticion["movilidad"][0])
         if categoria is None or transporte is None:
-            raise ErrorDeDatos("Faltan categorías o transportes en la base de datos. Carga database/datos_desarrollo.sql.")
+            raise ErrorDeDatos("Faltan categorías o transportes en la base de datos. Revisa los catálogos de MongoDB con el administrador.")
 
         try:
             lugares = google_places.buscar_para_plan(origen, peticion["intereses"], radio_km(peticion["movilidad"]))
@@ -90,10 +91,70 @@ class ServicioItinerarios:
                 "fecha_plan": datetime.combine(hoy.date(), datetime.min.time(), hoy.tzinfo).replace(hour=hora, minute=minuto),
                 "evaluacion": evaluacion_de(respuesta),
                 "origen_solicitud": origen_solicitud,
+                "titulo": f"Salida: {peticion['contexto']}",
+                "estado_usuario": "borrador",
+                # Solo referencias y clasificación propia: ni contenido de Google ni origen GPS.
+                "opciones_guardadas": [
+                    {
+                        "tipo": p["tipo"],
+                        "paradas": [
+                            {"place_id": parada["lugar_id"], "categoria": parada["lugar"]["categoria"]}
+                            for parada in p["paradas"]
+                        ],
+                    }
+                    for p in respuesta["planes"]
+                ],
                 # No se guarda el origen exacto del usuario (privacidad)
             }
         )
+        respuesta["id_plan"] = id_plan
         return respuesta, id_plan
 
-    def del_usuario(self, usuario: dict) -> list[dict]:
-        return self.repo.del_usuario(usuario["id"])
+    def del_usuario(self, usuario: dict, limite: int = 50, antes_de: int | None = None) -> list[dict]:
+        return self.repo.del_usuario(usuario["id"], limite, antes_de)
+
+    def detalle(self, usuario: dict, id_plan: int) -> dict:
+        plan = self.repo.por_id(id_plan, usuario["id"])
+        if plan is None:
+            raise NoEncontrado("No encontramos ese plan en tu cuenta.")
+        return plan
+
+    def actualizar(self, usuario: dict, id_plan: int, cambios: dict) -> dict:
+        plan = self.detalle(usuario, id_plan)
+        cambios = dict(cambios)
+        tipo = cambios.get("tipo_seleccionado", plan["tipo_seleccionado"])
+        if "tipo_seleccionado" in cambios:
+            if tipo not in {o["tipo"] for o in plan["opciones_guardadas"]}:
+                raise DatosInvalidos("Elige una alternativa que se haya generado para este plan.")
+            cambios.setdefault("estado_usuario", "guardado")
+        if "estado_usuario" in cambios and tipo is None:
+            raise Conflicto("Primero elige y guarda una alternativa del plan.")
+        actualizado = self.repo.actualizar(id_plan, usuario["id"], cambios)
+        if actualizado is None:
+            raise NoEncontrado("No encontramos ese plan en tu cuenta.")
+        return actualizado
+
+    def borrar(self, usuario: dict, id_plan: int) -> None:
+        if not self.repo.borrar(id_plan, usuario["id"]):
+            raise NoEncontrado("No encontramos ese plan en tu cuenta.")
+
+    def recuperar(self, usuario: dict, id_plan: int, datos: dict) -> dict:
+        plan = self.detalle(usuario, id_plan)
+        opcion = next((o for o in plan["opciones_guardadas"] if o["tipo"] == plan["tipo_seleccionado"]), None)
+        if opcion is None:
+            raise Conflicto("Este plan no tiene una alternativa guardada. Selecciona una o crea un plan nuevo.")
+        if not esta_dentro_de_zona(datos["origen"]):
+            raise DatosInvalidos(f"El punto de partida está fuera de la zona piloto ({ZONA['nombre']}).")
+        peticion = {
+            "contexto": plan["contexto"], "presupuesto": plan["presupuesto"],
+            "tiempo_horas": plan["tiempo_disponible"] / 60,
+            "intereses": plan["intereses"], "movilidad": plan["movilidad"],
+            "origen": datos["origen"], "hora_salida": datos["hora_salida"],
+        }
+        try:
+            lugares = google_places.consultar_paradas(opcion["paradas"])
+        except google_places.ErrorGooglePlaces as error:
+            raise ServicioExterno(str(error)) from error
+        respuesta = reconstruir(peticion, lugares, opcion["tipo"], ahora_mexico())
+        respuesta["id_plan"] = id_plan
+        return {"peticion": peticion, "respuesta": respuesta}

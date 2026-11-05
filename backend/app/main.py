@@ -12,6 +12,7 @@ from app.modulos.catalogos import router as catalogos
 from app.modulos.cuenta import router as cuenta
 from app.modulos.dashboard import router as dashboard
 from app.modulos.historial import router as historial
+from app.modulos.ia_kompas import router as ia_kompas
 from app.modulos.itinerarios import router as itinerarios
 from app.modulos.laboratorio import router as laboratorio
 from app.modulos.lugares import router as lugares
@@ -63,6 +64,7 @@ for router in (
     laboratorio.router_genetico,
     dashboard.router,
     asistente.router,
+    ia_kompas.router,
     solicitudes.router,
     # Panel de administración (CRUD) 🔒 admin: /api/admin/...
     rutas.router_admin,

@@ -246,3 +246,49 @@ export const enviarMensaje = (id: string, texto: string, ubicacion?: Coordenada)
 /** DELETE /api/asistente/conversaciones/{id} → borrado lógico */
 export const borrarConversacion = (id: string) =>
   USA_MOCK ? mockAsistente.borrar(id) : solicitud<null>(`/api/asistente/conversaciones/${encodeURIComponent(id)}`, { method: 'DELETE' });
+
+// ─────────────────────── Inteligencia Artificial y Machine Learning ───────────────────────
+
+export type ConsultaRecomendacionIA = {
+  distancia_km: number;
+  presupuesto_mxn: number;
+  hora_dia?: number;
+  es_hora_pico?: boolean;
+  clima_lluvia?: boolean;
+  rating_destino?: number;
+  origen?: string;
+  destino?: string;
+};
+
+export type RespuestaRecomendacionIA = {
+  modo_recomendado: 'caminando' | 'transporte_publico' | 'auto_privado' | string;
+  confianza: number;
+  origen_decision: 'machine_learning' | 'regla_fija';
+  tiempo_estimado_min: number;
+  ruta_bfs?: {
+    origen: string;
+    destino: string;
+    ruta_paradas: string[];
+    num_escalas: number;
+    saltos_totales: number;
+    algoritmo: string;
+    encontrado: boolean;
+  } | null;
+  comparacion_baseline: {
+    prediccion_regla_fija: string;
+    regla_activada: string;
+    coinciden: boolean;
+  };
+  explicacion: string;
+};
+
+/** POST /api/ia/recomendar-traslado → recomendación ultrarrápida por Machine Learning + BFS */
+export const recomendarTrasladoIA = (consulta: ConsultaRecomendacionIA) =>
+  solicitud<RespuestaRecomendacionIA>('/api/ia/recomendar-traslado', {
+    method: 'POST',
+    body: consulta,
+  });
+
+/** GET /api/ia/pipeline-estado → reporte de exactitud y estado del pipeline de IA */
+export const obtenerEstadoIA = () => solicitud<Record<string, unknown>>('/api/ia/pipeline-estado');
+

@@ -1,0 +1,4 @@
+parada_origen,parada_destino,distancia_km,hora_dia,es_hora_pico,presupuesto_mxn,clima_lluvia,rating_destino,duracion_min,modo_transporte_optimo
+Galerias Metepec,Cosmovitral,-2.5,19,1,120.0,0,,32,auto_privado
+Estadio Nemesio Diez,Galerias Metepec,6.25,16,0,35.0,1,8.5,26,auto_privado
+Cosmovitral,Cosmovitral,4.25,7,1,120.0,0,4.2,999,auto_privado

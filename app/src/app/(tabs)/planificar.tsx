@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { XStack, YStack } from 'tamagui';
 
 import { MensajeError, TituloSeccion } from '@/components/Avisos';
-import { BotonPrimario } from '@/components/Botones';
+import { BotonPrimario, BotonSecundario } from '@/components/Botones';
 import { ChipGroup } from '@/components/Chips';
 import OpcionMovilidad from '@/components/OpcionMovilidad';
 import Pantalla from '@/components/Pantalla';
@@ -63,6 +63,9 @@ export default function Planificar() {
     <Pantalla>
       <Titulo>Planifica tu salida</Titulo>
       <Subtitulo mt={4}>Configura tu salida para un plan a la medida</Subtitulo>
+      <YStack mt={16}>
+        <BotonSecundario texto="Ver Mis planes" onPress={() => router.push('/mis-planes')} />
+      </YStack>
 
       <YStack mt={28} gap={28}>
         <YStack>

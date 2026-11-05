@@ -2,18 +2,18 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { XStack, YStack } from 'tamagui';
 
-import { AvisoSinInformacion } from '@/components/Avisos';
+import { AvisoSinInformacion, MensajeError } from '@/components/Avisos';
 import { BotonSecundario } from '@/components/Botones';
 import ExplicacionReglas from '@/components/ExplicacionReglas';
 import Icono from '@/components/Icono';
 import Pantalla from '@/components/Pantalla';
 import TarjetaPlan from '@/components/TarjetaPlan';
 import { Subtitulo, Tarjeta, Texto, Titulo } from '@/components/ui';
-import { ESTADOS_PLAN } from '@/constants/catalogos';
+import { ESTADOS_PLAN, TIPOS_PLAN } from '@/constants/catalogos';
 import { useTema } from '@/context/Tema';
 import { useUbicacion } from '@/context/Ubicacion';
 import { useViaje } from '@/context/Viaje';
-import { USA_MOCK } from '@/services/api';
+import { cambiarPlan, USA_MOCK } from '@/services/api';
 import type { Plan } from '@/types/dominio';
 import { recorridoDesdePlan } from '@/utils/recorrido';
 
@@ -23,6 +23,19 @@ export default function Planes() {
   const { posicion } = useUbicacion();
   const { peticion, respuesta, setRecorrido } = useViaje();
   const [verDescartados, setVerDescartados] = useState(false);
+  const [guardando, setGuardando] = useState<Plan['tipo'] | null>(null);
+  const [error, setError] = useState('');
+
+  async function guardar(plan: Plan) {
+    if (guardando || respuesta?.id_plan == null) return;
+    setGuardando(plan.tipo); setError('');
+    try {
+      const ficha = await cambiarPlan(respuesta.id_plan, { tipo_seleccionado: plan.tipo });
+      router.push({ pathname: '/mis-planes/[id]', params: { id: String(ficha.id) } });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo guardar la alternativa.');
+    } finally { setGuardando(null); }
+  }
 
   if (!respuesta || !peticion) {
     return (
@@ -30,6 +43,7 @@ export default function Planes() {
         <YStack gap={16}>
           <AvisoSinInformacion mensaje="Todavía no has creado un plan." />
           <BotonSecundario texto="Ir al planificador" onPress={() => router.navigate('/planificar')} />
+          <BotonSecundario texto="Ver Mis planes" onPress={() => router.push('/mis-planes')} />
         </YStack>
       </Pantalla>
     );
@@ -48,12 +62,16 @@ export default function Planes() {
       <Subtitulo mt={4}>Hemos trazado las mejores opciones para ti hoy</Subtitulo>
 
       <YStack mt={24} gap={16}>
+        <BotonSecundario texto="Ver Mis planes" onPress={() => router.push('/mis-planes')} />
+        <MensajeError>{error}</MensajeError>
         {respuesta.datos_suficientes === false && <AvisoSinInformacion mensaje={respuesta.mensaje ?? undefined} />}
 
         <XStack flexWrap="wrap" justify="space-between" rowGap={16}>
           {respuesta.planes.map((plan) => (
-            <YStack key={plan.tipo} width="100%" $md={{ width: '49%' }} $xl={{ width: '32.5%' }}>
+            <YStack key={plan.tipo} gap={10} width="100%" $md={{ width: '49%' }} $xl={{ width: '32.5%' }}>
               <TarjetaPlan plan={plan} onPress={() => verEnMapa(plan)} />
+              {respuesta.id_plan != null && <BotonSecundario texto={`Guardar ${TIPOS_PLAN[plan.tipo].toLowerCase()}`}
+                cargando={guardando === plan.tipo} deshabilitado={guardando !== null} onPress={() => guardar(plan)} />}
             </YStack>
           ))}
         </XStack>

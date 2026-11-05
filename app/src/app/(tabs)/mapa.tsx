@@ -132,15 +132,18 @@ export default function PantallaMapa() {
               </Texto>
             </YStack>
             <Pildora tono="suave" px={12} py={6}>
-              <Texto tam="sm" peso="fuerte" acento>
-                {formatoMinutos(duracionTotal(recorrido))}
-              </Texto>
+              <YStack items="center">
+                <Texto tam="sm" peso="fuerte" acento>{formatoMinutos(duracionTotal(recorrido))}</Texto>
+                <Texto tam="xs" suave>{recorrido.tiempo_incompleto ? 'Parcial' : 'Estimado'}</Texto>
+              </YStack>
             </Pildora>
           </XStack>
           {!plegado && (
             <ScrollView shrink={1} px={20} showsVerticalScrollIndicator={false}>
               <YStack gap={12} pb={20}>
                 {recorrido.ejemplo && <EtiquetaEjemplo />}
+                {recorrido.nota_tiempo && <Texto tam="sm" peso="semi">{recorrido.nota_tiempo}</Texto>}
+                {recorrido.espera_total_min != null && <Texto tam="xs" suave>El total incluye {formatoMinutos(recorrido.espera_total_min)} de espera estimada.</Texto>}
                 <LineaRecorrido recorrido={recorrido} />
                 {recorrido.avisos?.map((a) => (
                   <Texto key={a} tam="xs" color="$aviso">

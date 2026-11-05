@@ -6,6 +6,7 @@ import { desdeGeoJSON, distanciaKm, distanciaPorCallesKm, VELOCIDAD_KMH } from '
 import { trazarPorCalles } from '../mapas';
 import { LUGARES } from './datos';
 import { inferirPlanes } from './motor';
+import { registrarGeneracion } from './planes';
 import { agregarReporte, reportesVigentes } from './reportes';
 import { autobusesEntre } from './traslados';
 
@@ -108,7 +109,7 @@ export async function buscarLugares({ cerca, categoria }: { cerca?: Coordenada; 
 
 export async function generarPlanes(peticion: PeticionPlan) {
   await esperar(700);
-  return inferirPlanes(LUGARES, peticion);
+  return registrarGeneracion(peticion, inferirPlanes(LUGARES, peticion));
 }
 
 // ─────────────── Solicitudes de rutas ───────────────

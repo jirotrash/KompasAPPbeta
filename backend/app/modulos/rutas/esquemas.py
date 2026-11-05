@@ -62,6 +62,7 @@ class TramoOpcion(Salida):
     tramo_en_ruta: list[tuple[float, float]] | None = Field(default=None, description="[[lng, lat], ...] entre subida y bajada")
     paradas_intermedias: list[ParadaRuta] | None = None
     trazo_ruta: list[tuple[float, float]] | None = Field(default=None, description="Trazo completo de la ruta [[lng, lat], ...]")
+    paradas_reales: bool | None = Field(default=None, description="True si las paradas fueron capturadas; no acredita horario ni tarifa")
 
 
 class Alternativa(Salida):
@@ -82,6 +83,8 @@ class Alternativa(Salida):
     paradas_intermedias: list[ParadaRuta] | None = None
     numero_transbordos: int | None = None
     tramos: list[TramoOpcion] | None = None
+    paradas_reales: bool | None = None
+    caminata_km: float | None = Field(default=None, ge=0)
 
 
 class NodoArbol(BaseModel):

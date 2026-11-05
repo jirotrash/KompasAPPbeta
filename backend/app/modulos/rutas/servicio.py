@@ -116,7 +116,7 @@ class ServicioRutas:
     def _tramo_en_ruta(self, ruta: dict, sube: NodoParada, baja: NodoParada) -> dict:
         """Tramo en autobús entre dos paradas de la ruta (puntos y paradas intermedias del árbol, en inorden)."""
         arbol, reales = arbol_de_ruta(ruta)
-        intermedias = [n for n in arbol.rango(sube.clave, baja.clave) if n is not sube and n is not baja]
+        intermedias = [n for n in arbol.rango(sube.clave, baja.clave) if sube.clave < n.clave < baja.clave]
         if reales:
             puntos = tramo_del_trazo(ruta["trazo"], sube.clave, baja.clave)
         else:
@@ -139,7 +139,7 @@ class ServicioRutas:
     @staticmethod
     def _caminata(desde: Coordenada, hasta: Coordenada) -> dict:
         km = distancia_por_calles_km(desde, hasta)
-        return {"modo": "pie", "desde": desde, "hasta": hasta, "distancia_km": round(km, 2), "duracion_min": minutos_caminando(km)}
+        return {"modo": "pie", "desde": desde, "hasta": hasta, "distancia_km": round(km, 2), "duracion_min": minutos_caminando(km) if km > 0 else 0}
 
     def _directa(self, ruta: dict, a: Coordenada, b: Coordenada) -> dict | None:
         """Una sola ruta, o None si no pasa cerca del origen y luego del destino."""
@@ -219,7 +219,9 @@ class ServicioRutas:
             "tramo_en_ruta": [p for t in buses for p in t["tramo_en_ruta"]],
             "paradas_intermedias": [p for t in buses for p in t["paradas_intermedias"]],
             "trazo": {"type": "LineString", "coordinates": [p for t in buses for p in t["tramo_en_ruta"]]},
-            "tramos": [{k: v for k, v in t.items() if k != "paradas_reales"} for t in tramos],
+            "tramos": tramos,
+            "paradas_reales": all(t["paradas_reales"] for t in buses),
+            "caminata_km": round(sum(t["distancia_km"] for t in tramos if t["modo"] == "pie"), 2),
             "tiempos": {"caminata": caminata, "espera": None, "trayecto": trayecto},
             "distancia_km": round(sum(t["distancia_km"] for t in tramos), 2),
             "fuente": FUENTE_TRAZO,

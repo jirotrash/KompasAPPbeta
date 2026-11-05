@@ -52,6 +52,7 @@ function PasoTramo({ tramo }: { tramo: Tramo }) {
             <Texto tam="xs" suave>
               {tramo.nota ?? 'Incluye caminata a la parada y espera estimada.'}
             </Texto>
+            {tramo.paradas_reales === false && <Texto tam="xs" suave>Puntos del trazo; confirma con la línea dónde se puede abordar.</Texto>}
           </>
         )}
         {tramo.aviso && (
@@ -95,6 +96,7 @@ export default function LineaRecorrido({ recorrido }: { recorrido: Recorrido }) 
                     {p.tipo === 'origen' ? 'Salida' : 'Llegada estimada'}: {p.hora}
                   </Texto>
                 )}
+                {!p.hora && recorrido.tiempo_incompleto && <Texto tam="xs" suave>Hora de llegada por confirmar.</Texto>}
               </YStack>
               {p.tipo === 'lugar' && <Icono nombre={iconoDeInteres(p.interes)} color={paleta.textoSuave} tamano={18} />}
               {p.tipo === 'parada' && <Icono nombre="autobus" color={paleta.textoSuave} tamano={18} />}

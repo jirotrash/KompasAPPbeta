@@ -3,115 +3,34 @@ import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, TextInput } from 'react-native';
 import { XStack, YStack } from 'tamagui';
 
-import { AvisoSinInformacion, Cargando, EtiquetaEjemplo, MensajeError } from '@/components/Avisos';
+import { AvisoSinInformacion, Cargando, MensajeError, MensajeInfo } from '@/components/Avisos';
 import { BotonSecundario } from '@/components/Botones';
-import ExplicacionReglas from '@/components/ExplicacionReglas';
+import { ChipGroup } from '@/components/Chips';
 import Icono from '@/components/Icono';
 import Pantalla from '@/components/Pantalla';
 import PedirRuta from '@/components/PedirRuta';
-import { Tarjeta, Texto } from '@/components/ui';
-import { CATEGORIAS, iconoDeInteres, MODOS } from '@/constants/catalogos';
+import TarjetaTransporte from '@/components/TarjetaTransporte';
+import { Texto } from '@/components/ui';
+import { CATEGORIAS, iconoDeInteres } from '@/constants/catalogos';
 import { PUNTOS_REFERENCIA, type Coordenada } from '@/constants/zona';
 import { useTema } from '@/context/Tema';
 import { useUbicacion } from '@/context/Ubicacion';
 import { useViaje } from '@/context/Viaje';
-import { buscarLugares, buscarRutas } from '@/services/api';
+import useAlternativas from '@/hooks/useAlternativas';
+import { buscarLugares, USA_MOCK } from '@/services/api';
 import { buscarDirecciones, type Direccion } from '@/services/mapas';
-import type { Alternativa, Lugar, RespuestaRutas } from '@/types/dominio';
-import { desdeGeoJSON, formatoKm, formatoMinutos, horaActual, normalizarTexto } from '@/utils/geo';
+import type { Alternativa, Lugar } from '@/types/dominio';
+import { desdeGeoJSON, normalizarTexto } from '@/utils/geo';
 import { recorridoDesdeAlternativa } from '@/utils/recorrido';
+import { ordenarAlternativas, type FiltroTransporte, type OrdenTransporte } from '@/utils/transporte';
 
 type Destino = Coordenada & { id: string; nombre: string; detalle?: string };
 
 const MIN_LETRAS = 3;
-const total = (a: Alternativa) => (a.tiempos.caminata ?? 0) + (a.tiempos.espera ?? 0) + (a.tiempos.trayecto ?? 0);
-
-function TarjetaAlternativa({ a, onPress }: { a: Alternativa; onPress: () => void }) {
-  const { paleta } = useTema();
-  const modo = MODOS[a.modo];
-  return (
-    <Tarjeta>
-      <YStack
-        gap={8}
-        role="button"
-        aria-label={`${a.linea ?? modo.texto}. Ver en el mapa`}
-        onPress={onPress}
-        cursor="pointer"
-        pressStyle={{ opacity: 0.75 }}
-      >
-        <XStack items="center" gap={12}>
-          <YStack width={44} height={44} rounded={14} bg="$suave" items="center" justify="center">
-            <Icono nombre={modo.icono} color={paleta.primario} tamano={22} />
-          </YStack>
-          <YStack flex={1}>
-            <Texto peso="fuerte">{a.linea ?? modo.texto}</Texto>
-            {a.sentido && (
-              <Texto tam="xs" suave>
-                Sentido {a.sentido}
-              </Texto>
-            )}
-            {a.distancia_km != null && (
-              <Texto tam="xs" suave>
-                ~{formatoKm(a.distancia_km)}
-              </Texto>
-            )}
-          </YStack>
-          <YStack items="flex-end">
-            <Texto tam="lg" peso="fuerte" acento>
-              {formatoMinutos(total(a))}
-            </Texto>
-            <Texto tam="xs" suave>
-              estimado
-            </Texto>
-          </YStack>
-        </XStack>
-        {a.ejemplo && <EtiquetaEjemplo />}
-        {a.modo === 'autobus' && (
-          <YStack gap={2}>
-            <Texto tam="sm">
-              <Texto tam="sm" peso="fuerte" color="$ok">
-                ↑ Sube en:{' '}
-              </Texto>
-              {a.parada_subida?.nombre ?? a.abordaje?.nombre}
-            </Texto>
-            {a.transbordos?.map((t) => (
-              <Texto key={`${t.linea}-${t.nombre}`} tam="sm">
-                <Texto tam="sm" peso="fuerte" color="$acento">
-                  ⇄ Transborda en:{' '}
-                </Texto>
-                {t.nombre} ({t.linea})
-              </Texto>
-            ))}
-            <Texto tam="sm">
-              <Texto tam="sm" peso="fuerte" color="$aviso">
-                ↓ Baja en:{' '}
-              </Texto>
-              {a.parada_bajada?.nombre ?? a.descenso?.nombre}
-            </Texto>
-            <Texto tam="xs" suave>
-              Caminata {formatoMinutos(a.tiempos.caminata)} · espera {a.tiempos.espera != null ? formatoMinutos(a.tiempos.espera) : 'sin dato'} ·
-              trayecto {formatoMinutos(a.tiempos.trayecto)} · tarifa {a.tarifa != null ? `$${a.tarifa}` : 'por confirmar'}
-            </Texto>
-          </YStack>
-        )}
-        {a.avisos?.map((t) => (
-          <Texto key={t} tam="xs" color="$aviso">
-            ⚠ {t}
-          </Texto>
-        ))}
-      </YStack>
-      <ExplicacionReglas reglas={a.reglas_cumplidas} />
-      <Texto tam="xs" suave>
-        Fuente: {a.fuente}
-      </Texto>
-    </Tarjeta>
-  );
-}
-
 /** Buscar a dónde ir (lugares propios + direcciones de OpenStreetMap) y ver cómo llegar. */
 export default function Buscar() {
   const { paleta } = useTema();
-  const { posicion } = useUbicacion();
+  const { posicion, estado: estadoUbicacion } = useUbicacion();
   const { setRecorrido } = useViaje();
   // lugar: id de un lugar propio; q: texto para buscar (p. ej. el destino de una tarjeta del asistente)
   const params = useLocalSearchParams<{ lugar?: string; q?: string }>();
@@ -120,8 +39,13 @@ export default function Buscar() {
   const [texto, setTexto] = useState(params.q ?? '');
   const [remoto, setRemoto] = useState<{ consulta: string; lista: Direccion[]; error: boolean }>({ consulta: '', lista: [], error: false });
   const [destino, setDestino] = useState<Destino | null>(null);
-  const [rutas, setRutas] = useState<{ para: Destino; respuesta: RespuestaRutas } | null>(null);
-  const [error, setError] = useState('');
+  const [origenManual, setOrigenManual] = useState<Destino | null>(null);
+  const [elegirOrigen, setElegirOrigen] = useState(false);
+  const [filtro, setFiltro] = useState<FiltroTransporte>('todos');
+  const [orden, setOrden] = useState<OrdenTransporte>('tiempo');
+  const origen = origenManual ?? posicion;
+  const { resultado: rutas, cargando: cargandoRutas, reintentar } = useAlternativas(origen, destino);
+  const opciones = ordenarAlternativas(rutas?.respuesta?.alternativas ?? [], filtro, orden);
 
   useEffect(() => {
     buscarLugares({ cerca: posicion })
@@ -154,18 +78,6 @@ export default function Buscar() {
     };
   }, [consulta]);
 
-  // Alternativas de traslado hacia el destino elegido
-  useEffect(() => {
-    if (!destino) return;
-    let activo = true;
-    buscarRutas({ origen: posicion, destino, hora: horaActual() })
-      .then((respuesta) => activo && setRutas({ para: destino, respuesta }))
-      .catch((e) => activo && setError(e instanceof Error ? e.message : 'No se pudieron buscar rutas.'));
-    return () => {
-      activo = false;
-    };
-  }, [destino, posicion]);
-
   const n = normalizarTexto(consulta);
   const propios: Destino[] = [
     ...PUNTOS_REFERENCIA.map((p) => ({ ...p, detalle: 'Punto de referencia' })),
@@ -184,29 +96,38 @@ export default function Buscar() {
   ];
 
   const elegir = (d: Destino) => {
-    setError('');
     setDestino(d);
+    reintentar();
   };
 
   const verEnMapa = (a: Alternativa) => {
-    if (!destino) return;
-    setRecorrido(recorridoDesdeAlternativa(a, posicion, destino, horaActual()));
+    if (!rutas?.respuesta) return;
+    setRecorrido(recorridoDesdeAlternativa(a, rutas.origen, rutas.destino, rutas.hora));
     router.navigate('/mapa');
   };
 
-  const cargandoRutas = destino && rutas?.para !== destino && !error;
-
   return (
     <Pantalla bordes={['left', 'right']}>
+      <Texto tam="xl" peso="fuerte" mb={12}>Compara tu transporte</Texto>
       <XStack items="center" gap={10} rounded={14} borderWidth={1} borderColor="$borde" bg="$tarjeta" px={14} minH={48}>
         <YStack width={10} height={10} rounded={999} bg="$primario" />
         <Texto flex={1} numberOfLines={1} tam="sm" suave>
           Desde:{' '}
           <Texto tam="sm" peso="semi">
-            {posicion.nombre}
+            {origen.nombre}
           </Texto>
         </Texto>
       </XStack>
+
+      <YStack gap={10} mt={10}>
+        <Texto tam="xs" suave>{origenManual || estadoUbicacion !== 'gps' ? 'Origen de referencia; no es tu ubicación GPS.' : 'Origen obtenido de tu ubicación actual.'}</Texto>
+        <BotonSecundario texto={elegirOrigen ? 'Cerrar selección de origen' : 'Cambiar origen'} onPress={() => setElegirOrigen((v) => !v)} />
+        {elegirOrigen && <ChipGroup
+          opciones={[{ valor: 'ubicacion', texto: estadoUbicacion === 'gps' ? 'Mi ubicación' : 'Ubicación de referencia' }, ...PUNTOS_REFERENCIA.map((p) => ({ valor: p.id, texto: p.nombre }))]}
+          valor={origenManual?.id ?? 'ubicacion'}
+          onCambiar={(id) => { setOrigenManual(PUNTOS_REFERENCIA.find((p) => p.id === id) ?? null); setElegirOrigen(false); reintentar(); }}
+        />}
+      </YStack>
 
       {destino ? (
         <XStack mt={12} minH={56} items="center" gap={12} rounded={14} borderWidth={2} borderColor="$primario" bg="$tarjeta" px={16}>
@@ -228,7 +149,6 @@ export default function Buscar() {
             cursor="pointer"
             onPress={() => {
               setDestino(null);
-              setRutas(null);
             }}
           >
             <Icono nombre="cerrar" color={paleta.textoSuave} tamano={20} />
@@ -252,7 +172,8 @@ export default function Buscar() {
       )}
 
       <YStack mt={16} gap={12}>
-        <MensajeError>{error}</MensajeError>
+        <MensajeError>{rutas?.error}</MensajeError>
+        {rutas?.error && <BotonSecundario texto="Reintentar búsqueda de transporte" onPress={reintentar} />}
 
         {!destino && (
           <YStack overflow="hidden" rounded={16} borderWidth={1} borderColor="$borde" bg="$tarjeta">
@@ -305,22 +226,26 @@ export default function Buscar() {
 
         {cargandoRutas && <Cargando texto="Buscando cómo llegar…" />}
 
-        {rutas?.para === destino && (
+        {rutas?.respuesta && (
           <>
             <Texto tam="lg" peso="fuerte">
-              Cómo llegar
+              Opciones de transporte
             </Texto>
             {!rutas.respuesta.datos_suficientes && <AvisoSinInformacion mensaje={rutas.respuesta.mensaje} />}
             {/* Sin camión dentro de la zona (fuera de ella no hay alternativas): se puede pedir la ruta al equipo */}
             {!rutas.respuesta.datos_suficientes && rutas.respuesta.alternativas.length > 0 && (
-              <PedirRuta key={`${rutas.para.id}-${posicion.lat},${posicion.lng}`} origen={posicion} destino={rutas.para} />
+              <PedirRuta key={rutas.clave} origen={rutas.origen} destino={rutas.destino} />
             )}
-            {rutas.respuesta.alternativas.map((a) => (
-              <TarjetaAlternativa key={a.id} a={a} onPress={() => verEnMapa(a)} />
-            ))}
-            <Texto tam="xs" suave>
-              Toca una opción para verla en el mapa. Salida: ahora ({horaActual()}).
-            </Texto>
+            {USA_MOCK && <MensajeInfo>Modo demostración: las líneas de ejemplo no representan un servicio real.</MensajeInfo>}
+            <Texto tam="sm" peso="semi">Medio de transporte</Texto>
+            <ChipGroup opciones={[{ valor: 'todos', texto: 'Todos' }, { valor: 'autobus', texto: 'Autobús' }, { valor: 'auto', texto: 'Taxi / App' }, { valor: 'pie', texto: 'A pie' }]} valor={filtro} onCambiar={setFiltro} />
+            <Texto tam="sm" peso="semi">Ordenar opciones</Texto>
+            <ChipGroup opciones={[{ valor: 'tiempo', texto: 'Tiempo calculado' }, { valor: 'caminata', texto: 'Menos caminata' }, { valor: 'transbordos', texto: 'Menos transbordos' }]} valor={orden} onCambiar={setOrden} />
+            <Texto tam="xs" suave>Los tiempos parciales no permiten asegurar cuál llega antes. Las tarifas sin dato se muestran por confirmar.</Texto>
+            <Texto tam="sm" peso="semi">{opciones.length} opción{opciones.length === 1 ? '' : 'es'} · consulta de las {rutas.hora}</Texto>
+            {opciones.length === 0 && <MensajeInfo>No hay opciones para este filtro. Prueba otro medio de transporte.</MensajeInfo>}
+            {opciones.map((a) => <TarjetaTransporte key={`${rutas.clave}-${a.id}`} alternativa={a} origen={rutas.origen} onMapa={() => verEnMapa(a)} />)}
+            <BotonSecundario texto="Actualizar alternativas" onPress={reintentar} />
           </>
         )}
 

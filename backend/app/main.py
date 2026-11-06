@@ -6,7 +6,6 @@ Arquitectura en capas por módulos (ARQUITECTURA.md): router → servicio → re
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.modulos.asistente import router as asistente
 from app.modulos.busquedas import router as busquedas
 from app.modulos.catalogos import router as catalogos
 from app.modulos.cuenta import router as cuenta
@@ -63,8 +62,7 @@ for router in (
     laboratorio.router_busqueda,
     laboratorio.router_genetico,
     dashboard.router,
-    asistente.router,
-    ia_kompas.router,
+    ia_kompas.router,  # <- Aquí sigue activo el router predictivo de Machine Learning
     solicitudes.router,
     # Panel de administración (CRUD) 🔒 admin: /api/admin/...
     rutas.router_admin,

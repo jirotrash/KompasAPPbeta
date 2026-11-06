@@ -1,23 +1,61 @@
 """Router FastAPI para los servicios de Inteligencia Artificial y Machine Learning de Kompás."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from pymongo.database import Database
 
 from app.modulos.ia_kompas.esquemas import (
     EsquemaConsultaRutaBFS,
     EsquemaConsultaTrasladoIA,
+    EsquemaDestinosProbables,
     EsquemaEstadoPipeline,
     EsquemaEvaluacionReglaFija,
+    EsquemaMisHabitos,
     EsquemaRespuestaTrasladoIA,
     EsquemaResultadoReglaFija,
     EsquemaResultadoRutaBFS,
 )
-from app.modulos.ia_kompas.servicio import ServicioIAKompas
+from app.modulos.ia_kompas.repositorio import RepositorioHabitos
+from app.modulos.ia_kompas.servicio import ServicioHabitos, ServicioIAKompas
+from app.modulos.rutas.repositorio import RepositorioRutas
+from app.modulos.rutas.servicio import ServicioRutas
+from app.nucleo.bd import get_bd
+from app.nucleo.seguridad import get_usuario_actual
 
 router = APIRouter(prefix="/api/ia", tags=["ia_kompas"])
 
 
 def obtener_servicio_ia() -> ServicioIAKompas:
     return ServicioIAKompas()
+
+
+def obtener_servicio_habitos(bd: Database = Depends(get_bd)) -> ServicioHabitos:
+    return ServicioHabitos(RepositorioHabitos(bd), ServicioRutas(RepositorioRutas(bd)))
+
+
+@router.get(
+    "/destinos-probables",
+    response_model=EsquemaDestinosProbables,
+    summary="Destinos probables según tus hábitos (historial_rutas) 🔒",
+)
+def destinos_probables(
+    hora: int | None = Query(default=None, ge=0, le=23, description="Hora del dispositivo (0-23)"),
+    dia: int | None = Query(default=None, ge=0, le=6, description="Día de la semana del dispositivo (0 = lunes)"),
+    servicio: ServicioHabitos = Depends(obtener_servicio_habitos),
+    usuario: dict = Depends(get_usuario_actual),
+):
+    """Aprende de los recorridos que el usuario inició: frecuencia por franja con pocos datos y KNN con
+    20 o más. Con menos de 5 recorridos responde `datos_insuficientes` (no se inventa un destino).
+    """
+    return servicio.destinos_probables(usuario, hora, dia)
+
+
+@router.get("/mis-habitos", response_model=EsquemaMisHabitos, summary="Resumen de tus recorridos 🔒")
+def mis_habitos(
+    servicio: ServicioHabitos = Depends(obtener_servicio_habitos),
+    usuario: dict = Depends(get_usuario_actual),
+):
+    """Rutas más usadas, transportes y reparto por franja horaria y día. Solo cuenta; no estima tráfico."""
+    return servicio.mis_habitos(usuario)
 
 
 @router.get(

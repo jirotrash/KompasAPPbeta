@@ -17,7 +17,7 @@ import { useTema } from '@/context/Tema';
 import { useUbicacion } from '@/context/Ubicacion';
 import { useViaje } from '@/context/Viaje';
 import useAlternativas from '@/hooks/useAlternativas';
-import { buscarLugares, USA_MOCK } from '@/services/api';
+import { buscarLugares, guardarRecorrido, USA_MOCK } from '@/services/api';
 import { buscarDirecciones, type Direccion } from '@/services/mapas';
 import type { Alternativa, Lugar } from '@/types/dominio';
 import { desdeGeoJSON, normalizarTexto } from '@/utils/geo';
@@ -103,6 +103,13 @@ export default function Buscar() {
   const verEnMapa = (a: Alternativa) => {
     if (!rutas?.respuesta) return;
     setRecorrido(recorridoDesdeAlternativa(a, rutas.origen, rutas.destino, rutas.hora));
+    // El asistente aprende de este historial. Solo las opciones en autobús traen una ruta de Kompás;
+    // en las combinadas cuenta la última ruta (la que lleva al destino).
+    const idRuta = a.id_ruta ?? a.tramos?.filter((t) => t.modo === 'autobus').at(-1)?.id_ruta;
+    if (idRuta != null && !a.ejemplo) {
+      const minutos = (a.tiempos.caminata ?? 0) + (a.tiempos.espera ?? 0) + (a.tiempos.trayecto ?? 0);
+      guardarRecorrido({ id_ruta: idRuta, transporte: 'Transporte público', tiempo_estimado: minutos }).catch(() => undefined);
+    }
     router.navigate('/mapa');
   };
 

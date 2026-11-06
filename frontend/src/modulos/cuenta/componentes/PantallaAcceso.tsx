@@ -12,7 +12,6 @@ export default function PantallaAcceso({ titulo, children }: { titulo: string; c
           <span className="text-xl font-bold">Kompás</span>
         </div>
         <div className="max-w-md space-y-6">
-          <Logo className="size-40 rounded-[2rem] shadow-xl" alt="Logotipo de Kompás" />
           <h2 className="text-4xl font-bold leading-tight">Panel de administración</h2>
           <p className="text-lg text-sobre-primario/80">
             Cómo se usa Kompás y cómo decide su sistema experto, con datos agregados desde la API.

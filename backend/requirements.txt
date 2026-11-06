@@ -9,3 +9,7 @@ python-dotenv
 pytest
 httpx
 tzdata  # zonas horarias (America/Mexico_City) en Windows; la usa app/ia/hechos.py
+numpy
+pandas
+scikit-learn
+

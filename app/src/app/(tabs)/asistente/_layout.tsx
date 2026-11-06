@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 
 import { useTema } from '@/context/Tema';
 
-/** Pestaña Asistente: lista de conversaciones y, encima, el chat de cada una. */
+/** Pestaña Asistente: destinos probables y hábitos aprendidos del historial (machine learning). */
 export default function LayoutAsistente() {
   const { paleta } = useTema();
   return (
@@ -16,7 +16,6 @@ export default function LayoutAsistente() {
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="[id]" options={{ title: 'Asistente' }} />
     </Stack>
   );
 }

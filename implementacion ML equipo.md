@@ -227,14 +227,27 @@ En la carpeta `backend`:
 ```
 Verás **19 pruebas** en verde: 12 de transporte y 7 de hábitos.
 
+### Usuarios de prueba
+
+| Usuario | Contraseña | ¿Para qué sirve? |
+| :--- | :--- | :--- |
+| **demo@kompas.mx** | **demo1234** | **El que usas para entrar a la app** y ver el asistente. Tiene la rutina de un estudiante (148 viajes). |
+| habitos.oficina@kompas.mx | *ninguna conocida* | Solo para comprobar que cada persona tiene su propio asistente. **No sirve para entrar a la app.** |
+| habitos.nocturno@kompas.mx | *ninguna conocida* | Igual que el anterior. **No sirve para entrar a la app.** |
+
+* **demo@kompas.mx no lo crea el script de hábitos**, sino el que prepara la base de datos (`preparar_bd`). Si tu base está vacía, córrelo primero; si no, el script de hábitos te avisa que falta.
+* Los otros dos sí los crea el script de hábitos, con una contraseña al azar a propósito: nadie debe poder entrar con ellos.
+* Las rutinas de los tres están en el punto 8.
+
 ### Opción 2: Ver el asistente en el celular
-1. **Carga los datos de entrenamiento** (ver el punto 8):
+1. **Prepara la base y carga los datos de entrenamiento** (ver el punto 8):
    ```powershell
    cd backend
    .\venv\Scripts\activate
+   python -m scripts.preparar_bd            # solo si tu base está vacía: crea el usuario demo y los transportes
    python -m scripts.sembrar_habitos_demo
    ```
-   Para borrarlos: `python -m scripts.sembrar_habitos_demo --borrar`.
+   Para borrarlos: `python -m scripts.sembrar_habitos_demo --borrar` (el usuario demo no se borra).
 2. **Enciende el backend** en la red local:
    ```powershell
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

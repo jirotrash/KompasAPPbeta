@@ -9,8 +9,9 @@ Uso (desde backend/, con el venv activo y la base ya preparada con scripts.prepa
 
 - Esquema real de `historial_rutas` (id_usuario, id_ruta, transporte {id, nombre}, tiempo_estimado).
 - Si la base tiene menos de 5 rutas, crea 5 rutas "Demo · …" (trazos de referencia, NO líneas reales).
-- Usuarios: demo@kompas.mx (estudiante) y habitos.oficina@ / habitos.nocturno@kompas.mx (contraseña
-  aleatoria que nadie conoce). Cada uno tiene su propia rutina: el modelo debe aprender la de cada quien.
+- Usuarios: demo@kompas.mx / demo1234 (estudiante; lo crea scripts.preparar_bd, este script no) y
+  habitos.oficina@ / habitos.nocturno@kompas.mx (contraseña aleatoria que nadie conoce: no sirven para
+  entrar a la app). Cada uno tiene su propia rutina: el modelo debe aprender la de cada quien.
 - ~10 % de días tienen un viaje fuera de rutina (ruido) para que la validación no sea trivial.
 - Semilla fija: la demo es reproducible. Correrlo dos veces primero borra lo anterior de este script.
 """
@@ -33,6 +34,7 @@ SEMILLA = 31
 ORIGEN_DEMO = "habitos"  # marca de este script (las rutas y usuarios demo de otros scripts no se tocan)
 MIN_POR_KM = {"Transporte público": 5, "Taxi/App": 2.6, "Caminando": 12}
 PROBABILIDAD_RUIDO = 0.10
+CORREO_DEMO = "demo@kompas.mx"
 
 # Trazos de referencia [lng, lat] dentro de la zona piloto. Son datos demo: no son líneas reales.
 RUTAS_DEMO = [
@@ -103,6 +105,9 @@ def asegurar_usuario(bd: Database, correo: str) -> int:
     usuario = bd.usuarios.find_one({"correo": correo, "deleted_at": None})
     if usuario:
         return usuario["_id"]
+    if correo == CORREO_DEMO:
+        # Lo crea preparar_bd con la contraseña conocida (demo1234); aquí quedaría con una aleatoria
+        sys.exit(f"No existe {CORREO_DEMO}: corre primero python -m scripts.preparar_bd")
     momento = ahora()
     doc = {
         "_id": siguiente_id(bd, "usuarios"),

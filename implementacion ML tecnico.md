@@ -321,6 +321,7 @@ Ejecución formal de la suite de pruebas unitarias sobre el entorno virtual:
 ### 7.1. `scripts/sembrar_habitos_demo.py`
 
 ```powershell
+python -m scripts.preparar_bd                         # requisito con base vacía: transportes y demo@kompas.mx
 python -m scripts.sembrar_habitos_demo                # 12 semanas (por defecto)
 python -m scripts.sembrar_habitos_demo --semanas 20
 python -m scripts.sembrar_habitos_demo --borrar       # borra recorridos, usuarios y rutas de este script
@@ -328,7 +329,15 @@ python -m scripts.sembrar_habitos_demo --borrar       # borra recorridos, usuari
 
 * **Marca:** todo lleva `demo: true` y `origen_demo: "habitos"`. `--borrar` solo toca lo que tiene las dos marcas, así que no afecta a `sembrar_actividad_demo`. Volver a correrlo primero borra sus recorridos anteriores (es reproducible, con semilla 31).
 * **Rutas:** si hay menos de 5 rutas activas, crea las rutas "Demo · …" con trazo densificado (`densificar()`, cada ~150 m), parada inicial y final y validación de zona piloto. **Son trazos de referencia, no líneas reales**; el prefijo "Demo ·" lo deja claro en la UI.
-* **Usuarios:** usa demo@kompas.mx y crea `habitos.oficina@kompas.mx` y `habitos.nocturno@kompas.mx` con contraseña aleatoria que nadie conoce.
+* **Usuarios de prueba:**
+
+  | Correo | Contraseña | Origen | Uso |
+  | :--- | :--- | :--- | :--- |
+  | `demo@kompas.mx` | `demo1234` | `scripts.preparar_bd` (rol `admin`) | Login en la app y en `/docs`. Perfil "estudiante". |
+  | `habitos.oficina@kompas.mx` | aleatoria (`secrets.token_urlsafe(24)`, con bcrypt) | este script (`demo: true`, `origen_demo: "habitos"`) | Solo verificación de personalización; **sin login posible**. |
+  | `habitos.nocturno@kompas.mx` | aleatoria | este script | Igual que el anterior. |
+
+  Si falta `demo@kompas.mx`, el script termina con *"corre primero python -m scripts.preparar_bd"*. No lo crea, porque quedaría con una contraseña aleatoria. `--borrar` elimina los dos usuarios `habitos.*` pero no `demo@kompas.mx`, porque no lleva `origen_demo`.
 * **Rutinas** (`PERFILES`): tuplas `(ruta, días, hora_min, hora_max, transporte, probabilidad)`. La hora se sortea uniforme en el rango.
 * **Ruido:** con `PROBABILIDAD_RUIDO = 0.10` por día, hay un viaje a una ruta y una hora (6–22) al azar.
 * **`tiempo_estimado`:** distancia por calles × min/km del transporte × U(0.85, 1.25).

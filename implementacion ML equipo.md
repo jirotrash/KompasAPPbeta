@@ -1,284 +1,313 @@
 # Implementación de Machine Learning e IA para el Equipo de Kompás
 
-> **¿Qué es este documento?**  
-> Este documento explica, con palabras sencillas y ejemplos de la vida diaria, cómo funciona el nuevo cerebro inteligente que le añadimos a la aplicación móvil de Kompás. No necesitas ser programador ni experto en matemáticas para entenderlo.
+> **¿Qué es este documento?**
+> Explica con palabras sencillas cómo funciona el machine learning que le añadimos a Kompás. No necesitas ser programador ni experto en matemáticas para entenderlo.
+> Versión técnica: `implementacion ML tecnico.md`.
 
 ---
 
-## 1. ¿Por qué hicimos este cambio y qué problema resuelve?
+## En resumen: qué hicimos, cómo y dónde
 
-Hasta ahora, cuando un usuario entraba al apartado de **Asistente** en su celular para pedir una recomendación, la aplicación dependía de un programa llamado **Ollama**. 
-Ollama funcionaba como un robot conversacional muy pesado:
-* **El problema de lentitud y recursos:** Exigía una computadora muy potente con tarjeta gráfica cara y mucha memoria RAM. Tardaba entre 4 y 10 segundos en contestar cada pregunta.
-* **El problema de disponibilidad:** Si la persona no tenía Ollama abierto en su máquina, la aplicación móvil arrojaba un mensaje de error: *"El asistente no está disponible en este momento"*.
+**¿Qué hicimos?**
+Cambiamos el "cerebro" de la pestaña **Asistente**. Antes era un chat que dependía de un programa pesado (Ollama). Ahora es un asistente que **aprende de los viajes que haces en la app** y te dice a dónde sueles ir a cada hora, por ejemplo: *"A esta hora sueles ir a la UTVT"*.
 
-### La solución: Nuestro propio motor de Machine Learning
-En lugar de depender de ese robot pesado y lento, construimos un **sistema inteligente propio, ligero y ultrarrápido** (responde en menos de 5 milisegundos). 
+**¿Cómo funciona, en tres pasos?**
+1. **Anota:** cada vez que eliges una ruta en autobús, Kompás anota cuál fue, qué día y a qué hora.
+2. **Aprende:** con esas notas busca tus costumbres ("los martes a las 7 casi siempre va a la UTVT").
+3. **Te sugiere:** cuando abres la app, compara la hora de ahora con tus costumbres y te dice a dónde vas probablemente.
 
-Este sistema combina tres cosas:
-1. **Un mapa inteligente (BFS):** Encuentra la mejor forma de ir de un punto a otro con la menor cantidad de transbordos o paradas intermedias posibles.
-2. **Una regla rápida de sentido común (Regla Fija):** Criterios básicos que todos conocemos (ej. si está a dos cuadras y hay buen clima, vete caminando).
-3. **Un cerebro que aprende (Machine Learning):** Un modelo que revisa traslados anteriores reales en Toluca y Metepec y aprende automáticamente cuándo conviene recomendar caminar, autobús, taxi o bicicleta.
+**¿Dónde lo ves?**
+* En la pestaña **Asistente**, la pantalla completa: la sugerencia, cómo la calculó y tus hábitos.
+* En **Inicio**, una tarjeta rápida con la sugerencia.
+* En **Compara tu transporte**, que es donde la app anota tus viajes (eso no se ve, pasa solo).
 
----
-
-## 2. ¿Qué variables usamos, en dónde y por qué?
-
-Para que una persona (o una máquina) elija el mejor medio de transporte, no adivina al azar: evalúa una serie de factores de la vida real. Estas son exactamente las **variables** que le enseñamos a evaluar a nuestro sistema:
-
-| Variable | ¿Qué significa en la vida real? | ¿Por qué es importante para la decisión? | ¿Dónde se usa? |
-| :--- | :--- | :--- | :--- |
-| **`distancia_km`** | Cuántos kilómetros hay entre el punto A y el punto B. | Si son 800 metros, la gente suele caminar; si son 12 kilómetros de Toluca a Metepec, caminar es inviable. | En el cálculo de rutas y en el modelo de ML. |
-| **`hora_dia`** | La hora en formato 24 horas (ej. las 8 de la mañana o las 18 de la tarde). | El tráfico de la ciudad y la seguridad cambian drásticamente según la hora. | En la regla fija y en el modelo de ML. |
-| **`es_hora_pico`** | Si es horario de tráfico pesado (ej. de 7 a 9 AM o de 6 a 8 PM). | En hora pico, el transporte público por carriles o caminar distancias medias puede ser más predecible que quedarse atorado en taxi. | En el modelo de ML. |
-| **`presupuesto_mxn`** | Cuánto dinero trae o quiere gastar el usuario (en pesos mexicanos). | Si el usuario trae $15 pesos, no le podemos recomendar taxi de $100 pesos; le recomendaremos autobús o caminar. | En el filtro de accesibilidad económica. |
-| **`clima_lluvia`** | Si está lloviendo o no (Sí / No). | Si está diluviando en Toluca, nadie quiere caminar ni esperar el autobús a la intemperie; se prioriza auto o transporte techado. | En la regla de seguridad y confort. |
-| **`rating_destino`** | La calificación del lugar en Google Places (de 1 a 5 estrellas). | Nos ayuda a entender si el destino es un punto de alta afluencia y demanda turística. | En la valoración del atractivo del plan. |
-| **`num_escalas`** | Cuántas veces tiene que bajarse y subirse a otro camión o transporte. | La gente prefiere viajes directos; cada transbordo añade tiempo, costo y cansancio. | En el algoritmo de rutas (BFS). |
+**¿Funciona de verdad?**
+Sí. Lo probamos con 3 usuarios de prueba y 12 semanas de viajes, y acertó **más de 9 de cada 10 veces** en viajes que nunca había visto (punto 8).
 
 ---
 
-## 3. ¿Cómo funciona paso a paso? (El camino de una recomendación)
+## 1. ¿Por qué hicimos este cambio?
 
-Imagina que un usuario abre la app en Toluca y pide ir desde **Los Portales** hasta el **Cosmovitral**:
+Antes, la pestaña **Asistente** de la app dependía de **Ollama**, un programa de inteligencia artificial para conversar que corría en la computadora del servidor:
+* **Era lento y pesado:** necesitaba una computadora potente y tardaba unos 4 segundos en contestar.
+* **Fallaba seguido:** si Ollama no estaba abierto, la app mostraba *"El asistente no está disponible en este momento"*.
 
-```mermaid
-flowchart TD
-    U["1. El usuario pide ayuda en la App Móvil"] --> V["2. Recolectamos datos simples: distancia, clima, dinero y hora"]
-    V --> B["3. Búsqueda en Grafo (BFS): ¿Hay ruta directa o requiere escalas?"]
-    B --> M["4. El Modelo de Machine Learning evalúa los datos"]
-    M --> R["5. La Regla Fija verifica que la recomendación tenga sentido común"]
-    R --> T["6. La App muestra la tarjeta con la mejor opción en milisegundos"]
-```
+**Decisión del equipo:** quitamos el chat con Ollama y la pestaña **Asistente** ahora funciona con **machine learning propio**: ya no conversa, **aprende de tu historial de recorridos** y te dice a dónde sueles ir a cada hora. Es ligero, no depende de otro programa y responde en milisegundos.
 
-1. **Paso 1 (Los datos):** La app detecta que son 1.2 km, no llueve, son las 11:00 AM y el usuario tiene $50 pesos.
-2. **Paso 2 (El mapa BFS):** El algoritmo de búsqueda revisa la red de paradas y confirma que se puede llegar directo en 0 escalas.
-3. **Paso 3 (La predicción del Machine Learning):** El modelo (entrenado con el 70% de datos históricos y validado con el 30%) predice que la opción óptima y más agradable es **"caminando"** (tiempo estimado: 14 minutos).
-4. **Paso 4 (La regla rápida):** El sistema de regla fija revisa la predicción: como la distancia es menor a 1.5 km y el clima es agradable, confirma al 100% que caminar es la decisión correcta.
-5. **Paso 5 (Respuesta al usuario):** El celular muestra inmediatamente una tarjeta visual clara con el recorrido, el tiempo y el botón para ver el mapa. Sin esperas y sin servidores externos caídos.
+> El **sistema experto de Einar** (las 20 reglas que evalúan los planes) **no se toca**: sigue funcionando igual. El machine learning se agrega a su lado.
 
 ---
 
-## 4. ¿Cómo se limpian los datos exactamente? (Tal como los códigos de práctica)
+## 2. Las dos partes del machine learning
 
-Para que el modelo de Machine Learning aprenda bien, no podemos darle datos sucios o erróneos. Por eso, en el archivo **`backend/app/modulos/ia_kompas/p02_pipeline_datos.py`** implementamos el mismo método de 4 pasos de la práctica original (`p02limpiezaguardadodatos_d.py`):
-
-```mermaid
-flowchart TD
-    A["1. Lista cruda con errores (kompas_traslados_crudo.csv)"] --> B["Paso 1: Borrar viajes duplicados idénticos"]
-    B --> C["Paso 2: Filtros de sentido común (distancia > 0, tiempo real)"]
-    C --> D{"¿El viaje es válido?"}
-    D -- "NO (tiene errores graves)" --> E["Archivo de Auditoría (kompas_traslados_revision.csv)"]
-    D -- "SÍ (es un viaje real)" --> F["Paso 3: Rellenar datos faltantes con la mediana"]
-    F --> G["Archivo Limpio para Entrenar (kompas_traslados_limpio.csv)"]
-```
-
-1. **Paso 1 (Eliminar viajes repetidos):**  
-   Si una persona o sensor registró dos veces exactamente el mismo viaje a la misma hora, usamos `drop_duplicates()` para no contar doble.
-2. **Paso 2 (Separar lo absurdo de lo real):**  
-   Aplicamos reglas de sentido común:
-   * La distancia no puede ser negativa (ej. `-2.5 km` es imposible físicamente).
-   * La calificación de un lugar debe estar entre 1.0 y 5.0 estrellas (Google Places no da calificaciones de 8.5).
-   * La duración del viaje no puede ser de 999 minutos para 4 kilómetros.
-3. **Paso 3 (La carpeta de "casos raros"):**  
-   Los viajes con datos absurdos **no se borran a escondidas**: se guardan en un archivo especial llamado **`kompas_traslados_revision.csv`**. Así el equipo puede revisar qué falló en el registro.
-4. **Paso 4 (Completar información faltante con la mediana):**  
-   A veces un café nuevo en Toluca todavía no tiene calificación en Google Places. En lugar de descartar todo el viaje, el sistema toma la **mediana** de calificación de la zona (ej. 4.5 estrellas) y rellena el hueco para no perder el ejemplo.
-5. **Resultado final:**  
-   Obtenemos **`kompas_traslados_limpio.csv`**, un archivo 100% confiable y sin un solo dato faltante listo para entrenar el modelo.
-
----
-
-## 5. ¿Dónde vive cada cosa en el proyecto?
-
-Para mantener el proyecto ordenado y profesional, organizamos los archivos así:
-
-* 📁 **`backend/data/`**: Aquí guardamos las listas de traslados con las que aprende el sistema (`kompas_traslados_crudo.csv` con ejemplos reales y `kompas_traslados_limpio.csv` listo para entrenar).
-* 📁 **`backend/app/modulos/ia_kompas/`**: Aquí vive todo el motor de inteligencia artificial con sus nombres reales de producción:
-  * `busqueda_escalas.py`: El que busca la ruta con menos escalas y transbordos en la red de paradas (BFS).
-  * `reglas_transporte.py`: La regla rápida de sentido común y criterio base (baseline).
-  * `pipeline_datos.py`: La fábrica que limpia, audita y prepara los datos de traslados.
-  * `modelo_predictivo.py`: El cerebro de Machine Learning que aprende y predice el transporte óptimo.
-  * `servicio.py`: El director de orquesta que junta todas las piezas.
-  * `router.py`: La puerta de comunicación para que la app móvil haga preguntas.
-  * *(Nota: Se conservan alias automáticos para mantener compatibilidad con cualquier entrega escolar).*
-* 📱 **`app/src/` (La app móvil en el celular)**:
-  * `TarjetaAsistente.tsx`: La tarjeta visual bonita que muestra la recomendación al usuario en la pantalla del chat.
-
----
-
-## 6. Avance Actual de la Implementación (Bitácora en Vivo)
-
-| Archivo Real de Producción | Estado | ¿Qué hace en lenguaje simple? |
+| Parte | ¿Qué responde? | ¿De dónde aprende? |
 | :--- | :--- | :--- |
-| **`busqueda_escalas.py`** | ✅ 100% Funcional | Mapa de paradas de Toluca y Metepec. Conecta puntos minimizando transbordos. |
-| **`reglas_transporte.py`** | ✅ 100% Funcional | Criterios básicos rápidos (ej. si no llueve y son menos de 1.5 km, caminar). |
-| **`pipeline_datos.py`** | ✅ 100% Funcional | Genera y limpia listas de viajes reales. Detecta y aparta datos raros en `kompas_traslados_revision.csv`. |
-| **`modelo_predictivo.py`** | ✅ 100% Funcional | El árbol de decisión entrenado con el 70% de los datos y evaluado con el 30%. |
-| **`servicio.py`** | ✅ 100% Funcional | Conecta todo y prepara respuestas amigables para el usuario. |
-| **`router.py`** | ✅ 100% Funcional | Las puertas de acceso web (`/api/ia/...`) para que el celular consulte en milisegundos. |
-| **Dependencias ML** | ✅ Instaladas | `numpy`, `pandas` y `scikit-learn` operando correctamente en el entorno virtual. |
-| **Pruebas Automatizadas** | ✅ 42 Pruebas en Verde | 12 pruebas de IA + 30 pruebas existentes de transporte y planes guardados sin regresiones. |
+| **A. Recomendación de transporte** | "¿Me conviene caminar, el camión o el auto?" | De un archivo de ~160 traslados de ejemplo (**sintéticos**: los generó el programa con errores a propósito para practicar la limpieza). |
+| **B. Destinos probables (hábitos)** | "A esta hora sueles ir a la UTVT" | De **tus propios viajes**, guardados en la base de datos de Kompás. Cero datos inventados. |
+
+La parte B es la que ahora le da vida a la pestaña **Asistente**.
 
 ---
 
-## 7. Resultados Reales con la Regla 70% / 30%
+## 3. Parte B: la app aprende tus hábitos (lo nuevo)
 
-Cuando pusimos a prueba nuestro sistema, esto fue lo que ocurrió con los datos:
-1. **El entrenamiento (70%):** El modelo estudió 109 viajes representativos de Toluca y Metepec. Aprendió por sí mismo cuándo la lluvia o la distancia obligan a cambiar de transporte.
-2. **El examen final (30% ciego):** Le presentamos 48 viajes nuevos que nunca antes había visto.
-3. **El veredicto:**
-   * El modelo de Machine Learning superó ampliamente el 70% de exactitud mínima exigida.
-   * La regla fija sirvió de juez y salvavidas complementario.
-   * La respuesta promedio se calculó en **menos de 5 milisegundos**, comparado con los más de 4,000 milisegundos que tardaba Ollama.
+### ¿Cómo funciona?
+Cada vez que inicias una ruta, Kompás guarda **qué ruta tomaste** y **a qué hora y qué día**. Con eso, el sistema busca patrones:
 
----
+* Si los lunes a viernes a las 7 de la mañana siempre tomas la ruta a la UTVT…
+* …cuando abras la app un martes a las 7:05, te dirá: **"A esta hora sueles ir a UTVT"**.
 
-## 8. Guía Práctica: ¿Cómo Probar y Correr el Sistema? (Paso a Paso)
+### ¿Por qué decimos que es autónomo?
+1. **Se entrena solo cada vez que abres la app.** No hay que darle mantenimiento: cada viaje nuevo ya cuenta la próxima vez.
+2. **Elige solo el método según cuántos datos tienes:**
 
-### ¿Qué necesitas activar para probar el sistema?
-**¡Cero configuraciones pesadas!**
-* ❌ **NO** necesitas abrir Ollama en la PC.
-* ❌ **NO** necesitas descargar modelos de varios gigabytes.
-* ❌ **NO** necesitas tarjeta gráfica (GPU).
-* ✅ **Solo necesitas:** Tener abierta tu terminal con el entorno virtual de Python (`backend/venv`).
-
----
-
-### Opción 1: Probar en 1 segundo con la suite automatizada (`pytest`)
-Abre tu terminal en la carpeta `backend` y ejecuta:
-```powershell
-& ".\venv\Scripts\pytest.exe" tests/test_ia_kompas.py -v
+```mermaid
+flowchart TD
+    A["¿Cuántos recorridos tiene el usuario?"] --> B{"Menos de 5"}
+    A --> C{"De 5 a 19"}
+    A --> D{"20 o más"}
+    B --> B1["No adivina: dice 'Aprendiendo tus hábitos'"]
+    C --> C1["Cuenta qué ruta tomas más en esa franja: mañana, tarde o noche"]
+    D --> D1["Modelo KNN: compara la hora de hoy con tus 7 viajes más parecidos"]
 ```
-**Lo que verás:** Las 12 pruebas ejecutándose en ~0.5 segundos, validando el mapa de rutas BFS, la regla de caminata/lluvia, la limpieza de datos y el modelo predictivo.
+
+3. **Se pone a prueba solo.** Con 20 viajes o más, el sistema se hace un examen: tapa uno de tus viajes, intenta adivinarlo con los demás, y repite eso con cada viaje. Luego compara su calificación contra la forma más simple de adivinar: "siempre di la ruta que más usa". Con los datos de prueba del usuario demo: **el modelo acertó 96 %, la forma simple solo 39 %**. Ese es el "96 % · la opción simple, 39 %" que ves en la pantalla.
+4. **La hora la pone tu celular.** No hay que configurar nada.
+
+### Un truco importante: la hora en círculo
+Para una computadora, las 23:00 y las 00:00 parecen muy lejanas (23 contra 0). Pero en la vida real están a una hora. Por eso la hora se representa como las manecillas de un reloj (en círculo); así el modelo entiende que la medianoche está junto a las 11 de la noche, y que el domingo está junto al lunes.
+
+### ¿Cómo se limpian y ordenan estos datos?
+Los viajes ya llegan revisados: antes de guardar uno, el servidor comprueba que la ruta y el medio de transporte existan de verdad. Cuando el asistente los lee para aprender:
+1. **Descarta** los viajes borrados y los que no tienen fecha.
+2. **Usa solo los 300 más recientes**, para que pesen más tus costumbres de ahora que las de hace meses.
+3. **Pone todas las horas en hora de Toluca**, para que "7 de la mañana" signifique siempre lo mismo.
+4. **Toma solo lo que necesita:** qué ruta, en qué transporte y cuándo. Nada más.
+5. **Busca el nombre real de la ruta.** Si la ruta ya se borró, dice "Ruta 4 (ya no disponible)" en lugar de inventar un nombre.
+
+### ¿En qué se fija para aprender?
+
+| Lo que mira | ¿De dónde sale? | ¿Por qué importa? |
+| :--- | :--- | :--- |
+| **La hora del viaje** | Del momento en que elegiste la ruta. | Tus costumbres dependen de la hora: escuela en la mañana, regreso en la tarde. |
+| **El día de la semana** | Del mismo momento. | Entre semana y en fin de semana sueles ir a lugares distintos. |
+| **Si es día de escuela o trabajo** | Lunes a viernes sí; sábado y domingo no. | Separa la rutina de la semana de las salidas del fin de semana. |
+| **La ruta que tomaste** | La que elegiste en la app. | Es **lo que el asistente aprende a adivinar**. |
 
 ---
 
-### Opción 2: Correr el servidor y probar de forma visual e interactiva
-1. **Inicia el backend:**
+## 4. Parte A: recomendación de transporte
+
+Combina tres piezas:
+1. **Un mapa de paradas (BFS):** encuentra el camino con menos transbordos.
+2. **Una regla fija de sentido común:** por ejemplo, si son menos de 1.5 km y no llueve, caminar.
+3. **Un árbol de decisión (machine learning):** aprendió de los traslados de ejemplo cuándo conviene caminar, el transporte público o el auto. Se entrenó con el 70 % de los datos y se examinó con el 30 % que nunca vio, comparándolo contra la regla fija.
+
+Si mandas la **temperatura**, además da un consejo: paraguas si llueve, bloqueador si pasa de 26 °C, suéter si baja de 15 °C.
+
+| Lo que mira | ¿Qué significa? | ¿Por qué importa? |
+| :--- | :--- | :--- |
+| **Distancia** | Kilómetros entre el punto A y el B. | 800 m se caminan; 12 km no. |
+| **Hora y hora pico** | La hora y si es hora de tráfico (7–9 y 18–20). | El tráfico cambia el tiempo de cada medio. |
+| **Presupuesto** | Cuánto quiere gastar el usuario. | Con $15 no se recomienda un taxi. |
+| **Lluvia** | Si está lloviendo. | Con lluvia nadie quiere caminar. |
+| **Calificación del destino** | Estrellas del lugar (1 a 5). | Indica qué tan concurrido es el destino. |
+
+### Limpieza de los datos de ejemplo (prácticas p02)
+Igual que en la práctica de limpieza de datos (`p02limpiezaguardadodatos_d.py`):
+
+```mermaid
+flowchart TD
+    A["Lista cruda con errores (kompas_traslados_crudo.csv)"] --> B["Borrar viajes duplicados"]
+    B --> C["Filtros de sentido común: distancia > 0, tiempo real"]
+    C --> D{"¿El viaje es válido?"}
+    D -- "NO" --> E["Archivo de revisión (kompas_traslados_revision.csv)"]
+    D -- "SÍ" --> F["Rellenar datos faltantes con la mediana"]
+    F --> G["Archivo limpio para entrenar (kompas_traslados_limpio.csv)"]
+```
+
+1. **Quitar repetidos:** si el mismo viaje aparece dos veces, se cuenta una sola.
+2. **Separar lo absurdo:** distancias negativas, calificaciones fuera de 1–5, duraciones imposibles.
+3. **No se borran a escondidas:** los casos raros se guardan en `kompas_traslados_revision.csv` para revisarlos.
+4. **Rellenar huecos con la mediana:** si falta la calificación de un lugar, se usa la mediana en vez de tirar el viaje.
+
+---
+
+## 5. ¿Dónde aparece en la app móvil?
+
+El machine learning aparece en tres lugares:
+
+| Lugar | ¿Qué hace? |
+| :--- | :--- |
+| **Pestaña Asistente** (ícono de reloj) | La pantalla completa del asistente: predicción, cómo se calculó y tus hábitos. |
+| **Pestaña Inicio** | Una tarjeta rápida "A esta hora sueles ir a…". |
+| **Compara tu transporte** (Buscar) | Cuando eliges una opción en autobús, la app **guarda el recorrido**. De ahí aprende el asistente. |
+
+### Pestaña Asistente, de arriba hacia abajo
+Ya no es un chat: no escribes nada, la pantalla ya sabe lo que sueles hacer. Así se lee, con los datos del usuario demo:
+
+**1. "¿Para qué hora?"**
+Botones **Ahora**, **Mañana · 7:00**, **Tarde · 15:00** y **Noche · 20:00**. Al tocar uno, el asistente te dice a dónde sueles ir a esa hora. Sirve para ver cómo cambia tu rutina durante el día.
+
+**2. La sugerencia**
+La tarjeta "A esta hora sueles ir a…", con el destino, qué tan seguro está (por ejemplo 100 %), a qué hora sueles salir y cuántas veces has hecho ese viaje. El botón **¿Cómo llego?** te lleva directo a buscar la ruta.
+
+**3. "Cómo lo calculé"**
+Dos recuadros que explican la sugerencia:
+* **Método:** con qué forma de aprender sacó la respuesta. Con pocos viajes dice *"Frecuencia por franja horaria"* (cuenta qué ruta usas más en la mañana, tarde o noche). Con 20 viajes o más dice *"Modelo KNN (vecinos más cercanos)"* (busca tus 7 viajes más parecidos en día y hora y ve a dónde fuiste).
+* **Aciertos en validación:** el resultado de su examen. *"96 % · la opción simple, 39 %"* quiere decir que el asistente adivina bien 96 de cada 100 viajes, y que si solo dijera "siempre la ruta que más usas" acertaría 39. Así se demuestra que de verdad aprendió.
+
+**4. "Tus hábitos"**
+Un resumen de todos tus viajes (arriba a la derecha dice cuántos: *"148 recorridos"*), con barras. La barra más larga es lo que más haces y las demás se miden contra ella:
+* **Rutas que más usas:** las 5 rutas que más tomas y cuántas veces. Ejemplo: Centro de Toluca – UTVT, 58 veces.
+* **¿A qué hora sales?:** cuántos viajes haces en la mañana (6 a 11), en la tarde (12 a 18) y en la noche (19 a 23).
+* **Cómo te mueves:** cuántas veces usaste transporte público, taxi o fuiste caminando.
+
+**5. La nota de abajo**
+Explica en una frase cómo aprende: con 5 viajes empieza a sugerir y con 20 usa el modelo que se pone a prueba solo. Recuerda que son estimaciones, no datos verificados.
+
+Cada vez que entras a la pestaña todo se vuelve a calcular, así que un viaje nuevo se nota de inmediato.
+
+### Pestaña Inicio
+Debajo de los botones de acceso rápido y arriba de "Cerca de ti" aparece esta tarjeta:
+
+```text
+┌──────────────────────────────────────────┐
+│ 🛣  A esta hora sueles ir a        87 %   │
+│     UTVT                                 │
+│ [Ruta UTVT] [Sueles salir ~07:00] [24 viajes] │
+│ También: Centro (10 %)                   │
+│ Estimación a partir de tus recorridos…   │
+│            [ ¿Cómo llego? ]              │
+└──────────────────────────────────────────┘
+```
+
+* **"¿Cómo llego?"** te lleva a Buscar con ese destino ya escrito.
+* Si todavía tienes menos de 5 recorridos, la tarjeta dice **"Aprendiendo tus hábitos"** y cuántos te faltan.
+* Arriba, junto a tu ubicación, aparece la **temperatura actual** con un consejo del clima.
+
+**Para que aparezca:** tener la sesión iniciada, que la app esté conectada al servidor real y no en "modo demostración" (ver el punto 7), y que haya viajes guardados.
+
+### ¿Cómo se alimenta solo?
+En **Compara tu transporte**, cuando tocas una opción **en autobús** para verla en el mapa, la app anota ese viaje en tu historial: qué ruta, en qué transporte y cuántos minutos. Tú no haces nada extra. Si la opción combina dos camiones, se anota el último, que es el que te lleva al destino. Las opciones a pie o en taxi todavía no se anotan, porque no tienen una ruta de Kompás.
+
+Si falla el guardado (sin internet, sin sesión), la app sigue funcionando normal; ese viaje simplemente no cuenta.
+
+---
+
+## 6. ¿Dónde vive cada cosa en el proyecto?
+
+* 📁 **`backend/data/`**: los traslados de ejemplo (`crudo`, `limpio` y `revision`).
+* 📁 **`backend/app/modulos/ia_kompas/`**: todo el machine learning.
+  * `habitos.py`: **nuevo.** Aprende tus hábitos y predice destinos probables.
+  * `repositorio.py`: **nuevo.** Lee tus recorridos de MongoDB.
+  * `busqueda_escalas.py`: el mapa de paradas con menos transbordos (BFS).
+  * `reglas_transporte.py`: la regla fija de sentido común.
+  * `pipeline_datos.py`: limpia y prepara los traslados de ejemplo.
+  * `modelo_predictivo.py`: el árbol de decisión del transporte.
+  * `servicio.py`: junta todas las piezas.
+  * `router.py`: las direcciones (`/api/ia/...`) que consulta la app.
+* 📁 **`backend/scripts/sembrar_habitos_demo.py`**: **nuevo.** Crea rutas, usuarios y recorridos de demostración para entrenar el modelo.
+* 📱 **`app/src/app/(tabs)/asistente/index.tsx`**: la pestaña Asistente con machine learning.
+* 📱 **`app/src/components/TarjetaPrediccion.tsx`**: la tarjeta "A esta hora sueles ir a".
+* 📱 **`app/src/app/(tabs)/index.tsx`**: la pantalla de Inicio.
+* 📱 **`app/src/app/buscar.tsx`**: guarda el recorrido cuando eliges una opción en autobús.
+* 🗑️ **Se borraron** el chat de Ollama: la pantalla de conversación (`asistente/[id].tsx`), `TarjetaAsistente.tsx`, el mock del asistente y `test_asistente.py`.
+
+---
+
+## 7. Cómo probarlo paso a paso
+
+**No necesitas** Ollama, modelos de varios gigabytes ni tarjeta gráfica. Solo el entorno virtual de Python (`backend/venv`) y MongoDB.
+
+### Opción 1: Pruebas automáticas
+En la carpeta `backend`:
+```powershell
+& ".\venv\Scripts\pytest.exe" tests/test_ia_kompas.py tests/test_habitos.py -v
+```
+Verás **19 pruebas** en verde: 12 de transporte y 7 de hábitos.
+
+### Opción 2: Ver el asistente en el celular
+1. **Carga los datos de entrenamiento** (ver el punto 8):
    ```powershell
    cd backend
    .\venv\Scripts\activate
+   python -m scripts.sembrar_habitos_demo
+   ```
+   Para borrarlos: `python -m scripts.sembrar_habitos_demo --borrar`.
+2. **Enciende el backend** en la red local:
+   ```powershell
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
-2. **Abre tu navegador en:** [http://localhost:8000/docs](http://localhost:8000/docs)
-3. **Busca la sección `ia_kompas`:**
-   * **Para ver el estado del entrenamiento:** Haz clic en `GET /api/ia/pipeline-estado` $\to$ *Try it out* $\to$ *Execute*. Verás cuántos datos se limpiaron y qué porcentaje de exactitud obtuvo el modelo.
-   * **Para pedir una recomendación en vivo:** Haz clic en `POST /api/ia/recomendar-traslado` $\to$ *Try it out*, pega este ejemplo y presiona *Execute*:
-     ```json
-     {
-       "distancia_km": 1.2,
-       "presupuesto_mxn": 50.0,
-       "hora_dia": 11,
-       "clima_lluvia": false,
-       "rating_destino": 4.6,
-       "origen": "Los Portales",
-       "destino": "Cosmovitral"
-     }
-     ```
-
----
-
-### Opción 3: Probar directo desde la terminal (PowerShell)
-Sin abrir el navegador, puedes disparar una consulta real con este comando:
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8000/api/ia/recomendar-traslado" -Method Post -ContentType "application/json" -Body '{
-  "distancia_km": 1.2,
-  "presupuesto_mxn": 50.0,
-  "hora_dia": 11,
-  "clima_lluvia": false,
-  "rating_destino": 4.6,
-  "origen": "Los Portales",
-  "destino": "Cosmovitral"
-}' | ConvertTo-Json -Depth 5
-```
-
----
-
-### ¿Cómo debería responder el agente? (Respuesta Real Esperada)
-
-El sistema responderá de inmediato (< 5 milisegundos) con una estructura limpia como esta:
-
-```json
-{
-  "modo_recomendado": "caminando",
-  "confianza": 0.94,
-  "origen_decision": "machine_learning",
-  "tiempo_estimado_min": 14,
-  "ruta_bfs": {
-    "origen": "Los Portales",
-    "destino": "Cosmovitral",
-    "ruta_paradas": ["Los Portales", "Cosmovitral"],
-    "num_escalas": 0,
-    "saltos_totales": 1,
-    "algoritmo": "BFS (Búsqueda en Anchura)",
-    "encontrado": true
-  },
-  "comparacion_baseline": {
-    "prediccion_regla_fija": "caminando",
-    "regla_activada": "R1_CORTA_DISTANCIA_BUEN_CLIMA",
-    "coinciden": true
-  },
-  "explicacion": "El modelo de Machine Learning recomienda 'caminando' con 94% de confianza. Distancia: 1.2 km, Presupuesto: $50 MXN, Hora: 11:00, Clima: favorable."
-}
-```
-
-#### ¿Cómo se traduce esto en la pantalla del celular?
-1. La aplicación móvil toma este resultado y dibuja automáticamente la **`TarjetaAsistente`**.
-2. Muestra:
-   * **Modo recomendado:** Ícono de caminata con tiempo estimado: `14 min`.
-   * **Transbordos:** *"Ruta directa (0 escalas)"*.
-   * **Explicación amigable:** *"Te sugerimos caminar: la distancia es corta (1.2 km), el clima es favorable y ahorras tu presupuesto"*.
-   * **Botón interactivo:** `"Ver ruta en el mapa"`, para que el usuario trace el camino con un solo toque.
-
----
-
-## 9. ¿Para cuál se hizo: Móvil o Web? ¿Y cómo correrlo en el Celular?
-
-### ¿Para cuál cliente está pensado?
-**Se diseñó principalmente para la Aplicación Móvil**, pero al estar construido como un servicio centralizado en el backend de Kompás, **funciona tanto para el Móvil (Expo / React Native) como para la Web (React)**. Cualquier cliente puede hacerle preguntas al modelo a través de la API.
-
----
-
-### Pasos para correr y probar el sistema en la App Móvil (Paso a Paso)
-
-Para probarlo directamente en tu teléfono celular con **Expo Go**:
-
-#### Paso 1: Configurar la dirección IP en la App Móvil
-El celular y tu computadora deben estar conectados a la **misma red Wi-Fi**.
-1. Abre una terminal y averigua la dirección IP de tu computadora con el comando `ipconfig` (busca donde dice *Dirección IPv4*, por ejemplo `192.168.1.75`).
-2. Abre el archivo **`app/.env`** y asegúrate de que la URL apunte a tu IP:
+3. **En `app/.env`** pon la IP de tu PC (`ipconfig` → Dirección IPv4) y apaga el modo demostración:
    ```env
    EXPO_PUBLIC_API_URL=http://192.168.1.75:8000
+   EXPO_PUBLIC_USE_MOCK=false
    ```
+4. **Enciende la app** con `cd app` y `npx expo start`, y escanea el QR. El celular y la PC deben estar en la misma red Wi-Fi.
+5. Entra con **demo@kompas.mx / demo1234**. En **Inicio** verás la tarjeta "A esta hora sueles ir a", y en **Asistente** la pantalla completa. Toca **Mañana**, **Tarde** o **Noche** para ver cómo cambia la predicción.
 
-#### Paso 2: Encender el Backend en modo red local
-Abre una terminal en la computadora y levanta el servidor escuchando en toda la red local con `--host 0.0.0.0`:
-```powershell
-cd backend
-.\venv\Scripts\activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-> El parámetro `--host 0.0.0.0` es indispensable para que tu computadora permita que el celular se conecte a la API.
-
-#### Paso 3: Encender la App Móvil con Expo
-Abre una segunda terminal en la computadora y corre:
-```powershell
-cd app
-npx expo start
-```
-1. En pantalla aparecerá un **código QR**.
-2. Abre la app **Expo Go** en tu celular (disponible gratis en Android y iPhone).
-3. Escanea el código QR para abrir Kompás en tu teléfono.
-
-#### Paso 4: ¿Qué pasa cuando interactúas en la App?
-* Cuando vas a la pestaña del **Asistente** o calculas una ruta entre paradas, la app ya no se queda congelada esperando a que una computadora con Ollama procese texto.
-* La app manda los parámetros (distancia, lluvia, presupuesto) y el modelo de Machine Learning le regresa de inmediato la tarjeta con la mejor opción, el tiempo estimado y la justificación.
+### Opción 3: Probar en el navegador
+Abre [http://localhost:8000/docs](http://localhost:8000/docs), inicia sesión con el candado (🔒) y prueba:
+* `GET /api/ia/destinos-probables`: destinos probables a esta hora.
+* `GET /api/ia/mis-habitos`: resumen de tus recorridos.
+* `POST /api/ia/recomendar-traslado`: recomendación de transporte.
+* `GET /api/ia/pipeline-estado`: limpieza de datos y exactitud del modelo.
 
 ---
 
-## 10. Glosario Rápido para el Equipo
+## 8. Datos de prueba y resultados: ¿de verdad funciona?
 
-* **BFS (Breadth-First Search):** Algoritmo que busca caminos paso por paso para garantizar que encuentres el camino con menos transbordos posibles.
-* **Baseline (Línea Base):** La solución más simple posible (nuestras reglas fijas) con la que comparamos al modelo de Machine Learning para demostrar con números si de verdad es mejor.
-* **70% Entrenamiento / 30% Prueba:** Regla de oro de la ciencia de datos. Le enseñamos al modelo con el 70% de los viajes registrados y luego lo ponemos a prueba con el 30% restante (viajes que nunca ha visto) para verificar que no esté memorizando, sino aprendiendo a pensar.
+### Los datos que cargamos
+Con un programa que preparamos (`sembrar_habitos_demo`, ver punto 7) llenamos la base de datos con **12 semanas** de viajes de prueba:
+
+* **5 rutas de demostración**, llamadas "Demo · …": Centro de Toluca–UTVT, UTVT–Centro de Lerma, Centro de Toluca–Metepec, Toluca–San Mateo Atenco y Toluca oriente. Son trazos de referencia, **no líneas de camión reales**. Solo se crean si la base tiene menos de 5 rutas.
+* **3 usuarios con rutinas distintas**, para comprobar que cada quien tiene su propio modelo:
+
+| Usuario | Recorridos | Su rutina |
+| :--- | ---: | :--- |
+| demo@kompas.mx (estudiante) | 148 | UTVT a las 7, Lerma a las 15, Metepec viernes y sábado en la noche, San Mateo el domingo, Toluca oriente a pie lunes y miércoles |
+| habitos.oficina@kompas.mx | 116 | Toluca oriente a las 8, Metepec a las 18, San Mateo el sábado |
+| habitos.nocturno@kompas.mx | 44 | Metepec martes y jueves en la noche, Lerma el sábado, UTVT el viernes |
+
+* **Viajes "fuera de lo normal" a propósito:** uno de cada 10 días hay un viaje a cualquier hora y a cualquier ruta, como cuando un día vas a otro lado. Así el examen no es fácil, como en la vida real.
+* Todo va marcado como **datos de demostración**: el dashboard no los cuenta y se borran con un solo comando.
+
+### Resultado 1: lo que ve la app (demo@kompas.mx)
+
+| Si preguntas… | El asistente responde |
+| :--- | :--- |
+| Martes 7:00 | **UTVT**, 100 %, sueles salir ~07:00 |
+| Jueves 15:00 | **Centro de Lerma**, 100 % |
+| Viernes 20:00 | **Metepec**, 61 % (duda con tu caminata de la noche) |
+| Domingo 11:00 | **San Mateo Atenco**, 100 % |
+
+### Resultado 2: cada usuario tiene su propio asistente
+El mismo **lunes a las 8:00**, al estudiante le sugiere **UTVT** y al oficinista **Toluca oriente**. El modelo aprende la rutina de cada persona, no una general.
+
+### Resultado 3: el examen ciego (la prueba más importante)
+Le dimos al modelo **solo el 75 % más antiguo** de los viajes y le pedimos adivinar el **25 % más reciente**, que nunca había visto. Es como estudiar con las primeras 9 semanas y presentar el examen con las últimas 3:
+
+| Usuario | Aciertos del modelo | Aciertos de la opción simple ("siempre la ruta más usada") |
+| :--- | ---: | ---: |
+| Estudiante | **95 %** | 38 % |
+| Oficinista | **93 %** | 41 % |
+| Nocturno | **91 %** | 64 % |
+
+**Conclusión:** el modelo acierta más de 9 de cada 10 viajes que nunca vio, y siempre le gana a la opción simple.
+
+### Lo que todavía no hace
+* **Siempre sugiere algo.** Si nunca sales a cierta hora (el usuario nocturno no viaja los lunes en la mañana), igual te muestra tu ruta más parecida. Falta un umbral para que diga "a esta hora no sueles salir".
+* **Solo aprende de las opciones en autobús**, porque son las que tienen una ruta de Kompás.
+
+---
+
+## 9. Glosario rápido
+
+* **Machine learning:** programas que aprenden patrones de los datos en vez de seguir solo reglas escritas a mano.
+* **KNN (k vecinos más cercanos):** para adivinar, busca los casos pasados más parecidos al de hoy y ve qué pasó en ellos.
+* **Árbol de decisión:** una serie de preguntas sí/no ("¿son más de 4 km?", "¿llueve?") que el modelo aprende solo.
+* **Baseline (línea base):** la solución más simple, con la que comparamos al modelo para demostrar con números que es mejor.
+* **70 % / 30 %:** se aprende con el 70 % de los datos y se examina con el 30 % que nunca vio.
+* **Leave-one-out:** se tapa un dato, se adivina con el resto, y se repite con cada uno.
+* **BFS:** busca caminos paso por paso para encontrar el de menos transbordos.

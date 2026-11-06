@@ -82,3 +82,16 @@ Convertir ambos casos en `tests/test_ia.py` con `ahora` fijo (`2026-09-30T17:59:
 - No mandar hechos ni conclusiones desde la app.
 - No convertir `priceLevel` en pesos ni poner costo 0 cuando no se sabe.
 - No inventar horarios ni rutas.
+
+## 6. Convivencia con el machine learning (`ia_kompas`) y retiro de Ollama
+
+> Actualización de noviembre de 2026. Detalle completo en `implementacion ML tecnico.md` y `implementacion ML equipo.md`.
+
+- **El sistema experto de Einar sigue siendo el que decide si un plan es recomendable.** Nada de esta sección cambia `hechos.py`, `reglas.json`, `motor.py` ni `backend/app/ia/`.
+- **El asistente con Ollama se retiró** (`backend/app/modulos/asistente/` y `backend/app/externos/ollama.py`). El machine learning de `backend/app/modulos/ia_kompas/` lo sustituye como "IA que responde rápido":
+  - `POST /api/ia/recomendar-traslado`: un árbol de decisión (70/30, comparado contra la regla fija) recomienda el medio de transporte. Acepta `temperatura` como campo opcional y regresa `consejo_clima`.
+  - `GET /api/ia/destinos-probables` 🔒: aprende de la colección `historial_rutas` del usuario (hora y día de `created_at`, ruta de `id_ruta`) y predice a dónde suele ir a esa hora. Con pocos datos usa la frecuencia por franja; con 20 o más recorridos, KNN. Con menos de 5 recorridos dice que faltan datos.
+  - `GET /api/ia/mis-habitos` 🔒: resumen de los recorridos del usuario (solo conteos).
+- **Las mismas reglas de este documento aplican al ML:** no inventar rutas, horarios ni destinos; las probabilidades se marcan como estimación; el esquema de MongoDB no cambia (`ia_kompas` solo **lee** `historial_rutas`).
+- **En la app móvil:** la pestaña **Asistente** (ya sin chat) muestra la predicción por hora, cómo se calculó y los hábitos del usuario. Inicio muestra la tarjeta "A esta hora sueles ir a…". Al elegir una opción en autobús en "Compara tu transporte", la app guarda el recorrido (`POST /api/historial`) y de ahí aprende el modelo.
+- **Datos de prueba:** `python -m scripts.sembrar_habitos_demo` carga 5 rutas demo, 3 usuarios y 12 semanas de recorridos (`demo: true`). En la prueba ciega (entrena con el 75 % más antiguo y predice el 25 % más reciente), el modelo acierta 91–95 % contra 38–64 % de "siempre la ruta más usada".

@@ -106,7 +106,7 @@ function EditorPlan({ id }: { id: number }) {
           </Tarjeta>}
           {confirmarBorrado ? <Tarjeta gap={12}>
             <Texto peso="fuerte">¿Eliminar este plan de tu lista?</Texto>
-            <Texto suave>Dejará de aparecer en Mis planes y no podrás abrirlo desde el asistente.</Texto>
+            <Texto suave>Dejará de aparecer en Mis planes.</Texto>
             <BotonSecundario texto="Cancelar eliminación" deshabilitado={ocupado} onPress={() => setConfirmarBorrado(false)} />
             <BotonPrimario texto="Confirmar eliminación" cargando={ocupado} onPress={() => ejecutar(async () => {
               await eliminarPlan(id); router.replace('/mis-planes');

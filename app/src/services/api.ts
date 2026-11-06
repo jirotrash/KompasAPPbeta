@@ -11,8 +11,6 @@ import type {
   ComparacionDistancias,
   ComparacionGeo,
   CambioPlan,
-  Conversacion,
-  EstadoAsistente,
   Lugar,
   NuevoReporte,
   NuevoUsuario,
@@ -22,23 +20,18 @@ import type {
   PlanRecuperado,
   PuntoPlano,
   RespuestaDFS,
-  RespuestaMensaje,
   RespuestaPlanes,
   RespuestaRutas,
-  ResumenConversacion,
   Sesion,
   SolicitudRuta,
 } from '@/types/dominio';
 
 import * as mock from './mock';
-import * as mockAsistente from './mock/asistente';
 import * as mockPlanes from './mock/planes';
 
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 export const USA_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false';
 const TIEMPO_LIMITE_MS = 15000;
-// El modelo local puede tardar (sobre todo la primera respuesta, mientras Ollama lo carga)
-const TIEMPO_LIMITE_ASISTENTE_MS = 120000;
 
 let token: string | null = null;
 /** Lo llama el contexto de sesión al iniciar o cerrar sesión. */
@@ -213,39 +206,30 @@ export const crearReporte = (reporte: NuevoReporte) => mock.crearReporte(reporte
 /** GET /api/reportes?ruta_id= → reportes vigentes (sin ruta_id: todos los de la zona) */
 export const obtenerReportes = (rutaId?: string) => mock.obtenerReportes(rutaId);
 
-// ─────────────────────── Asistente (Ollama, siempre a través de la API) ───────────────────────
+// ─────────────────── Historial de recorridos (alimenta al machine learning) ───────────────────
 
-/** GET /api/asistente/estado → { disponible, modelo } (la API hace ping a Ollama) */
-export const estadoAsistente = () => (USA_MOCK ? mockAsistente.estado() : solicitud<EstadoAsistente>('/api/asistente/estado'));
+type Transporte = { id: number; nombre: string };
+let transportes: Promise<Transporte[]> | null = null;
 
-/** GET /api/asistente/conversaciones → conversaciones del usuario, de la más reciente a la más antigua */
-export const listarConversaciones = () =>
-  USA_MOCK ? mockAsistente.listar() : solicitud<ResumenConversacion[]>('/api/asistente/conversaciones');
+/** GET /api/transportes → catálogo (se pide una sola vez por sesión de la app) */
+export const listarTransportes = () => {
+  transportes ??= solicitud<Transporte[]>('/api/transportes').catch((e) => {
+    transportes = null;
+    throw e;
+  });
+  return transportes;
+};
 
-/** POST /api/asistente/conversaciones → conversación vacía */
-export const crearConversacion = () =>
-  USA_MOCK ? mockAsistente.crear() : solicitud<Conversacion>('/api/asistente/conversaciones', { method: 'POST' });
-
-/** GET /api/asistente/conversaciones/{id} → conversación completa (404 si no es del usuario) */
-export const obtenerConversacion = (id: string) =>
-  USA_MOCK ? mockAsistente.obtener(id) : solicitud<Conversacion>(`/api/asistente/conversaciones/${encodeURIComponent(id)}`);
-
-/**
- * POST /api/asistente/conversaciones/{id}/mensajes → respuesta del asistente y tarjetas de rutas o planes.
- * `ubicacion` sirve para "desde aquí" y para armar salidas; la API no la guarda. 503 si Ollama no responde.
- */
-export const enviarMensaje = (id: string, texto: string, ubicacion?: Coordenada) =>
-  USA_MOCK
-    ? mockAsistente.enviar(id, texto, ubicacion)
-    : solicitud<RespuestaMensaje>(`/api/asistente/conversaciones/${encodeURIComponent(id)}/mensajes`, {
-        method: 'POST',
-        body: { texto, ubicacion },
-        tiempoLimiteMs: TIEMPO_LIMITE_ASISTENTE_MS,
-      });
-
-/** DELETE /api/asistente/conversaciones/{id} → borrado lógico */
-export const borrarConversacion = (id: string) =>
-  USA_MOCK ? mockAsistente.borrar(id) : solicitud<null>(`/api/asistente/conversaciones/${encodeURIComponent(id)}`, { method: 'DELETE' });
+/** POST /api/historial 🔒 → guarda el recorrido que el usuario inició. Es lo que aprende el asistente. */
+export async function guardarRecorrido(r: { id_ruta: number; transporte: string; tiempo_estimado: number }) {
+  if (USA_MOCK) return null;
+  const transporte = (await listarTransportes()).find((t) => t.nombre === r.transporte);
+  if (!transporte) return null;
+  return solicitud<{ id: number }>('/api/historial', {
+    method: 'POST',
+    body: { id_ruta: r.id_ruta, id_transporte: transporte.id, tiempo_estimado: Math.max(1, Math.round(r.tiempo_estimado)) },
+  });
+}
 
 // ─────────────────────── Inteligencia Artificial y Machine Learning ───────────────────────
 
@@ -255,6 +239,7 @@ export type ConsultaRecomendacionIA = {
   hora_dia?: number;
   es_hora_pico?: boolean;
   clima_lluvia?: boolean;
+  temperatura?: number;
   rating_destino?: number;
   origen?: string;
   destino?: string;
@@ -280,7 +265,77 @@ export type RespuestaRecomendacionIA = {
     coinciden: boolean;
   };
   explicacion: string;
+  consejo_clima?: string | null;
 };
+
+export type DestinoProbable = {
+  id_ruta: number;
+  nombre: string;
+  ultima_parada: string | null;
+  probabilidad: number;
+  viajes: number;
+  hora_habitual: string;
+};
+
+export type RespuestaDestinosProbables = {
+  estado: 'ok' | 'datos_insuficientes';
+  metodo: 'frecuencia_franja' | 'knn' | null;
+  hora_consulta: number;
+  dia_consulta: string;
+  franja: string;
+  viajes_analizados: number;
+  minimo_viajes: number;
+  destinos: DestinoProbable[];
+  exactitud_validacion: number | null;
+  exactitud_baseline: number | null;
+  explicacion: string;
+  aviso: string;
+};
+
+export type ClimaActual = { temperatura: number; descripcion: string; lluvia: boolean };
+
+export type MisHabitos = {
+  total_viajes: number;
+  rutas_frecuentes: { id_ruta: number; nombre: string; ultima_parada: string | null; viajes: number }[];
+  transportes: Record<string, number>;
+  por_franja: Record<string, number>;
+  por_dia: Record<string, number>;
+};
+
+/** Día de la semana como lo espera la API: 0 = lunes … 6 = domingo. */
+export const diaApi = (momento = new Date()) => (momento.getDay() + 6) % 7;
+
+/** GET /api/ia/destinos-probables?hora=&dia= 🔒 → destinos que el usuario suele tomar a esa hora.
+ *  Por defecto, la hora y el día del dispositivo. */
+export const destinosProbables = (momento = new Date(), hora = momento.getHours()) =>
+  USA_MOCK
+    ? Promise.resolve<RespuestaDestinosProbables | null>(null)
+    : solicitud<RespuestaDestinosProbables>('/api/ia/destinos-probables', {
+        params: { hora: String(hora), dia: String(diaApi(momento)) },
+      });
+
+/** GET /api/ia/mis-habitos 🔒 → conteos de los recorridos del usuario */
+export const misHabitos = () =>
+  USA_MOCK ? Promise.resolve<MisHabitos | null>(null) : solicitud<MisHabitos>('/api/ia/mis-habitos');
+
+/** Clima actual de Toluca (wttr.in, sin llave). null si no responde: la app no inventa el clima. */
+export async function consultarClima(): Promise<ClimaActual | null> {
+  const control = new AbortController();
+  const temporizador = setTimeout(() => control.abort(), 6000);
+  try {
+    const respuesta = await fetch('https://wttr.in/Toluca?format=j1', { signal: control.signal });
+    if (!respuesta.ok) return null;
+    const actual = (await respuesta.json()).current_condition?.[0];
+    const temperatura = parseFloat(actual?.temp_C);
+    const descripcion: string = actual?.weatherDesc?.[0]?.value ?? '';
+    if (Number.isNaN(temperatura)) return null;
+    return { temperatura, descripcion, lluvia: /rain|shower|drizzle|thunder|lluvia/i.test(descripcion) };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(temporizador);
+  }
+}
 
 /** POST /api/ia/recomendar-traslado → recomendación ultrarrápida por Machine Learning + BFS */
 export const recomendarTrasladoIA = (consulta: ConsultaRecomendacionIA) =>

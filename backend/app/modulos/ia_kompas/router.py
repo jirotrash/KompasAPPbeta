@@ -8,8 +8,12 @@ from app.modulos.ia_kompas.esquemas import (
     EsquemaConsultaTrasladoIA,
     EsquemaDestinosProbables,
     EsquemaEstadoPipeline,
+    EsquemaEvaluacionModeloParticiones,
     EsquemaEvaluacionReglaFija,
+    EsquemaMetricasLaboratorioIA,
     EsquemaMisHabitos,
+    EsquemaPeticionSimulacionIA,
+    EsquemaRespuestaSimulacionIA,
     EsquemaRespuestaTrasladoIA,
     EsquemaResultadoReglaFija,
     EsquemaResultadoRutaBFS,
@@ -71,6 +75,50 @@ def consultar_estado_pipeline(
     del modelo entrenado con 70% de datos y probado con 30% ciego contra la regla fija.
     """
     return servicio.estado_pipeline()
+
+
+@router.get(
+    "/evaluacion-modelo",
+    response_model=EsquemaEvaluacionModeloParticiones,
+    summary="Evaluación Experimental de Particiones (70/30 vs 80/20 vs 60/20/20), Underfitting/Overfitting y Reglas Fijas",
+)
+def consultar_evaluacion_modelo(
+    servicio: ServicioIAKompas = Depends(obtener_servicio_ia),
+):
+    """Evalúa los 500 recorridos limpios de Kompás comparando particiones (70/30, 75/25, 80/20, 85/15, 60/20/20),
+    curva de profundidad max_depth (1 a 15) para demostrar subajuste vs. sobreajuste, comparación contra Reglas Fijas
+    y matriz de confusión.
+    """
+    return servicio.evaluacion_modelo()
+
+
+@router.get(
+    "/metricas",
+    response_model=EsquemaMetricasLaboratorioIA,
+    summary="Métricas del Laboratorio IA: Limpieza (P02), Particiones, Under/Overfitting y Reglas vs ML (P03)",
+)
+def consultar_metricas_ia(
+    servicio: ServicioIAKompas = Depends(obtener_servicio_ia),
+):
+    """Devuelve el resumen de limpieza de 500 planes, la tabla comparativa de particiones
+    (60/40, 70/30, 75/25, 80/20, 60/20/20), la curva de complejidad por max_depth y la matriz de confusión.
+    """
+    return servicio.obtener_metricas_laboratorio()
+
+
+@router.post(
+    "/simular",
+    response_model=EsquemaRespuestaSimulacionIA,
+    summary="Simulador Interactivo en Vivo: Reglas Fijas vs Árbol de Decisión Óptimo + Ruta BFS",
+)
+def simular_prediccion_ia(
+    peticion: EsquemaPeticionSimulacionIA,
+    servicio: ServicioIAKompas = Depends(obtener_servicio_ia),
+):
+    """Evalúa en vivo un plan/traslado comparando Reglas Fijas (P01), Árbol de Decisión óptimo (P03) y ruta BFS (P01)."""
+    return servicio.simular_plan_ia(peticion.model_dump())
+
+
 
 
 @router.post(

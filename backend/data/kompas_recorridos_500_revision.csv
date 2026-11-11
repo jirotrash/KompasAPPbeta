@@ -1,0 +1,5 @@
+parada_origen,parada_destino,distancia_km,presupuesto_mxn,rating_lugar,rating_destino,num_paradas,trafico_nivel,hora_dia,es_hora_pico,clima_lluvia,duracion_min,modo_optimo,modo_transporte_optimo,plan_viable
+Los Portales de Toluca,Los Portales de Toluca,-3.5,483.4,4.5,4.5,5,3,13,0,0,56,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Zona Artesanal de San Mateo Atenco,10.19,482.52,9.2,9.2,2,6,9,1,0,58,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Mercado 16 de Septiembre,15.13,430.71,4.4,4.4,4,6,14,0,0,850,caminando,caminando,requiere_ajuste
+Iglesia del Calvario de Metepec,Museo Torres Bicentenario,2.0,-45.0,4.1,4.1,2,3,17,0,0,40,caminando,caminando,viable

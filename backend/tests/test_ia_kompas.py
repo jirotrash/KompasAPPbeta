@@ -13,7 +13,20 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.modulos.ia_kompas.bfs_y_reglas import predecir_con_reglas
 from app.modulos.ia_kompas.busqueda_escalas import GRAFO_BASE_KOMPAS, buscar_ruta_bfs
+from app.modulos.ia_kompas.datos_kompas import (
+    generar_dataset_recorridos_kompas,
+    limpiar_dataset_recorridos_kompas,
+    obtener_variables_recorridos_kompas,
+)
+from app.modulos.ia_kompas.datos_y_limpieza import generar_y_limpiar_datos_kompas
+from app.modulos.ia_kompas.entrenamiento_particiones import (
+    comparar_particiones_kompas,
+    ejecutar_evaluacion_completa_modelo,
+    evaluar_underfitting_overfitting,
+)
+from app.modulos.ia_kompas.modelo_entrenamiento import obtener_laboratorio_ia
 from app.modulos.ia_kompas.modelo_predictivo import ModeloPredictivoKompás
 from app.modulos.ia_kompas.pipeline_datos import (
     etapa_a_analisis_inicial,
@@ -232,3 +245,175 @@ def test_endpoint_ruta_bfs(cliente):
     data = resp.json()
     assert data["encontrado"] is True
     assert "Cosmovitral" in data["ruta_paradas"]
+
+
+# ----------------------------------------------------------------------
+# 6. Pruebas de Dataset de 500 Recorridos, Optimización de Particiones y Under/Overfitting
+# ----------------------------------------------------------------------
+def test_dataset_500_recorridos_kompas_y_limpieza(tmp_path):
+    ruta_crudo = tmp_path / "recorridos_500_crudo.csv"
+    ruta_limpio = tmp_path / "recorridos_500_limpio.csv"
+    ruta_revision = tmp_path / "recorridos_500_revision.csv"
+
+    df_crudo = generar_dataset_recorridos_kompas(ruta_csv=ruta_crudo, n_recorridos_limpios=500, semilla=42)
+    assert len(df_crudo) > 500
+    assert df_crudo["rating_lugar"].isnull().sum() > 0
+    assert df_crudo.duplicated().sum() > 0
+
+    df_limpio, reporte = limpiar_dataset_recorridos_kompas(
+        df_crudo=df_crudo,
+        ruta_crudo=ruta_crudo,
+        ruta_limpio=ruta_limpio,
+        ruta_revision=ruta_revision,
+    )
+    assert len(df_limpio) == 500
+    assert reporte["etapa_d"]["duplicados_eliminados"] > 0
+    assert df_limpio["distancia_km"].between(0.5, 25.0).all()
+    assert df_limpio["presupuesto_mxn"].between(20.0, 500.0).all()
+    assert df_limpio["rating_lugar"].between(3.0, 5.0).all()
+    assert df_limpio["num_paradas"].between(1, 8).all()
+    assert df_limpio["trafico_nivel"].between(1, 10).all()
+    assert set(df_limpio["modo_optimo"].unique()).issubset({"caminando", "transporte_publico", "auto_privado"})
+    assert "plan_viable" in df_limpio.columns
+
+
+def test_optimizacion_particiones_y_control_under_overfitting(tmp_path):
+    ruta_crudo = tmp_path / "recorridos_crudo.csv"
+    ruta_limpio = tmp_path / "recorridos_limpio.csv"
+    ruta_revision = tmp_path / "recorridos_revision.csv"
+
+    df_crudo = generar_dataset_recorridos_kompas(ruta_csv=ruta_crudo, n_recorridos_limpios=500, semilla=42)
+    df_limpio, _ = limpiar_dataset_recorridos_kompas(
+        df_crudo=df_crudo,
+        ruta_crudo=ruta_crudo,
+        ruta_limpio=ruta_limpio,
+        ruta_revision=ruta_revision,
+    )
+    X, y, _ = obtener_variables_recorridos_kompas(df_limpio)
+
+    # 1. Validar análisis de Underfitting vs Overfitting (max_depth 1 a 15)
+    ajuste = evaluar_underfitting_overfitting(X, y, random_state=42)
+    assert 3 <= ajuste["max_depth_optimo"] <= 5
+    assert len(ajuste["curva_profundidad"]) == 15
+
+    depth_1 = ajuste["evidencia_underfitting"]["max_depth_1"]
+    depth_optimo = ajuste["metricas_depth_optimo"]
+    depth_15 = ajuste["evidencia_overfitting"]["max_depth_15"]
+
+    # Demostración de Underfitting en max_depth=1
+    assert depth_1["exactitud_prueba"] < depth_optimo["exactitud_prueba"]
+    assert depth_1["diagnostico"] == "underfitting"
+
+    # Demostración de Overfitting en max_depth>=12 (alta exactitud en train pero brecha o caída en val/test)
+    assert depth_15["exactitud_entrenamiento"] >= 0.98
+    assert depth_15["brecha_generalizacion"] > depth_optimo["brecha_generalizacion"]
+    assert depth_15["diagnostico"] == "overfitting"
+
+    # El árbol en max_depth óptimo supera a las Reglas Fijas
+    comp_regla = ajuste["comparacion_regla_fija"]
+    assert comp_regla["exactitud_arbol_optimo"] > comp_regla["exactitud_regla_fija"]
+    assert comp_regla["mejora_exactitud_puntos"] > 0
+
+    # 2. Validar comparador de particiones (70/30, 75/25, 80/20, 85/15, 60/20/20)
+    particiones = comparar_particiones_kompas(X, y, max_depth=ajuste["max_depth_optimo"], random_state=42)
+    codigos = {item["codigo"] for item in particiones["tabla_particiones"]}
+    assert codigos == {"70_30", "75_25", "80_20", "85_15", "60_20_20"}
+
+    optima = particiones["particion_optima_seleccionada"]
+    baseline = particiones["particion_baseline_70_30"]
+    assert optima["codigo"] != "70_30"
+    assert optima["f1_prueba_ponderado"] >= baseline["f1_prueba_ponderado"]
+    assert len(particiones["comparativa_optima_vs_70_30"]["justificacion_tecnica"]) > 50
+
+
+def test_endpoint_evaluacion_modelo(cliente):
+    resp = cliente.get("/api/ia/evaluacion-modelo")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert data["dataset_kompas"]["total_muestras"] == 500
+    assert len(data["tabla_comparativa_particiones"]) == 5
+    assert "particion_optima" in data
+    assert "particion_baseline_70_30" in data
+    assert "analisis_underfitting_overfitting" in data
+    assert "comparacion_contra_reglas_fijas" in data
+    assert "matriz_confusion" in data
+    assert len(data["matriz_confusion"]["etiquetas"]) == 3
+
+
+# ----------------------------------------------------------------------
+# 7. Pruebas de Laboratorio IA End-to-End (/api/ia/metricas y /api/ia/simular)
+# ----------------------------------------------------------------------
+def test_datos_y_limpieza_500_planes_y_reglas(tmp_path):
+    df_limpio, resumen = generar_y_limpiar_datos_kompas(
+        n_registros=500,
+        semilla=42,
+        ruta_crudo=tmp_path / "planes_crudo.csv",
+        ruta_limpio=tmp_path / "planes_limpio.csv",
+    )
+    assert resumen["registros_iniciales"] > 500
+    assert resumen["nulos_imputados"] >= 20
+    assert resumen["duplicados_eliminados"] >= 10
+    assert resumen["registros_limpios"] == 500
+    assert resumen["nulos_restantes"] == 0
+    assert set(df_limpio["plan_viable"].unique()) == {0, 1}
+
+    regla_ok = predecir_con_reglas(
+        distancia_km=4.0,
+        presupuesto_mxn=240.0,
+        rating_lugar=4.6,
+        num_paradas=3,
+        trafico_nivel=4,
+    )
+    assert regla_ok["plan_viable"] == 1
+    assert regla_ok["etiqueta_viabilidad"] == "viable"
+
+
+def test_endpoint_metricas_laboratorio_ia(cliente):
+    resp = cliente.get("/api/ia/metricas")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert data["resumen_limpieza"]["registros_limpios"] == 500
+    assert len(data["comparativa_particiones"]) == 5
+    codigos = {p["codigo"] for p in data["comparativa_particiones"]}
+    assert codigos == {"60_40", "70_30", "75_25", "80_20", "60_20_20"}
+
+    # Verificar que la partición óptima supere el umbral esperado (>= 0.80) y al baseline 70/30
+    optima = next(p for p in data["comparativa_particiones"] if p["es_optima"])
+    baseline = next(p for p in data["comparativa_particiones"] if p["codigo"] == "70_30")
+    assert optima["test_acc"] >= 0.80
+    assert optima["test_acc"] >= baseline["test_acc"]
+    assert data["comparativa_sistemas"]["exactitud_ml"] > data["comparativa_sistemas"]["exactitud_reglas"]
+
+    # Verificar curva de complejidad en profundidades [1, 2, 3, 4, 5, 8, 12, 15]
+    profundidades = [c["max_depth"] for c in data["curva_complejidad"]]
+    assert profundidades == [1, 2, 3, 4, 5, 8, 12, 15]
+    estados = {c["estado"] for c in data["curva_complejidad"]}
+    assert "Underfitting (Subajuste)" in estados
+    assert "Buen ajuste" in estados
+    assert "Overfitting (Sobreajuste)" in estados
+
+
+def test_endpoint_simular_ia(cliente):
+    payload = {
+        "distancia_km": 6.5,
+        "presupuesto_mxn": 240.0,
+        "rating_lugar": 4.6,
+        "num_paradas": 3,
+        "trafico_nivel": 5,
+        "origen": "Terminal Toluca",
+        "destino": "Galerias Metepec",
+    }
+    resp = cliente.post("/api/ia/simular", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert data["prediccion_reglas"]["plan_viable"] in {0, 1}
+    assert data["prediccion_arbol_ml"]["plan_viable"] in {0, 1}
+    assert 0.0 <= data["prediccion_arbol_ml"]["confianza"] <= 1.0
+    assert data["ruta_bfs"]["encontrado"] is True
+    assert data["ruta_bfs"]["ruta_paradas"][0] == "Terminal Toluca"
+    assert data["ruta_bfs"]["ruta_paradas"][-1] == "Galerias Metepec"
+
+

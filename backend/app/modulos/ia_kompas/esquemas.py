@@ -115,3 +115,48 @@ class EsquemaEstadoPipeline(BaseModel):
     exactitud_regla_fija: float
     particion: dict[str, int]
     importancia_variables: dict[str, float]
+
+
+class EsquemaEvaluacionModeloParticiones(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    dataset_kompas: dict
+    tabla_comparativa_particiones: list[dict]
+    particion_optima: dict
+    particion_baseline_70_30: dict
+    comparativa_optima_vs_70_30: dict
+    analisis_underfitting_overfitting: dict
+    comparacion_contra_reglas_fijas: dict
+    matriz_confusion: dict
+    importancia_variables: dict[str, float]
+
+
+class EsquemaMetricasLaboratorioIA(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    resumen_limpieza: dict
+    particion_optima: str
+    max_depth_optimo: int
+    comparativa_particiones: list[dict]
+    curva_complejidad: list[dict]
+    comparativa_sistemas: dict
+
+
+class EsquemaPeticionSimulacionIA(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    distancia_km: float = Field(default=5.0, ge=0.1, le=50.0, description="Distancia del recorrido en km")
+    presupuesto_mxn: float = Field(default=180.0, ge=0.0, le=5000.0, description="Presupuesto en MXN")
+    rating_lugar: float = Field(default=4.5, ge=1.0, le=5.0, description="Rating del lugar (3.0 a 5.0)")
+    num_paradas: int = Field(default=3, ge=1, le=15, description="Número de paradas del plan")
+    trafico_nivel: int = Field(default=5, ge=1, le=10, description="Nivel de tráfico (1 a 10)")
+    origen: str = Field(default="Terminal Toluca", description="Zona turística de origen para BFS")
+    destino: str = Field(default="Galerias Metepec", description="Zona turística de destino para BFS")
+
+
+class EsquemaRespuestaSimulacionIA(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    entrada: dict
+    prediccion_reglas: dict
+    prediccion_arbol_ml: dict
+    coinciden_sistemas: bool
+    ruta_bfs: EsquemaResultadoRutaBFS
+
+

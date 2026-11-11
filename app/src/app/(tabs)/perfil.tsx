@@ -108,6 +108,12 @@ export default function Perfil() {
       <YStack mt={32} gap={24}>
         <Seccion titulo="Mis salidas">
           <Fila icono="planificar" texto="Mis planes" detalle="Retoma, organiza o elimina tus salidas" onPress={() => router.push('/mis-planes')} />
+          <Fila
+            icono="filtros"
+            texto="Laboratorio IA / Métricas del Modelo"
+            detalle="Particiones (70/30 vs 80/20 vs 60/20/20), Overfitting y Simulador BFS"
+            onPress={() => router.push('/laboratorio-ia')}
+          />
         </Seccion>
         <Seccion titulo="Apariencia">
           <XStack gap={8} p={8}>

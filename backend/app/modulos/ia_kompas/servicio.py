@@ -6,7 +6,9 @@
 """
 
 from app.modulos.ia_kompas.busqueda_escalas import buscar_ruta_bfs
+from app.modulos.ia_kompas.entrenamiento_particiones import ejecutar_evaluacion_completa_modelo
 from app.modulos.ia_kompas.habitos import predecir_destinos, resumir_habitos
+from app.modulos.ia_kompas.modelo_entrenamiento import obtener_laboratorio_ia
 from app.modulos.ia_kompas.modelo_predictivo import obtener_modelo
 from app.modulos.ia_kompas.pipeline_datos import ejecutar_pipeline_completo
 from app.modulos.ia_kompas.reglas_transporte import evaluar_traslado_regla_fija
@@ -98,6 +100,23 @@ class ServicioIAKompas:
             hora_dia=hora_dia,
             clima_lluvia=clima_lluvia,
         )
+
+    def evaluacion_modelo(self) -> dict:
+        """Ejecuta el experimento comparativo de particiones (70/30, 75/25, 80/20, 85/15, 60/20/20),
+        el análisis de underfitting vs. overfitting (max_depth 1 a 15) y la comparación contra Reglas Fijas
+        sobre el dataset limpio de 500 recorridos turísticos de Kompás.
+        """
+        return ejecutar_evaluacion_completa_modelo()
+
+    def obtener_metricas_laboratorio(self) -> dict:
+        """Devuelve el JSON estructurado de métricas para el Laboratorio IA (GET /api/ia/metricas)."""
+        return obtener_laboratorio_ia().obtener_metricas()
+
+    def simular_plan_ia(self, datos: dict) -> dict:
+        """Simula un plan/traslado con Reglas Fijas, Árbol de Decisión óptimo y BFS (POST /api/ia/simular)."""
+        return obtener_laboratorio_ia().simular(datos)
+
+
 
 
 class ServicioHabitos:

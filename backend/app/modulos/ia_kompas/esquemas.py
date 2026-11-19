@@ -178,4 +178,3 @@ class EsquemaRespuestaSimulacionIA(BaseModel):
     ruta_bfs: EsquemaResultadoRutaBFS
 
 
-main

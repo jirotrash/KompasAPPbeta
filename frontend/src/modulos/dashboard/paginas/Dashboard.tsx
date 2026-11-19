@@ -43,6 +43,7 @@ import GraficaRutasTop from '../graficas/GraficaRutasTop.tsx'
 import GraficaTiempoDisponible from '../graficas/GraficaTiempoDisponible.tsx'
 import GraficaTransporte from '../graficas/GraficaTransporte.tsx'
 import MapaLugaresReportes from '../graficas/MapaLugaresReportes.tsx'
+import SeccionMachineLearning from '../graficas/SeccionMachineLearning.tsx'
 import useDashboard from '../hooks/useDashboard.ts'
 import { SECCIONES, seccionDe, type IdSeccion } from '../secciones.ts'
 import type { DatosDashboard } from '../tipos.ts'
@@ -70,7 +71,8 @@ function Resumen({ d }: { d: DatosDashboard }) {
   )
 }
 
-const CONTENIDO: Record<IdSeccion, (d: DatosDashboard) => ReactNode> = {
+// La sección de Machine Learning no depende de /api/dashboard ni de los filtros: carga sus propios datos.
+const CONTENIDO: Record<Exclude<IdSeccion, 'ml'>, (d: DatosDashboard) => ReactNode> = {
   resumen: (d) => <Resumen d={d} />,
   planes: (d) => (
     <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
@@ -225,7 +227,7 @@ export default function Dashboard() {
         )}
       </header>
 
-      <FiltrosDashboard inicial={seleccion} onAplicar={setSeleccion} cargando={cargando} />
+      {seccion.id !== 'ml' && <FiltrosDashboard inicial={seleccion} onAplicar={setSeleccion} cargando={cargando} />}
 
       {/* En escritorio las secciones están en la barra lateral; en celular, aquí como pestañas */}
       <div role="tablist" aria-label="Secciones del dashboard" className="-mx-1 flex gap-1 overflow-x-auto border-b border-borde px-1 md:hidden">
@@ -253,7 +255,9 @@ export default function Dashboard() {
       </div>
 
       <div id="panel-dashboard" role="region" aria-label={seccion.texto}>
-        {error ? (
+        {seccion.id === 'ml' ? (
+          <SeccionMachineLearning />
+        ) : error ? (
           <div className="grid justify-items-start gap-3">
             <MensajeError>{error}</MensajeError>
             <button type="button" className="boton-secundario" onClick={recargar}>

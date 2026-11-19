@@ -4,6 +4,8 @@
 import { solicitud, USA_MOCK } from '../../compartido/api/cliente.ts'
 import type { ArbolRuta, Ruta } from '../../compartido/tipos/dominio.ts'
 import * as mock from './mock.ts'
+import * as mockML from './mockML.ts'
+import type { ComparacionAlgoritmos, DiagnosticoAjuste, OptimizacionHiperparametros } from './tiposML.ts'
 import type { ComparativoBusqueda, EndpointDashboard, Filtros, ParadaRed, RespuestasDashboard } from './tipos.ts'
 
 const pedir = <E extends EndpointDashboard>(endpoint: E, filtros: Filtros, extra: Record<string, string> = {}): Promise<RespuestasDashboard[E]> =>
@@ -45,6 +47,21 @@ export const obtenerAsistente = (filtros: Filtros) => pedir('asistente', filtros
 /** GET /api/dfs/paradas → nodos de la red académica (para elegir origen y destino del comparativo) */
 export const obtenerParadasRed = (): Promise<ParadaRed[]> => (USA_MOCK ? mock.paradasRed() : solicitud<ParadaRed[]>('/api/dfs/paradas'))
 
+// ───────────── Machine Learning supervisado (prácticas P04, P05 y P06 en /api/ia) ─────────────
+// No usan los filtros de fecha: entrenan sobre el CSV limpio del pipeline de datos.
+
+/** GET /api/ia/diagnostico-ajuste → partición 60/20/20, árboles de profundidad 1/4/libre y curva de complejidad */
+export const obtenerDiagnosticoAjuste = (): Promise<DiagnosticoAjuste> =>
+  USA_MOCK ? mockML.diagnosticoAjuste() : solicitud<DiagnosticoAjuste>('/api/ia/diagnostico-ajuste')
+
+/** GET /api/ia/comparar-algoritmos → Árbol de decisión vs. Random Forest vs. KNN */
+export const obtenerComparacionAlgoritmos = (): Promise<ComparacionAlgoritmos> =>
+  USA_MOCK ? mockML.compararAlgoritmos() : solicitud<ComparacionAlgoritmos>('/api/ia/comparar-algoritmos')
+
+/** GET /api/ia/optimizar-hiperparametros → GridSearchCV con 5 pliegues (tarda unos segundos) */
+export const obtenerOptimizacionHiperparametros = (): Promise<OptimizacionHiperparametros> =>
+  USA_MOCK ? mockML.optimizarHiperparametros() : solicitud<OptimizacionHiperparametros>('/api/ia/optimizar-hiperparametros')
+
 /** GET /api/busqueda/comparar?origen=&destino= → DFS, UCS, voraz y A* en una tabla */
 export const compararBusqueda = (origen: string, destino: string): Promise<ComparativoBusqueda> =>
   USA_MOCK ? mock.comparar(origen, destino) : solicitud<ComparativoBusqueda>('/api/busqueda/comparar', { params: { origen, destino } })
@@ -55,3 +72,33 @@ export const obtenerRutas = (): Promise<Ruta[]> => (USA_MOCK ? mock.rutas() : so
 /** GET /api/rutas/{id}/arbol → paradas de la ruta en orden (recorrido inorden del árbol binario) */
 export const obtenerArbolRuta = (id: number): Promise<ArbolRuta> =>
   USA_MOCK ? mock.arbolRuta(id) : solicitud<ArbolRuta>(`/api/rutas/${id}/arbol`)
+
+// ───────────── Machine Learning Avanzado y Deep Learning (P14 a P27 en /api/ia) ─────────────
+
+/** POST /api/ia/motor-recomendacion-integral → Random Forest + K-Means + PCA + Directivas de Movilidad (P14) */
+export const evaluarRecomendacionIntegral = (datos: {
+  distancia_km: number
+  hora_dia: number
+  duracion_min: number
+  presupuesto_mxn: number
+  es_hora_pico?: number
+  clima_lluvia?: number
+}) => solicitud<any>('/api/ia/motor-recomendacion-integral', { metodo: 'POST', cuerpo: datos })
+
+/** GET /api/ia/analitica/reporte-clusters → Estadísticas de los 4 clusters de viajeros en MongoDB Atlas (P16) */
+export const obtenerReporteClusters = () => solicitud<any[]>('/api/ia/analitica/reporte-clusters')
+
+/** GET /api/ia/analitica/horas-pico → Demanda y congestión por hora (P16) */
+export const obtenerHorasPicoAnalitica = () => solicitud<any[]>('/api/ia/analitica/horas-pico')
+
+/** GET /api/ia/deep-learning/comparar-modelos → Benchmark Decision Tree vs Random Forest vs CNN 1D (P25) */
+export const obtenerBenchmarkDL = () => solicitud<any>('/api/ia/deep-learning/comparar-modelos')
+
+/** POST /api/ia/deep-learning/clasificar-congestion → Diagnóstico de congestión con CNN 1D en PyTorch (P24) */
+export const clasificarCongestionCNN = (secuencia: number[][]) =>
+  solicitud<any>('/api/ia/deep-learning/clasificar-congestion', { metodo: 'POST', cuerpo: { secuencia } })
+
+/** POST /api/ia/deep-learning/predecir-eta → Tiempo continuo de llegada con CNN 1D regresora (P27) */
+export const predecirEtaCNN = (secuencia: number[][]) =>
+  solicitud<any>('/api/ia/deep-learning/predecir-eta', { metodo: 'POST', cuerpo: { secuencia } })
+

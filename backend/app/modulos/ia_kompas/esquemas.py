@@ -117,6 +117,24 @@ class EsquemaEstadoPipeline(BaseModel):
     importancia_variables: dict[str, float]
 
 
+
+class EsquemaConsultaRecomendacionIntegral(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    distancia_km: float = Field(default=10.0, ge=0.1, le=100.0, description="Distancia del viaje en km")
+    hora_dia: int = Field(default=8, ge=0, le=23, description="Hora de partida (0 a 23)")
+    duracion_min: float = Field(default=35.0, ge=1.0, le=300.0, description="Duracion estimada en minutos")
+    presupuesto_mxn: float = Field(default=25.0, ge=0.0, le=1000.0, description="Presupuesto disponible en pesos")
+    es_hora_pico: int = Field(default=1, ge=0, le=1, description="1 si es hora pico, 0 si es hora valle")
+    clima_lluvia: int = Field(default=0, ge=0, le=1, description="1 si llueve, 0 si esta despejado")
+
+
+class EsquemaConsultaSecuenciaCNN1D(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    secuencia: list[list[float]] = Field(
+        default=[[42.0, 3.2, 45.0], [28.5, 5.8, 68.0], [14.0, 12.5, 92.0], [11.2, 14.0, 95.0]],
+        description="Lista de tramos temporales: cada elemento con [velocidad_kmh, tiempo_min, ocupacion_pct]",
+    )
+
 class EsquemaEvaluacionModeloParticiones(BaseModel):
     model_config = ConfigDict(extra="ignore")
     dataset_kompas: dict
@@ -160,3 +178,4 @@ class EsquemaRespuestaSimulacionIA(BaseModel):
     ruta_bfs: EsquemaResultadoRutaBFS
 
 
+main

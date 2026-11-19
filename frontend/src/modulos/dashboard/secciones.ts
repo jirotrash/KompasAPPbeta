@@ -9,6 +9,7 @@ import {
   IconoItinerario,
   IconoMatraz,
   IconoReporte,
+  IconoTabla,
 } from '../../compartido/componentes/Iconos.tsx'
 
 export const SECCIONES = [
@@ -18,6 +19,7 @@ export const SECCIONES = [
   { id: 'movilidad', texto: 'Movilidad', Icono: IconoBus, descripcion: 'Recorridos guardados por medio de transporte, rutas más usadas y paradas donde más se sube y se baja.' },
   { id: 'reportes', texto: 'Reportes y lugares', Icono: IconoReporte, descripcion: 'Reportes comunitarios y lugares registrados en la zona piloto.' },
   { id: 'laboratorio', texto: 'Laboratorio IA', Icono: IconoMatraz, descripcion: 'Búsqueda (DFS, UCS, voraz y A*), algoritmo genético, transbordos con A* y distancias Euclidiana vs. Manhattan.' },
+  { id: 'ml', texto: 'Machine Learning', Icono: IconoTabla, descripcion: 'Árbol de decisión vs. Random Forest vs. KNN, partición 60/20/20, sobreajuste vs. subajuste y validación cruzada (prácticas P04–P06).' },
   { id: 'asistente', texto: 'Asistente', Icono: IconoChat, descripcion: 'Uso del asistente con IA de la app (solo datos agregados, nunca el contenido de los mensajes).' },
 ] as const
 

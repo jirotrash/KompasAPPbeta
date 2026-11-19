@@ -1,0 +1,501 @@
+parada_origen,parada_destino,distancia_km,presupuesto_mxn,rating_lugar,rating_destino,num_paradas,trafico_nivel,hora_dia,es_hora_pico,clima_lluvia,duracion_min,modo_optimo,modo_transporte_optimo,plan_viable
+Los Portales de Toluca,Los Portales de Toluca,4.9,483.4,4.5,4.5,5,3,13,0,0,56,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Zona Artesanal de San Mateo Atenco,10.19,482.52,4.3,4.3,2,6,9,1,0,58,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Mercado 16 de Septiembre,15.13,430.71,4.4,4.4,4,6,14,0,0,214,caminando,caminando,requiere_ajuste
+Iglesia del Calvario de Metepec,Museo Torres Bicentenario,2.0,110.05,4.1,4.1,2,3,17,0,0,40,caminando,caminando,viable
+Centro Histórico de Metepec,Estadio Nemesio Diez,5.08,305.25,4.6,4.6,2,1,12,0,0,48,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Iglesia del Calvario de Metepec,5.89,441.51,5.0,5.0,1,5,10,0,0,54,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Galerías Metepec,1.28,199.74,4.6,4.6,5,2,14,0,0,60,transporte_publico,transporte_publico,viable
+Centro de Lerma,Alameda Central Toluca,3.86,68.53,4.5,4.5,1,7,12,0,1,53,transporte_publico,transporte_publico,viable
+Alameda Central Toluca,Estadio Nemesio Diez,17.61,409.26,4.4,4.4,6,6,12,0,1,99,auto_privado,auto_privado,viable
+Los Portales de Toluca,Alameda Central Toluca,9.87,251.25,4.9,4.9,4,3,11,0,0,85,transporte_publico,transporte_publico,viable
+Galerías Metepec,Mercado 16 de Septiembre,11.93,290.91,4.2,4.2,3,4,11,0,0,87,transporte_publico,transporte_publico,viable
+Mercado 16 de Septiembre,Centro de Lerma,21.25,491.43,3.9,3.9,7,8,18,1,0,119,auto_privado,auto_privado,viable
+Centro de Lerma,Museo Torres Bicentenario,2.81,311.46,4.2,4.2,5,5,13,0,1,56,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Museo Torres Bicentenario,7.38,223.99,4.3,4.3,6,1,13,0,0,64,auto_privado,auto_privado,viable
+Centro de Lerma,Mercado 16 de Septiembre,1.14,197.59,4.4,4.4,6,3,17,0,0,69,transporte_publico,transporte_publico,viable
+Plazas Outlet Lerma,Los Portales de Toluca,10.46,220.46,4.1,4.1,1,2,12,0,1,62,transporte_publico,transporte_publico,viable
+Galerías Metepec,Parque Estatal Sierra Morelos,9.8,76.83,4.3,4.3,2,9,7,1,1,86,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Los Portales de Toluca,7.45,401.48,4.7,4.7,5,6,20,1,0,69,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Iglesia del Calvario de Metepec,15.46,422.1,4.8,4.8,8,4,6,0,0,102,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Parque Ambiental Bicentenario,1.16,156.51,4.9,4.9,2,6,15,0,0,30,caminando,caminando,viable
+Galerías Metepec,Parque Metropolitano Bicentenario,21.52,165.82,4.2,4.2,1,7,10,0,1,81,auto_privado,auto_privado,requiere_ajuste
+Parque Metropolitano Bicentenario,Terminal de Autobuses Toluca,2.75,439.68,4.0,4.0,8,7,9,1,0,78,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Alameda Central Toluca,2.58,31.51,4.8,4.8,8,1,6,0,0,84,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Museo Torres Bicentenario,2.78,269.82,4.5,4.5,2,6,21,0,0,49,caminando,caminando,viable
+Plazas Outlet Lerma,Parque Metropolitano Bicentenario,15.42,242.56,4.6,4.6,4,1,13,0,0,71,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Estadio Nemesio Diez,8.93,351.26,4.8,4.8,6,1,11,0,0,68,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Parque Estatal Sierra Morelos,2.28,98.43,4.3,4.3,2,10,18,1,0,43,caminando,caminando,viable
+Museo Torres Bicentenario,Terminal de Autobuses Toluca,1.65,340.8,3.9,3.9,3,7,6,0,1,45,auto_privado,auto_privado,viable
+Galerías Metepec,Parque Estatal Sierra Morelos,4.47,263.35,5.0,5.0,4,5,15,0,1,72,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Parque Estatal Sierra Morelos,6.13,316.98,4.6,4.6,6,6,14,0,0,72,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Parque Ambiental Bicentenario,1.45,39.25,4.4,4.4,3,1,15,0,1,42,transporte_publico,transporte_publico,requiere_ajuste
+Alameda Central Toluca,Terminal de Autobuses Toluca,14.03,241.63,3.7,3.7,4,6,8,1,0,108,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Terminal de Autobuses Toluca,5.13,270.68,4.0,4.0,3,3,22,0,0,61,transporte_publico,transporte_publico,viable
+Galerías Metepec,Estadio Nemesio Diez,8.38,122.88,4.7,4.7,7,1,10,0,0,97,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Parque Ambiental Bicentenario,8.49,87.02,4.9,4.9,2,7,17,0,1,76,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Terminal de Autobuses Toluca,7.83,110.47,4.1,4.1,2,6,18,1,1,71,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Iglesia del Calvario de Metepec,0.94,185.19,5.0,5.0,2,4,11,0,1,41,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Los Portales de Toluca,1.15,66.47,5.0,5.0,8,10,8,1,1,104,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Galerías Metepec,3.3,474.71,4.8,4.8,8,6,11,0,1,77,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Cosmovitral Jardín Botánico,6.29,214.4,4.4,4.4,5,7,19,1,0,115,caminando,caminando,viable
+Terminal de Autobuses Toluca,Centro de Lerma,9.28,408.31,3.9,3.9,2,4,21,0,1,51,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Cosmovitral Jardín Botánico,18.36,487.72,4.7,4.7,7,4,21,0,0,103,auto_privado,auto_privado,viable
+Centro de Lerma,Alameda Central Toluca,1.99,58.75,4.5,4.5,4,9,9,1,0,56,caminando,caminando,requiere_ajuste
+Parque Metropolitano Bicentenario,Terminal de Autobuses Toluca,8.02,263.35,4.5,4.5,7,3,16,0,0,76,auto_privado,auto_privado,viable
+Los Portales de Toluca,Museo Torres Bicentenario,1.66,438.28,4.1,4.1,3,7,8,1,0,44,caminando,caminando,viable
+Mercado 16 de Septiembre,Cosmovitral Jardín Botánico,6.03,324.43,4.5,4.5,8,9,18,1,0,90,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Centro Histórico de Metepec,6.49,225.93,4.5,4.5,7,7,13,0,0,81,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Parque Ambiental Bicentenario,4.99,226.92,4.6,4.6,2,8,18,1,0,50,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Galerías Metepec,11.54,37.23,4.9,4.9,6,1,17,0,0,100,transporte_publico,transporte_publico,requiere_ajuste
+Plazas Outlet Lerma,Zona Artesanal de San Mateo Atenco,4.0,276.61,4.4,4.4,3,4,22,0,1,44,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Plazas Outlet Lerma,16.21,496.9,5.0,5.0,3,7,14,0,0,80,auto_privado,auto_privado,viable
+Alameda Central Toluca,Centro Histórico de Metepec,6.88,480.18,4.8,4.8,3,7,11,0,0,58,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Museo Torres Bicentenario,22.76,39.39,4.2,4.2,6,3,14,0,0,145,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Parque Metropolitano Bicentenario,6.81,358.78,4.6,4.6,3,6,8,1,0,56,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Mercado 16 de Septiembre,6.01,164.85,4.5,4.5,6,8,7,1,0,100,transporte_publico,transporte_publico,requiere_ajuste
+Cosmovitral Jardín Botánico,Galerías Metepec,8.02,453.43,4.7,4.7,5,6,14,0,1,70,auto_privado,auto_privado,viable
+Galerías Metepec,Centro de Lerma,5.35,41.66,4.9,4.9,7,10,20,1,0,111,transporte_publico,transporte_publico,requiere_ajuste
+Terminal de Autobuses Toluca,Parque Estatal Sierra Morelos,7.3,469.22,4.3,4.3,8,1,15,0,0,76,auto_privado,auto_privado,viable
+Centro de Lerma,Plazas Outlet Lerma,14.26,421.99,4.7,4.7,1,7,19,1,1,64,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Museo Torres Bicentenario,2.81,76.4,4.4,4.4,8,8,9,1,0,104,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Galerías Metepec,14.79,48.72,4.0,4.0,1,1,13,0,1,74,transporte_publico,transporte_publico,viable
+Centro de Lerma,Cosmovitral Jardín Botánico,6.47,420.66,5.0,5.0,5,7,16,0,0,69,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Iglesia del Calvario de Metepec,6.57,94.76,5.0,5.0,3,1,11,0,1,60,transporte_publico,transporte_publico,requiere_ajuste
+Mercado 16 de Septiembre,Terminal de Autobuses Toluca,18.92,276.75,3.6,3.6,6,5,6,0,0,100,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Parque Estatal Sierra Morelos,4.25,459.56,4.6,4.6,6,10,7,1,1,76,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Alameda Central Toluca,8.9,292.38,3.8,3.8,7,5,21,0,0,82,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Alameda Central Toluca,2.04,210.67,4.0,4.0,4,6,16,0,1,66,transporte_publico,transporte_publico,viable
+Parque Metropolitano Bicentenario,Alameda Central Toluca,1.53,233.61,4.8,4.8,8,2,10,0,1,64,auto_privado,auto_privado,viable
+Los Portales de Toluca,Zona Artesanal de San Mateo Atenco,5.28,50.3,4.1,4.1,3,6,10,0,0,70,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Parque Ambiental Bicentenario,21.7,485.0,4.3,4.3,2,3,6,0,1,79,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Mercado 16 de Septiembre,24.78,169.11,4.2,4.2,4,1,22,0,1,94,auto_privado,auto_privado,requiere_ajuste
+Alameda Central Toluca,Centro Histórico de Metepec,8.39,110.89,4.5,4.5,5,7,7,1,0,98,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Estadio Nemesio Diez,9.41,157.3,4.6,4.6,6,7,18,1,1,110,transporte_publico,transporte_publico,requiere_ajuste
+Terminal de Autobuses Toluca,Cosmovitral Jardín Botánico,5.1,482.9,5.0,5.0,7,4,10,0,0,71,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Cosmovitral Jardín Botánico,3.85,65.26,4.3,4.3,2,2,11,0,0,34,auto_privado,auto_privado,requiere_ajuste
+Iglesia del Calvario de Metepec,Parque Metropolitano Bicentenario,3.66,436.31,4.3,4.3,3,4,10,0,0,59,transporte_publico,transporte_publico,viable
+Parque Metropolitano Bicentenario,Parque Estatal Sierra Morelos,9.56,359.77,4.7,4.7,8,8,20,1,0,97,auto_privado,auto_privado,viable
+Alameda Central Toluca,Galerías Metepec,6.3,418.41,4.8,4.8,4,3,6,0,1,54,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Parque Estatal Sierra Morelos,4.76,488.43,5.0,5.0,2,5,11,0,0,58,transporte_publico,transporte_publico,viable
+Zona Artesanal de San Mateo Atenco,Los Portales de Toluca,8.18,424.23,4.4,4.4,8,3,10,0,0,82,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Los Portales de Toluca,9.96,472.82,4.9,4.9,4,6,10,0,0,69,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Museo Torres Bicentenario,7.97,80.93,4.0,4.0,8,7,9,1,0,119,transporte_publico,transporte_publico,requiere_ajuste
+Terminal de Autobuses Toluca,Los Portales de Toluca,0.68,401.98,5.0,5.0,8,7,21,0,1,73,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Cosmovitral Jardín Botánico,2.25,281.92,4.3,4.3,8,3,12,0,1,68,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Centro Histórico de Metepec,1.74,280.88,5.0,5.0,5,1,13,0,0,44,auto_privado,auto_privado,viable
+Centro de Lerma,Parque Estatal Sierra Morelos,1.78,451.48,4.4,4.4,7,2,12,0,0,59,auto_privado,auto_privado,viable
+Los Portales de Toluca,Centro de Lerma,10.37,486.47,4.9,4.9,8,6,22,0,0,94,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Los Portales de Toluca,4.17,358.32,4.8,4.8,3,7,11,0,0,51,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Museo Torres Bicentenario,9.46,251.81,3.9,3.9,1,2,11,0,0,58,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Museo Torres Bicentenario,4.58,239.07,4.1,4.1,3,5,11,0,0,65,transporte_publico,transporte_publico,viable
+Centro Histórico de Metepec,Plazas Outlet Lerma,13.19,205.44,4.7,4.7,6,5,11,0,0,87,auto_privado,auto_privado,requiere_ajuste
+Plazas Outlet Lerma,Parque Estatal Sierra Morelos,13.21,193.57,4.5,4.5,5,6,7,1,0,83,auto_privado,auto_privado,requiere_ajuste
+Museo Torres Bicentenario,Alameda Central Toluca,2.24,207.92,4.4,4.4,1,4,16,0,0,35,caminando,caminando,viable
+Centro Histórico de Metepec,Mercado 16 de Septiembre,12.84,63.08,4.1,4.1,5,5,6,0,0,108,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Parque Metropolitano Bicentenario,9.83,57.17,4.9,4.9,2,10,9,1,1,89,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Plazas Outlet Lerma,3.91,394.34,4.4,4.4,5,10,9,1,1,69,auto_privado,auto_privado,viable
+Alameda Central Toluca,Parque Ambiental Bicentenario,2.84,234.11,4.2,4.2,5,1,10,0,0,47,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Plazas Outlet Lerma,1.28,466.73,4.1,4.1,6,7,18,1,1,62,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Zona Artesanal de San Mateo Atenco,5.82,313.87,4.4,4.4,4,4,16,0,1,55,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Zona Artesanal de San Mateo Atenco,22.84,36.88,4.5,4.5,4,2,22,0,0,128,transporte_publico,transporte_publico,requiere_ajuste
+Museo Torres Bicentenario,Parque Ambiental Bicentenario,23.89,95.61,5.0,5.0,6,4,11,0,0,152,transporte_publico,transporte_publico,requiere_ajuste
+Alameda Central Toluca,Plazas Outlet Lerma,2.44,118.79,4.7,4.7,6,1,21,0,0,68,transporte_publico,transporte_publico,requiere_ajuste
+Plazas Outlet Lerma,Centro de Lerma,1.21,488.35,4.3,4.3,7,1,6,0,0,55,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Terminal de Autobuses Toluca,6.78,124.98,4.2,4.2,3,1,14,0,0,61,transporte_publico,transporte_publico,viable
+Plazas Outlet Lerma,Museo Torres Bicentenario,22.77,267.56,4.1,4.1,4,7,19,1,0,102,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Galerías Metepec,1.85,469.36,4.4,4.4,3,6,15,0,0,46,caminando,caminando,viable
+Plazas Outlet Lerma,Parque Metropolitano Bicentenario,1.66,489.05,4.3,4.3,5,2,21,0,0,46,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Galerías Metepec,7.5,133.45,4.1,4.1,2,7,11,0,1,73,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Mercado 16 de Septiembre,12.32,43.58,4.2,4.2,4,2,6,0,0,91,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Museo Torres Bicentenario,17.02,93.73,4.4,4.4,2,6,19,1,1,103,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Museo Torres Bicentenario,3.4,50.4,4.5,4.5,5,7,7,1,1,81,caminando,caminando,requiere_ajuste
+Plazas Outlet Lerma,Iglesia del Calvario de Metepec,2.83,263.35,5.0,5.0,7,9,19,1,1,100,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Plazas Outlet Lerma,2.78,292.91,4.5,4.5,8,6,18,1,0,76,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Centro Histórico de Metepec,14.1,457.98,4.9,4.9,4,6,20,1,1,108,transporte_publico,transporte_publico,viable
+Galerías Metepec,Zona Artesanal de San Mateo Atenco,9.34,277.87,4.3,4.3,1,6,14,0,0,50,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Zona Artesanal de San Mateo Atenco,5.31,320.47,4.4,4.4,2,5,21,0,0,60,transporte_publico,transporte_publico,viable
+Cosmovitral Jardín Botánico,Alameda Central Toluca,1.22,116.9,4.1,4.1,1,7,8,1,1,43,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Estadio Nemesio Diez,16.5,404.28,4.9,4.9,7,6,13,0,0,103,auto_privado,auto_privado,viable
+Alameda Central Toluca,Cosmovitral Jardín Botánico,8.49,316.54,4.9,4.9,8,10,8,1,0,98,auto_privado,auto_privado,viable
+Los Portales de Toluca,Terminal de Autobuses Toluca,15.16,434.79,3.7,3.7,5,7,19,1,0,90,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Centro Histórico de Metepec,1.63,475.44,4.7,4.7,2,8,18,1,1,42,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Iglesia del Calvario de Metepec,11.96,186.99,4.6,4.6,1,6,19,1,0,78,transporte_publico,transporte_publico,viable
+Zona Artesanal de San Mateo Atenco,Terminal de Autobuses Toluca,5.25,263.35,4.5,4.5,8,7,18,1,0,110,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Centro Histórico de Metepec,5.67,128.45,4.3,4.3,3,5,11,0,1,68,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Parque Ambiental Bicentenario,1.22,230.16,5.0,5.0,1,6,7,1,0,23,caminando,caminando,viable
+Parque Ambiental Bicentenario,Alameda Central Toluca,14.06,473.93,4.8,4.8,2,7,21,0,0,69,auto_privado,auto_privado,viable
+Los Portales de Toluca,Parque Metropolitano Bicentenario,23.05,201.59,4.8,4.8,3,7,14,0,0,97,auto_privado,auto_privado,requiere_ajuste
+Plazas Outlet Lerma,Parque Metropolitano Bicentenario,8.33,389.97,5.0,5.0,6,7,7,1,1,79,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Galerías Metepec,21.1,279.43,4.4,4.4,8,3,21,0,0,113,auto_privado,auto_privado,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Parque Metropolitano Bicentenario,6.42,107.75,5.0,5.0,3,2,22,0,0,63,transporte_publico,transporte_publico,viable
+Parque Ambiental Bicentenario,Centro de Lerma,8.28,173.95,4.1,4.1,6,4,13,0,0,97,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Parque Metropolitano Bicentenario,8.25,333.53,4.7,4.7,1,6,19,1,1,47,auto_privado,auto_privado,viable
+Los Portales de Toluca,Centro Histórico de Metepec,5.11,342.97,4.6,4.6,1,3,6,0,0,46,transporte_publico,transporte_publico,viable
+Galerías Metepec,Centro Histórico de Metepec,5.86,228.68,4.8,4.8,1,8,7,1,0,62,transporte_publico,transporte_publico,viable
+Plazas Outlet Lerma,Terminal de Autobuses Toluca,8.52,129.75,4.2,4.2,8,5,10,0,1,116,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Zona Artesanal de San Mateo Atenco,3.19,366.52,4.3,4.3,5,5,17,0,0,57,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Alameda Central Toluca,0.78,101.06,5.0,5.0,7,7,8,1,0,87,transporte_publico,transporte_publico,requiere_ajuste
+Cosmovitral Jardín Botánico,Estadio Nemesio Diez,12.22,469.6,4.9,4.9,1,6,6,0,0,57,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Plazas Outlet Lerma,5.83,110.19,4.5,4.5,1,5,17,0,1,54,transporte_publico,transporte_publico,viable
+Centro Histórico de Metepec,Mercado 16 de Septiembre,3.65,71.51,3.8,3.8,7,9,19,1,0,100,caminando,caminando,requiere_ajuste
+Mercado 16 de Septiembre,Zona Artesanal de San Mateo Atenco,2.83,258.87,4.4,4.4,1,8,18,1,0,42,caminando,caminando,viable
+Alameda Central Toluca,Parque Estatal Sierra Morelos,0.92,269.38,4.6,4.6,2,10,19,1,0,27,caminando,caminando,viable
+Estadio Nemesio Diez,Museo Torres Bicentenario,24.32,263.93,4.1,4.1,5,7,19,1,1,112,auto_privado,auto_privado,requiere_ajuste
+Centro Histórico de Metepec,Iglesia del Calvario de Metepec,2.76,229.6,4.5,4.5,5,6,16,0,1,58,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Plazas Outlet Lerma,11.91,497.51,5.0,5.0,2,2,14,0,0,74,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Parque Metropolitano Bicentenario,2.25,253.41,4.5,4.5,4,7,20,1,0,53,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Iglesia del Calvario de Metepec,19.32,249.41,4.3,4.3,6,4,11,0,1,99,auto_privado,auto_privado,requiere_ajuste
+Alameda Central Toluca,Galerías Metepec,1.6,222.45,4.3,4.3,4,8,7,1,0,51,caminando,caminando,viable
+Museo Torres Bicentenario,Mercado 16 de Septiembre,4.56,52.08,4.1,4.1,4,9,18,1,0,83,transporte_publico,transporte_publico,requiere_ajuste
+Cosmovitral Jardín Botánico,Museo Torres Bicentenario,7.43,304.62,4.5,4.5,1,3,10,0,0,54,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Iglesia del Calvario de Metepec,1.34,129.42,5.0,5.0,4,7,22,0,0,66,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Zona Artesanal de San Mateo Atenco,4.43,326.05,4.5,4.5,7,3,13,0,0,67,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Alameda Central Toluca,5.85,44.4,4.5,4.5,6,8,20,1,0,100,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Plazas Outlet Lerma,3.32,491.07,4.5,4.5,8,7,6,0,0,79,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Galerías Metepec,3.27,263.35,4.2,4.2,2,4,17,0,0,55,caminando,caminando,viable
+Zona Artesanal de San Mateo Atenco,Galerías Metepec,13.1,450.44,4.3,4.3,1,5,13,0,0,56,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Plazas Outlet Lerma,3.18,248.27,4.1,4.1,5,7,13,0,0,61,auto_privado,auto_privado,viable
+Galerías Metepec,Zona Artesanal de San Mateo Atenco,12.87,48.96,3.9,3.9,2,7,10,0,0,92,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Los Portales de Toluca,2.3,414.66,5.0,5.0,5,4,22,0,1,52,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Estadio Nemesio Diez,3.83,263.35,5.0,5.0,8,3,12,0,0,72,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Terminal de Autobuses Toluca,1.95,395.24,4.2,4.2,3,6,20,1,1,44,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Centro de Lerma,7.12,225.52,4.2,4.2,5,4,13,0,0,64,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Cosmovitral Jardín Botánico,4.67,326.21,5.0,5.0,6,7,6,0,1,71,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Alameda Central Toluca,5.94,430.99,3.8,3.8,2,8,20,1,0,52,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Parque Ambiental Bicentenario,6.76,322.91,5.0,5.0,8,7,9,1,0,88,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Centro de Lerma,13.46,186.88,4.3,4.3,2,1,10,0,0,55,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Galerías Metepec,17.3,338.01,4.7,4.7,7,7,20,1,0,107,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Museo Torres Bicentenario,2.34,342.49,4.4,4.4,6,2,21,0,0,54,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Parque Estatal Sierra Morelos,5.43,263.35,4.3,4.3,2,7,21,0,0,48,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Terminal de Autobuses Toluca,12.5,198.04,3.4,3.4,6,4,13,0,1,112,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Mercado 16 de Septiembre,22.02,224.04,3.9,3.9,2,6,18,1,0,280,caminando,caminando,requiere_ajuste
+Los Portales de Toluca,Parque Ambiental Bicentenario,1.51,409.82,4.9,4.9,5,1,11,0,1,44,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Zona Artesanal de San Mateo Atenco,15.88,262.77,4.5,4.5,8,10,18,1,1,116,auto_privado,auto_privado,requiere_ajuste
+Centro de Lerma,Los Portales de Toluca,1.93,373.56,4.1,4.1,8,7,14,0,1,76,auto_privado,auto_privado,viable
+Centro de Lerma,Parque Ambiental Bicentenario,7.69,240.66,4.4,4.4,7,6,6,0,0,82,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Centro de Lerma,22.07,123.44,3.9,3.9,4,1,13,0,0,122,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Parque Ambiental Bicentenario,2.76,377.7,4.6,4.6,5,1,13,0,0,47,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Los Portales de Toluca,2.29,82.95,4.1,4.1,3,2,10,0,0,51,caminando,caminando,viable
+Parque Estatal Sierra Morelos,Galerías Metepec,8.86,115.32,4.0,4.0,8,6,12,0,1,120,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Parque Estatal Sierra Morelos,24.41,320.88,4.3,4.3,4,6,14,0,0,144,transporte_publico,transporte_publico,viable
+Mercado 16 de Septiembre,Centro de Lerma,8.95,378.69,4.2,4.2,7,6,6,0,0,85,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Terminal de Autobuses Toluca,16.22,449.45,3.5,3.5,3,6,8,1,0,78,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Mercado 16 de Septiembre,8.45,150.84,4.1,4.1,6,6,19,1,1,103,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Mercado 16 de Septiembre,2.16,73.15,4.5,4.5,2,7,11,0,0,42,caminando,caminando,viable
+Iglesia del Calvario de Metepec,Terminal de Autobuses Toluca,5.48,478.9,3.4,3.4,6,7,16,0,0,73,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Plazas Outlet Lerma,15.97,94.12,4.3,4.3,1,6,15,0,1,92,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Centro Histórico de Metepec,18.01,114.88,5.0,5.0,1,1,15,0,1,85,transporte_publico,transporte_publico,viable
+Centro Histórico de Metepec,Parque Ambiental Bicentenario,9.44,159.84,4.6,4.6,3,1,13,0,0,70,transporte_publico,transporte_publico,viable
+Alameda Central Toluca,Iglesia del Calvario de Metepec,19.77,274.11,4.6,4.6,4,1,14,0,1,82,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Plazas Outlet Lerma,24.06,443.76,4.8,4.8,6,9,20,1,1,122,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Mercado 16 de Septiembre,14.53,385.06,4.0,4.0,3,6,22,0,0,74,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Plazas Outlet Lerma,7.99,359.92,4.8,4.8,1,5,10,0,1,44,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Parque Estatal Sierra Morelos,4.07,104.09,4.8,4.8,3,2,17,0,0,54,transporte_publico,transporte_publico,viable
+Parque Metropolitano Bicentenario,Mercado 16 de Septiembre,9.92,191.69,4.0,4.0,4,6,22,0,0,151,caminando,caminando,viable
+Mercado 16 de Septiembre,Los Portales de Toluca,23.85,249.63,4.8,4.8,5,1,6,0,0,97,auto_privado,auto_privado,requiere_ajuste
+Los Portales de Toluca,Estadio Nemesio Diez,18.54,90.76,4.9,4.9,6,10,19,1,0,150,transporte_publico,transporte_publico,requiere_ajuste
+Parque Metropolitano Bicentenario,Centro de Lerma,23.28,151.25,4.6,4.6,2,7,14,0,0,91,auto_privado,auto_privado,requiere_ajuste
+Los Portales de Toluca,Parque Ambiental Bicentenario,14.17,263.35,4.5,4.5,5,6,22,0,0,116,transporte_publico,transporte_publico,viable
+Parque Metropolitano Bicentenario,Cosmovitral Jardín Botánico,24.83,81.09,4.7,4.7,6,7,15,0,0,164,transporte_publico,transporte_publico,requiere_ajuste
+Mercado 16 de Septiembre,Los Portales de Toluca,22.01,284.12,4.6,4.6,7,8,20,1,0,120,auto_privado,auto_privado,requiere_ajuste
+Parque Metropolitano Bicentenario,Galerías Metepec,23.79,358.41,4.7,4.7,5,8,8,1,0,113,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Parque Ambiental Bicentenario,6.18,53.57,4.3,4.3,7,7,8,1,0,106,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Terminal de Autobuses Toluca,4.8,250.94,4.3,4.3,2,7,21,0,0,47,auto_privado,auto_privado,viable
+Centro de Lerma,Terminal de Autobuses Toluca,1.63,395.46,4.1,4.1,6,5,14,0,0,59,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Terminal de Autobuses Toluca,3.12,379.04,3.4,3.4,1,2,15,0,0,45,caminando,caminando,viable
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,14.77,411.24,5.0,5.0,1,10,8,1,1,71,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Cosmovitral Jardín Botánico,15.45,235.16,5.0,5.0,7,6,9,1,0,241,caminando,caminando,requiere_ajuste
+Mercado 16 de Septiembre,Parque Ambiental Bicentenario,4.92,413.87,5.0,5.0,4,8,19,1,1,61,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Iglesia del Calvario de Metepec,2.59,135.56,5.0,5.0,5,2,11,0,0,64,transporte_publico,transporte_publico,requiere_ajuste
+Plazas Outlet Lerma,Iglesia del Calvario de Metepec,12.4,193.19,4.8,4.8,5,5,15,0,0,107,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Zona Artesanal de San Mateo Atenco,5.28,263.35,3.7,3.7,6,3,11,0,1,84,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Galerías Metepec,1.3,244.39,3.9,3.9,2,4,10,0,1,32,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Centro de Lerma,2.47,208.19,4.3,4.3,2,9,8,1,0,46,caminando,caminando,viable
+Iglesia del Calvario de Metepec,Plazas Outlet Lerma,7.91,135.65,4.2,4.2,1,6,21,0,0,64,transporte_publico,transporte_publico,viable
+Centro de Lerma,Parque Estatal Sierra Morelos,1.88,380.85,4.3,4.3,7,3,21,0,0,61,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Plazas Outlet Lerma,9.02,170.65,4.4,4.4,2,10,7,1,0,87,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Galerías Metepec,14.17,150.95,4.7,4.7,5,4,12,0,1,81,auto_privado,auto_privado,requiere_ajuste
+Los Portales de Toluca,Iglesia del Calvario de Metepec,21.85,82.83,4.3,4.3,4,2,15,0,1,124,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Alameda Central Toluca,5.47,230.63,4.2,4.2,2,1,12,0,0,49,transporte_publico,transporte_publico,viable
+Parque Estatal Sierra Morelos,Parque Ambiental Bicentenario,9.37,165.42,5.0,5.0,4,7,18,1,0,94,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Terminal de Autobuses Toluca,12.82,197.25,3.5,3.5,1,5,10,0,0,56,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Parque Estatal Sierra Morelos,10.49,133.28,4.9,4.9,2,8,7,1,0,86,transporte_publico,transporte_publico,viable
+Centro de Lerma,Museo Torres Bicentenario,9.65,386.31,4.1,4.1,2,3,11,0,0,69,transporte_publico,transporte_publico,viable
+Alameda Central Toluca,Los Portales de Toluca,3.45,466.4,4.8,4.8,7,4,16,0,0,88,transporte_publico,transporte_publico,viable
+Centro de Lerma,Plazas Outlet Lerma,0.56,259.01,4.8,4.8,5,10,9,1,0,61,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Los Portales de Toluca,5.61,328.64,4.9,4.9,8,8,19,1,0,87,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Centro de Lerma,6.96,436.24,4.5,4.5,4,1,6,0,0,69,transporte_publico,transporte_publico,viable
+Parque Ambiental Bicentenario,Los Portales de Toluca,1.97,499.44,4.2,4.2,2,6,7,1,0,40,caminando,caminando,viable
+Galerías Metepec,Iglesia del Calvario de Metepec,4.34,314.49,5.0,5.0,5,4,14,0,1,57,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Zona Artesanal de San Mateo Atenco,2.73,447.09,4.0,4.0,8,3,14,0,0,69,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Centro de Lerma,4.24,456.13,4.3,4.3,5,6,11,0,0,61,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Centro Histórico de Metepec,1.63,399.9,4.8,4.8,1,5,10,0,0,28,caminando,caminando,viable
+Cosmovitral Jardín Botánico,Parque Estatal Sierra Morelos,18.18,263.35,4.8,4.8,3,9,7,1,0,89,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Plazas Outlet Lerma,8.2,58.95,4.5,4.5,8,5,17,0,0,115,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Alameda Central Toluca,0.74,27.59,4.1,4.1,5,3,12,0,0,60,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Zona Artesanal de San Mateo Atenco,8.81,249.06,3.8,3.8,8,9,8,1,0,97,auto_privado,auto_privado,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Centro de Lerma,7.37,257.27,4.5,4.5,5,5,12,0,1,67,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Parque Metropolitano Bicentenario,0.52,215.53,4.7,4.7,1,6,21,0,0,14,caminando,caminando,viable
+Estadio Nemesio Diez,Centro de Lerma,2.12,292.72,4.6,4.6,7,2,10,0,0,59,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Parque Estatal Sierra Morelos,9.71,285.04,4.6,4.6,7,5,21,0,0,84,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Museo Torres Bicentenario,11.95,421.57,3.8,3.8,6,2,10,0,1,77,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,18.28,72.16,4.7,4.7,8,9,9,1,1,161,transporte_publico,transporte_publico,requiere_ajuste
+Los Portales de Toluca,Zona Artesanal de San Mateo Atenco,9.65,128.09,4.2,4.2,2,6,10,0,0,78,transporte_publico,transporte_publico,viable
+Zona Artesanal de San Mateo Atenco,Estadio Nemesio Diez,0.76,400.64,4.9,4.9,8,5,11,0,0,69,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Plazas Outlet Lerma,3.17,426.96,4.2,4.2,2,10,8,1,0,54,caminando,caminando,viable
+Los Portales de Toluca,Parque Metropolitano Bicentenario,2.62,497.52,5.0,5.0,8,4,15,0,1,71,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Galerías Metepec,17.29,439.0,4.2,4.2,2,1,11,0,0,64,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Parque Metropolitano Bicentenario,9.24,447.15,4.5,4.5,5,9,18,1,0,80,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Parque Metropolitano Bicentenario,3.03,170.89,4.6,4.6,7,6,14,0,0,92,transporte_publico,transporte_publico,requiere_ajuste
+Cosmovitral Jardín Botánico,Terminal de Autobuses Toluca,24.32,212.8,3.5,3.5,1,1,13,0,0,107,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Mercado 16 de Septiembre,13.43,148.68,4.2,4.2,1,1,14,0,1,69,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Terminal de Autobuses Toluca,0.83,311.02,4.5,4.5,7,7,8,1,0,67,auto_privado,auto_privado,viable
+Alameda Central Toluca,Los Portales de Toluca,5.58,470.63,4.4,4.4,1,10,18,1,0,49,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Parque Estatal Sierra Morelos,3.96,185.43,4.7,4.7,5,8,7,1,0,86,transporte_publico,transporte_publico,viable
+Zona Artesanal de San Mateo Atenco,Galerías Metepec,10.94,287.36,3.5,3.5,8,10,18,1,0,104,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Iglesia del Calvario de Metepec,22.85,263.35,4.5,4.5,5,7,22,0,0,108,auto_privado,auto_privado,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Centro de Lerma,1.34,101.5,4.1,4.1,4,8,18,1,0,48,caminando,caminando,viable
+Los Portales de Toluca,Centro Histórico de Metepec,0.88,113.69,4.4,4.4,4,5,13,0,1,59,transporte_publico,transporte_publico,requiere_ajuste
+Terminal de Autobuses Toluca,Terminal de Autobuses Toluca,0.69,47.81,4.3,4.3,6,3,11,0,0,68,transporte_publico,transporte_publico,requiere_ajuste
+Parque Ambiental Bicentenario,Centro de Lerma,1.39,475.66,4.1,4.1,5,6,20,1,0,55,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Terminal de Autobuses Toluca,1.88,213.38,3.8,3.8,5,3,10,0,0,63,caminando,caminando,viable
+Terminal de Autobuses Toluca,Galerías Metepec,7.13,420.38,4.4,4.4,2,5,14,0,0,66,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Mercado 16 de Septiembre,14.16,347.04,3.4,3.4,6,6,19,1,0,91,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Parque Estatal Sierra Morelos,0.59,112.12,4.2,4.2,6,2,21,0,0,65,transporte_publico,transporte_publico,requiere_ajuste
+Mercado 16 de Septiembre,Parque Metropolitano Bicentenario,9.53,104.22,4.9,4.9,6,1,21,0,0,93,transporte_publico,transporte_publico,requiere_ajuste
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,4.69,409.75,3.7,3.7,1,9,7,1,1,45,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Parque Ambiental Bicentenario,3.77,147.06,4.4,4.4,6,7,21,0,0,90,transporte_publico,transporte_publico,requiere_ajuste
+Parque Metropolitano Bicentenario,Iglesia del Calvario de Metepec,1.28,458.38,4.7,4.7,6,10,7,1,0,69,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Terminal de Autobuses Toluca,4.75,87.23,4.5,4.5,2,3,15,0,0,52,transporte_publico,transporte_publico,viable
+Parque Ambiental Bicentenario,Centro Histórico de Metepec,1.57,345.3,5.0,5.0,7,5,21,0,1,65,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Zona Artesanal de San Mateo Atenco,17.28,410.95,4.1,4.1,5,7,17,0,0,130,transporte_publico,transporte_publico,viable
+Cosmovitral Jardín Botánico,Mercado 16 de Septiembre,9.53,132.92,4.6,4.6,4,5,22,0,1,89,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Cosmovitral Jardín Botánico,23.38,152.58,4.4,4.4,6,3,11,0,1,107,auto_privado,auto_privado,requiere_ajuste
+Mercado 16 de Septiembre,Centro de Lerma,9.06,482.97,4.6,4.6,5,3,11,0,0,66,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Museo Torres Bicentenario,6.75,147.01,3.8,3.8,5,6,11,0,0,121,caminando,caminando,viable
+Iglesia del Calvario de Metepec,Mercado 16 de Septiembre,9.07,226.38,4.5,4.5,3,4,12,0,1,77,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Centro Histórico de Metepec,5.24,227.61,4.6,4.6,8,6,17,0,0,82,auto_privado,auto_privado,requiere_ajuste
+Plazas Outlet Lerma,Los Portales de Toluca,15.97,141.46,4.2,4.2,8,7,13,0,0,147,transporte_publico,transporte_publico,requiere_ajuste
+Los Portales de Toluca,Estadio Nemesio Diez,2.22,392.38,4.7,4.7,2,6,18,1,0,43,caminando,caminando,viable
+Los Portales de Toluca,Museo Torres Bicentenario,1.17,390.49,4.4,4.4,6,6,13,0,0,60,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Parque Estatal Sierra Morelos,3.78,201.59,4.4,4.4,1,3,11,0,0,41,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Zona Artesanal de San Mateo Atenco,4.61,420.86,4.5,4.5,3,8,9,1,0,55,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Los Portales de Toluca,11.23,122.28,4.4,4.4,8,2,15,0,0,117,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Los Portales de Toluca,4.23,22.07,4.8,4.8,2,3,21,0,0,50,transporte_publico,transporte_publico,requiere_ajuste
+Iglesia del Calvario de Metepec,Iglesia del Calvario de Metepec,0.85,294.16,5.0,5.0,4,7,20,1,0,42,caminando,caminando,viable
+Mercado 16 de Septiembre,Parque Ambiental Bicentenario,18.76,497.16,4.7,4.7,2,1,10,0,1,67,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Cosmovitral Jardín Botánico,16.85,38.55,4.5,4.5,6,6,14,0,0,133,transporte_publico,transporte_publico,requiere_ajuste
+Parque Ambiental Bicentenario,Zona Artesanal de San Mateo Atenco,1.27,119.84,4.4,4.4,4,2,17,0,0,47,caminando,caminando,viable
+Galerías Metepec,Galerías Metepec,18.2,269.08,4.7,4.7,5,3,16,0,0,88,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Cosmovitral Jardín Botánico,6.71,408.77,5.0,5.0,8,6,7,1,0,85,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Los Portales de Toluca,2.87,62.74,4.9,4.9,5,2,16,0,0,65,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Iglesia del Calvario de Metepec,1.42,209.71,5.0,5.0,6,3,6,0,0,65,caminando,caminando,viable
+Mercado 16 de Septiembre,Centro de Lerma,3.17,378.6,5.0,5.0,1,10,7,1,0,46,caminando,caminando,viable
+Parque Metropolitano Bicentenario,Museo Torres Bicentenario,24.13,198.34,4.5,4.5,2,7,17,0,0,131,transporte_publico,transporte_publico,viable
+Galerías Metepec,Centro Histórico de Metepec,12.41,110.64,4.9,4.9,8,7,7,1,0,135,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Estadio Nemesio Diez,23.61,113.84,5.0,5.0,7,4,11,0,0,158,transporte_publico,transporte_publico,requiere_ajuste
+Museo Torres Bicentenario,Mercado 16 de Septiembre,8.97,216.82,3.7,3.7,6,7,16,0,0,108,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Iglesia del Calvario de Metepec,2.9,250.12,4.6,4.6,4,2,17,0,0,67,caminando,caminando,viable
+Estadio Nemesio Diez,Parque Metropolitano Bicentenario,7.39,433.67,4.4,4.4,2,7,13,0,0,53,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Iglesia del Calvario de Metepec,7.57,328.28,5.0,5.0,7,6,7,1,0,81,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Cosmovitral Jardín Botánico,23.57,351.39,4.6,4.6,7,7,19,1,0,122,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Estadio Nemesio Diez,2.72,491.83,4.8,4.8,2,3,22,0,0,49,caminando,caminando,viable
+Cosmovitral Jardín Botánico,Galerías Metepec,9.37,217.68,4.9,4.9,5,1,21,0,0,85,transporte_publico,transporte_publico,viable
+Parque Estatal Sierra Morelos,Parque Estatal Sierra Morelos,2.18,213.61,4.9,4.9,5,10,18,1,0,85,transporte_publico,transporte_publico,viable
+Galerías Metepec,Centro de Lerma,2.4,463.21,4.1,4.1,4,6,12,0,1,67,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Plazas Outlet Lerma,1.7,138.02,4.2,4.2,8,7,20,1,0,98,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Galerías Metepec,1.96,370.31,4.9,4.9,1,6,14,0,0,32,caminando,caminando,viable
+Galerías Metepec,Los Portales de Toluca,2.42,382.2,4.9,4.9,3,9,8,1,0,53,caminando,caminando,viable
+Parque Metropolitano Bicentenario,Centro Histórico de Metepec,2.19,66.94,4.1,4.1,1,10,20,1,1,55,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Mercado 16 de Septiembre,1.22,244.75,4.0,4.0,6,6,11,0,0,63,caminando,caminando,viable
+Zona Artesanal de San Mateo Atenco,Cosmovitral Jardín Botánico,19.23,116.27,4.8,4.8,6,5,21,0,0,138,transporte_publico,transporte_publico,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Parque Estatal Sierra Morelos,12.25,108.98,4.9,4.9,8,1,12,0,1,118,transporte_publico,transporte_publico,requiere_ajuste
+Los Portales de Toluca,Zona Artesanal de San Mateo Atenco,20.8,242.64,4.6,4.6,5,10,20,1,0,110,auto_privado,auto_privado,requiere_ajuste
+Estadio Nemesio Diez,Estadio Nemesio Diez,6.12,158.93,4.9,4.9,2,5,15,0,1,62,transporte_publico,transporte_publico,viable
+Alameda Central Toluca,Plazas Outlet Lerma,2.34,402.11,4.6,4.6,4,7,13,0,0,60,caminando,caminando,viable
+Zona Artesanal de San Mateo Atenco,Museo Torres Bicentenario,8.06,455.65,4.3,4.3,1,7,11,0,0,49,auto_privado,auto_privado,viable
+Centro de Lerma,Cosmovitral Jardín Botánico,2.44,405.31,4.5,4.5,6,6,20,1,0,63,auto_privado,auto_privado,viable
+Centro de Lerma,Los Portales de Toluca,24.15,147.69,4.5,4.5,6,8,7,1,0,164,transporte_publico,transporte_publico,requiere_ajuste
+Mercado 16 de Septiembre,Zona Artesanal de San Mateo Atenco,2.61,151.58,4.3,4.3,7,2,13,0,1,79,transporte_publico,transporte_publico,requiere_ajuste
+Plazas Outlet Lerma,Mercado 16 de Septiembre,7.23,142.27,4.1,4.1,3,1,12,0,0,63,transporte_publico,transporte_publico,viable
+Parque Metropolitano Bicentenario,Cosmovitral Jardín Botánico,24.7,84.82,4.0,4.0,3,7,15,0,1,141,transporte_publico,transporte_publico,requiere_ajuste
+Los Portales de Toluca,Zona Artesanal de San Mateo Atenco,16.31,473.02,4.2,4.2,1,7,10,0,0,69,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Terminal de Autobuses Toluca,9.39,212.98,3.9,3.9,4,7,17,0,0,94,transporte_publico,transporte_publico,viable
+Parque Estatal Sierra Morelos,Zona Artesanal de San Mateo Atenco,2.93,127.85,4.2,4.2,4,7,12,0,1,72,transporte_publico,transporte_publico,requiere_ajuste
+Mercado 16 de Septiembre,Parque Ambiental Bicentenario,4.61,426.4,4.6,4.6,7,9,9,1,0,81,auto_privado,auto_privado,viable
+Alameda Central Toluca,Los Portales de Toluca,2.46,211.61,4.8,4.8,7,8,9,1,1,86,caminando,caminando,viable
+Alameda Central Toluca,Zona Artesanal de San Mateo Atenco,8.75,36.86,3.9,3.9,2,7,17,0,0,77,transporte_publico,transporte_publico,requiere_ajuste
+Cosmovitral Jardín Botánico,Parque Estatal Sierra Morelos,10.38,97.73,4.0,4.0,3,4,10,0,0,82,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Museo Torres Bicentenario,6.71,326.84,4.2,4.2,5,5,11,0,0,87,transporte_publico,transporte_publico,viable
+Galerías Metepec,Cosmovitral Jardín Botánico,23.49,395.79,5.0,5.0,3,2,16,0,0,87,auto_privado,auto_privado,viable
+Galerías Metepec,Alameda Central Toluca,2.63,121.25,5.0,5.0,1,6,11,0,0,40,caminando,caminando,viable
+Parque Metropolitano Bicentenario,Alameda Central Toluca,0.9,460.35,4.7,4.7,7,6,12,0,0,65,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Iglesia del Calvario de Metepec,11.16,428.48,4.3,4.3,6,5,10,0,0,82,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Terminal de Autobuses Toluca,4.63,427.22,3.8,3.8,5,4,11,0,0,58,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Museo Torres Bicentenario,2.94,129.28,4.4,4.4,3,2,17,0,1,50,transporte_publico,transporte_publico,viable
+Plazas Outlet Lerma,Plazas Outlet Lerma,4.05,44.26,4.5,4.5,7,1,15,0,0,81,transporte_publico,transporte_publico,requiere_ajuste
+Mercado 16 de Septiembre,Plazas Outlet Lerma,3.04,436.36,4.6,4.6,1,5,22,0,0,44,caminando,caminando,viable
+Parque Metropolitano Bicentenario,Alameda Central Toluca,22.37,166.78,4.1,4.1,4,9,19,1,1,145,transporte_publico,transporte_publico,viable
+Alameda Central Toluca,Cosmovitral Jardín Botánico,21.77,317.08,4.7,4.7,7,6,6,0,0,115,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Parque Estatal Sierra Morelos,10.2,384.78,4.7,4.7,8,7,12,0,0,96,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Estadio Nemesio Diez,17.68,81.58,5.0,5.0,3,4,10,0,0,108,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Zona Artesanal de San Mateo Atenco,0.52,394.8,4.0,4.0,6,6,15,0,0,58,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Parque Estatal Sierra Morelos,3.19,470.49,4.5,4.5,2,6,10,0,0,54,caminando,caminando,viable
+Galerías Metepec,Cosmovitral Jardín Botánico,1.53,369.62,3.8,3.8,1,2,22,0,0,26,caminando,caminando,viable
+Parque Estatal Sierra Morelos,Cosmovitral Jardín Botánico,18.52,231.79,4.5,4.5,3,6,11,0,0,84,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Cosmovitral Jardín Botánico,8.29,440.81,4.5,4.5,8,1,14,0,0,78,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Terminal de Autobuses Toluca,7.18,273.18,3.5,3.5,6,8,8,1,0,79,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Cosmovitral Jardín Botánico,13.5,377.49,4.8,4.8,4,7,21,0,0,80,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Museo Torres Bicentenario,5.36,413.84,4.3,4.3,3,5,21,0,0,67,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Parque Ambiental Bicentenario,6.63,379.69,4.5,4.5,2,10,19,1,0,58,auto_privado,auto_privado,viable
+Galerías Metepec,Mercado 16 de Septiembre,1.97,158.17,4.2,4.2,3,1,11,0,1,44,transporte_publico,transporte_publico,viable
+Cosmovitral Jardín Botánico,Plazas Outlet Lerma,5.07,76.57,4.1,4.1,2,4,6,0,0,56,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Mercado 16 de Septiembre,13.57,134.4,4.3,4.3,2,9,18,1,0,100,transporte_publico,transporte_publico,viable
+Centro Histórico de Metepec,Alameda Central Toluca,3.16,261.38,4.0,4.0,6,5,13,0,0,63,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Estadio Nemesio Diez,0.67,262.53,4.8,4.8,2,7,22,0,0,24,caminando,caminando,viable
+Mercado 16 de Septiembre,Museo Torres Bicentenario,0.6,299.67,4.2,4.2,1,4,17,0,0,15,caminando,caminando,viable
+Terminal de Autobuses Toluca,Alameda Central Toluca,19.96,209.65,4.5,4.5,5,5,15,0,0,97,auto_privado,auto_privado,requiere_ajuste
+Parque Estatal Sierra Morelos,Cosmovitral Jardín Botánico,17.49,397.71,4.7,4.7,3,3,22,0,1,75,auto_privado,auto_privado,viable
+Los Portales de Toluca,Zona Artesanal de San Mateo Atenco,10.53,458.31,4.2,4.2,4,10,19,1,0,79,auto_privado,auto_privado,viable
+Centro de Lerma,Plazas Outlet Lerma,3.08,138.43,3.9,3.9,2,1,13,0,1,41,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Mercado 16 de Septiembre,13.51,373.53,3.6,3.6,2,2,6,0,0,80,transporte_publico,transporte_publico,viable
+Parque Estatal Sierra Morelos,Parque Estatal Sierra Morelos,2.95,345.43,4.4,4.4,4,6,7,1,0,67,caminando,caminando,viable
+Alameda Central Toluca,Los Portales de Toluca,6.3,271.08,4.6,4.6,6,5,13,0,0,70,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Plazas Outlet Lerma,2.94,110.49,4.2,4.2,4,2,15,0,0,67,caminando,caminando,viable
+Los Portales de Toluca,Museo Torres Bicentenario,9.63,401.71,4.5,4.5,5,3,6,0,1,68,auto_privado,auto_privado,viable
+Galerías Metepec,Centro de Lerma,3.52,481.1,4.1,4.1,5,10,8,1,1,68,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Museo Torres Bicentenario,2.7,366.48,4.0,4.0,3,3,17,0,1,39,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Museo Torres Bicentenario,1.78,460.57,4.2,4.2,3,6,18,1,0,45,caminando,caminando,viable
+Cosmovitral Jardín Botánico,Iglesia del Calvario de Metepec,3.66,492.41,4.9,4.9,4,1,6,0,1,43,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Cosmovitral Jardín Botánico,0.91,188.98,4.8,4.8,1,2,14,0,0,19,caminando,caminando,viable
+Parque Metropolitano Bicentenario,Iglesia del Calvario de Metepec,2.12,326.35,4.5,4.5,6,10,7,1,1,71,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Alameda Central Toluca,9.41,247.49,4.2,4.2,5,8,18,1,0,78,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Los Portales de Toluca,10.44,493.58,4.6,4.6,3,10,20,1,0,73,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Los Portales de Toluca,18.07,65.03,4.7,4.7,3,7,20,1,0,117,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Centro de Lerma,10.84,217.94,4.2,4.2,3,3,16,0,0,81,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Galerías Metepec,7.06,440.26,4.5,4.5,6,2,16,0,0,65,auto_privado,auto_privado,viable
+Centro de Lerma,Galerías Metepec,2.43,156.34,4.0,4.0,7,3,21,0,1,81,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Centro de Lerma,14.57,398.14,4.0,4.0,1,4,16,0,1,58,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Galerías Metepec,4.39,203.74,4.5,4.5,4,6,13,0,1,74,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Zona Artesanal de San Mateo Atenco,10.45,490.39,3.7,3.7,1,7,18,1,0,54,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Los Portales de Toluca,3.58,444.09,4.3,4.3,4,6,16,0,0,75,caminando,caminando,viable
+Parque Estatal Sierra Morelos,Museo Torres Bicentenario,1.04,164.63,3.9,3.9,2,9,20,1,0,28,caminando,caminando,viable
+Mercado 16 de Septiembre,Iglesia del Calvario de Metepec,17.48,389.69,5.0,5.0,3,3,14,0,0,75,auto_privado,auto_privado,viable
+Alameda Central Toluca,Terminal de Autobuses Toluca,0.78,181.69,4.1,4.1,4,10,20,1,0,41,caminando,caminando,viable
+Cosmovitral Jardín Botánico,Museo Torres Bicentenario,12.72,311.05,4.0,4.0,3,4,6,0,0,90,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Centro de Lerma,10.48,336.07,4.1,4.1,4,2,6,0,0,84,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Cosmovitral Jardín Botánico,24.9,418.21,4.0,4.0,7,10,7,1,0,132,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Alameda Central Toluca,8.64,31.74,4.2,4.2,7,7,15,0,0,114,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Cosmovitral Jardín Botánico,18.21,125.68,4.8,4.8,1,6,18,1,0,100,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Estadio Nemesio Diez,0.88,361.72,5.0,5.0,4,10,9,1,0,43,caminando,caminando,viable
+Centro de Lerma,Los Portales de Toluca,18.97,290.49,4.4,4.4,7,10,8,1,1,118,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Centro de Lerma,1.36,263.35,4.6,4.6,5,10,20,1,0,63,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Galerías Metepec,7.58,46.5,4.0,4.0,2,7,18,1,1,73,transporte_publico,transporte_publico,requiere_ajuste
+Parque Ambiental Bicentenario,Mercado 16 de Septiembre,2.54,187.17,3.7,3.7,5,5,17,0,0,72,transporte_publico,transporte_publico,viable
+Centro de Lerma,Centro de Lerma,4.66,435.25,4.4,4.4,2,4,14,0,0,55,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Parque Ambiental Bicentenario,5.94,263.35,5.0,5.0,1,5,13,0,0,54,transporte_publico,transporte_publico,viable
+Cosmovitral Jardín Botánico,Galerías Metepec,1.4,210.29,4.7,4.7,6,5,6,0,1,76,transporte_publico,transporte_publico,viable
+Alameda Central Toluca,Cosmovitral Jardín Botánico,0.53,473.67,4.7,4.7,5,9,9,1,0,59,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Los Portales de Toluca,4.13,44.42,3.8,3.8,7,4,21,0,0,90,transporte_publico,transporte_publico,requiere_ajuste
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,0.63,379.86,4.0,4.0,3,5,11,0,0,32,caminando,caminando,viable
+Mercado 16 de Septiembre,Cosmovitral Jardín Botánico,4.98,143.65,4.7,4.7,7,4,17,0,0,93,transporte_publico,transporte_publico,requiere_ajuste
+Plazas Outlet Lerma,Cosmovitral Jardín Botánico,21.59,435.97,4.6,4.6,4,1,17,0,0,86,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Alameda Central Toluca,5.25,378.11,4.0,4.0,6,1,11,0,0,59,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Parque Estatal Sierra Morelos,7.83,445.14,4.6,4.6,1,10,9,1,0,55,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Iglesia del Calvario de Metepec,1.77,123.64,4.8,4.8,1,7,17,0,0,29,caminando,caminando,viable
+Galerías Metepec,Centro de Lerma,5.84,275.02,4.5,4.5,7,8,7,1,0,82,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Centro Histórico de Metepec,5.72,394.05,4.7,4.7,7,2,14,0,0,68,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Terminal de Autobuses Toluca,2.77,137.94,4.3,4.3,8,6,21,0,1,98,transporte_publico,transporte_publico,requiere_ajuste
+Parque Estatal Sierra Morelos,Parque Metropolitano Bicentenario,24.31,130.76,4.6,4.6,3,6,18,1,1,136,transporte_publico,transporte_publico,viable
+Cosmovitral Jardín Botánico,Los Portales de Toluca,6.93,33.05,4.6,4.6,1,7,18,1,0,63,transporte_publico,transporte_publico,viable
+Terminal de Autobuses Toluca,Plazas Outlet Lerma,0.98,480.09,4.8,4.8,8,7,7,1,0,74,auto_privado,auto_privado,viable
+Alameda Central Toluca,Terminal de Autobuses Toluca,0.7,360.81,3.6,3.6,5,6,9,1,0,53,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Centro Histórico de Metepec,17.24,325.07,5.0,5.0,2,6,10,0,0,75,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Mercado 16 de Septiembre,6.77,377.12,4.2,4.2,7,4,10,0,0,75,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Parque Ambiental Bicentenario,23.18,263.35,4.8,4.8,8,7,9,1,0,127,auto_privado,auto_privado,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Iglesia del Calvario de Metepec,3.59,248.54,5.0,5.0,3,4,22,0,1,43,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Galerías Metepec,20.93,235.78,5.0,5.0,7,6,8,1,0,113,auto_privado,auto_privado,requiere_ajuste
+Los Portales de Toluca,Plazas Outlet Lerma,5.21,327.41,4.7,4.7,7,8,18,1,1,80,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Estadio Nemesio Diez,9.85,116.74,4.2,4.2,5,4,15,0,0,95,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Zona Artesanal de San Mateo Atenco,13.35,446.27,4.8,4.8,6,3,16,0,0,83,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Museo Torres Bicentenario,7.35,409.64,4.2,4.2,3,10,9,1,1,66,auto_privado,auto_privado,viable
+Centro de Lerma,Parque Ambiental Bicentenario,6.04,187.79,4.5,4.5,8,2,11,0,0,99,transporte_publico,transporte_publico,requiere_ajuste
+Plazas Outlet Lerma,Iglesia del Calvario de Metepec,21.39,297.73,4.4,4.4,8,1,16,0,1,110,auto_privado,auto_privado,requiere_ajuste
+Parque Ambiental Bicentenario,Terminal de Autobuses Toluca,20.43,87.69,4.1,4.1,8,4,11,0,0,155,transporte_publico,transporte_publico,requiere_ajuste
+Centro Histórico de Metepec,Alameda Central Toluca,2.43,486.73,4.2,4.2,6,7,17,0,0,65,auto_privado,auto_privado,viable
+Alameda Central Toluca,Mercado 16 de Septiembre,1.72,453.39,4.5,4.5,1,3,6,0,0,29,caminando,caminando,viable
+Museo Torres Bicentenario,Galerías Metepec,3.03,462.51,4.4,4.4,3,6,7,1,1,46,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Estadio Nemesio Diez,12.86,179.44,5.0,5.0,4,10,18,1,0,85,auto_privado,auto_privado,requiere_ajuste
+Cosmovitral Jardín Botánico,Centro Histórico de Metepec,2.33,101.18,5.0,5.0,8,4,16,0,1,91,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Parque Ambiental Bicentenario,8.14,121.65,4.7,4.7,5,2,6,0,1,84,transporte_publico,transporte_publico,requiere_ajuste
+Los Portales de Toluca,Galerías Metepec,19.53,63.2,4.5,4.5,5,5,21,0,0,132,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Centro de Lerma,15.42,77.65,4.1,4.1,2,3,6,0,0,89,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Estadio Nemesio Diez,7.59,54.23,5.0,5.0,7,7,22,0,0,111,transporte_publico,transporte_publico,requiere_ajuste
+Terminal de Autobuses Toluca,Zona Artesanal de San Mateo Atenco,10.16,495.12,4.2,4.2,3,7,18,1,1,66,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Iglesia del Calvario de Metepec,9.58,55.55,4.7,4.7,1,4,22,0,0,64,transporte_publico,transporte_publico,viable
+Los Portales de Toluca,Mercado 16 de Septiembre,0.77,83.62,4.4,4.4,8,4,22,0,0,86,transporte_publico,transporte_publico,requiere_ajuste
+Parque Ambiental Bicentenario,Terminal de Autobuses Toluca,1.5,417.08,3.7,3.7,2,2,11,0,0,34,caminando,caminando,viable
+Parque Estatal Sierra Morelos,Terminal de Autobuses Toluca,9.7,298.52,3.9,3.9,1,8,18,1,0,55,auto_privado,auto_privado,viable
+Los Portales de Toluca,Iglesia del Calvario de Metepec,7.34,391.72,4.2,4.2,1,6,9,1,1,45,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Galerías Metepec,2.59,322.84,4.7,4.7,4,5,14,0,0,63,caminando,caminando,viable
+Mercado 16 de Septiembre,Centro de Lerma,21.43,443.44,4.9,4.9,1,6,10,0,0,79,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Centro Histórico de Metepec,0.85,326.46,5.0,5.0,7,7,14,0,0,67,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Parque Estatal Sierra Morelos,1.61,270.62,5.0,5.0,5,7,20,1,0,57,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Iglesia del Calvario de Metepec,9.87,362.12,4.5,4.5,3,2,13,0,0,75,transporte_publico,transporte_publico,viable
+Galerías Metepec,Terminal de Autobuses Toluca,2.19,234.75,4.0,4.0,1,8,7,1,1,37,auto_privado,auto_privado,viable
+Zona Artesanal de San Mateo Atenco,Los Portales de Toluca,24.74,186.11,4.3,4.3,4,5,11,0,0,102,auto_privado,auto_privado,requiere_ajuste
+Parque Metropolitano Bicentenario,Mercado 16 de Septiembre,4.36,244.47,4.0,4.0,2,10,19,1,0,52,auto_privado,auto_privado,viable
+Mercado 16 de Septiembre,Terminal de Autobuses Toluca,12.02,101.46,4.2,4.2,8,1,14,0,1,117,transporte_publico,transporte_publico,requiere_ajuste
+Galerías Metepec,Mercado 16 de Septiembre,5.76,402.35,4.1,4.1,3,2,15,0,0,60,transporte_publico,transporte_publico,viable
+Estadio Nemesio Diez,Estadio Nemesio Diez,6.35,145.14,4.3,4.3,4,2,13,0,0,70,transporte_publico,transporte_publico,viable
+Mercado 16 de Septiembre,Los Portales de Toluca,7.35,93.7,4.1,4.1,1,2,10,0,0,51,transporte_publico,transporte_publico,viable
+Parque Estatal Sierra Morelos,Estadio Nemesio Diez,16.8,138.25,4.3,4.3,2,4,16,0,1,97,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Parque Ambiental Bicentenario,23.21,424.19,4.9,4.9,2,7,16,0,0,91,auto_privado,auto_privado,viable
+Cosmovitral Jardín Botánico,Centro Histórico de Metepec,1.85,178.5,5.0,5.0,1,1,21,0,0,30,caminando,caminando,viable
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,7.17,349.3,4.9,4.9,6,6,16,0,0,74,auto_privado,auto_privado,viable
+Galerías Metepec,Parque Ambiental Bicentenario,2.46,431.08,4.0,4.0,8,5,22,0,0,73,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Centro Histórico de Metepec,2.21,57.32,5.0,5.0,8,9,20,1,0,105,transporte_publico,transporte_publico,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Zona Artesanal de San Mateo Atenco,16.43,387.21,4.6,4.6,3,9,7,1,0,85,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Mercado 16 de Septiembre,4.66,167.68,3.6,3.6,7,1,12,0,1,84,transporte_publico,transporte_publico,requiere_ajuste
+Los Portales de Toluca,Centro Histórico de Metepec,9.71,123.98,4.6,4.6,5,6,12,0,1,100,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Terminal de Autobuses Toluca,21.25,350.67,4.3,4.3,1,2,6,0,0,69,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Centro Histórico de Metepec,10.19,456.7,4.9,4.9,1,8,9,1,1,56,auto_privado,auto_privado,viable
+Centro de Lerma,Museo Torres Bicentenario,16.37,161.61,3.8,3.8,5,9,18,1,1,132,transporte_publico,transporte_publico,viable
+Centro Histórico de Metepec,Alameda Central Toluca,5.44,293.04,4.6,4.6,4,5,11,0,0,75,transporte_publico,transporte_publico,viable
+Cosmovitral Jardín Botánico,Mercado 16 de Septiembre,12.11,159.12,3.4,3.4,1,7,8,1,0,81,transporte_publico,transporte_publico,viable
+Mercado 16 de Septiembre,Parque Ambiental Bicentenario,1.64,286.06,4.6,4.6,8,3,10,0,1,67,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Parque Ambiental Bicentenario,3.64,318.49,5.0,5.0,6,4,10,0,0,62,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Parque Metropolitano Bicentenario,9.37,312.96,4.6,4.6,5,6,8,1,1,74,auto_privado,auto_privado,viable
+Terminal de Autobuses Toluca,Parque Estatal Sierra Morelos,2.27,319.3,4.4,4.4,8,9,7,1,0,81,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Cosmovitral Jardín Botánico,2.44,84.84,5.0,5.0,8,6,18,1,0,97,transporte_publico,transporte_publico,requiere_ajuste
+Centro de Lerma,Estadio Nemesio Diez,8.84,352.9,5.0,5.0,8,8,20,1,1,95,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Centro Histórico de Metepec,14.05,343.88,5.0,5.0,3,5,14,0,0,71,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Iglesia del Calvario de Metepec,1.58,347.64,5.0,5.0,8,1,16,0,0,62,auto_privado,auto_privado,viable
+Iglesia del Calvario de Metepec,Iglesia del Calvario de Metepec,2.79,55.55,5.0,5.0,5,7,21,0,0,79,transporte_publico,transporte_publico,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Terminal de Autobuses Toluca,9.75,234.48,4.2,4.2,6,7,20,1,0,165,caminando,caminando,viable
+Plazas Outlet Lerma,Alameda Central Toluca,0.63,216.34,4.5,4.5,7,1,6,0,0,70,transporte_publico,transporte_publico,requiere_ajuste
+Museo Torres Bicentenario,Los Portales de Toluca,8.0,61.62,4.6,4.6,2,5,22,0,0,69,transporte_publico,transporte_publico,requiere_ajuste
+Cosmovitral Jardín Botánico,Parque Ambiental Bicentenario,14.91,126.74,4.6,4.6,4,8,7,1,0,117,transporte_publico,transporte_publico,requiere_ajuste
+Zona Artesanal de San Mateo Atenco,Parque Metropolitano Bicentenario,24.35,231.66,4.2,4.2,2,5,6,0,0,89,auto_privado,auto_privado,viable
+Los Portales de Toluca,Parque Ambiental Bicentenario,23.37,376.6,4.4,4.4,3,6,12,0,0,95,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,8.59,133.79,4.6,4.6,4,8,18,1,1,94,transporte_publico,transporte_publico,viable
+Museo Torres Bicentenario,Centro de Lerma,8.76,418.28,4.3,4.3,7,10,7,1,0,93,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Galerías Metepec,3.08,281.98,5.0,5.0,7,3,10,0,0,64,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Zona Artesanal de San Mateo Atenco,8.06,385.0,4.3,4.3,4,4,10,0,0,81,transporte_publico,transporte_publico,viable
+Iglesia del Calvario de Metepec,Parque Ambiental Bicentenario,21.28,246.83,5.0,5.0,3,2,12,0,0,81,auto_privado,auto_privado,viable
+Alameda Central Toluca,Zona Artesanal de San Mateo Atenco,19.44,259.61,4.7,4.7,5,5,22,0,0,96,auto_privado,auto_privado,viable
+Parque Metropolitano Bicentenario,Parque Ambiental Bicentenario,21.16,317.47,4.6,4.6,8,2,11,0,0,111,auto_privado,auto_privado,viable
+Galerías Metepec,Parque Metropolitano Bicentenario,7.59,465.43,4.8,4.8,8,9,9,1,0,94,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Alameda Central Toluca,14.34,256.07,4.3,4.3,2,10,8,1,1,76,auto_privado,auto_privado,viable
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,9.13,273.76,4.9,4.9,2,10,9,1,1,64,auto_privado,auto_privado,viable
+Parque Estatal Sierra Morelos,Parque Metropolitano Bicentenario,6.76,308.96,4.8,4.8,6,10,8,1,0,82,auto_privado,auto_privado,viable
+Museo Torres Bicentenario,Galerías Metepec,12.9,374.01,4.1,4.1,3,1,15,0,1,59,auto_privado,auto_privado,viable
+Plazas Outlet Lerma,Alameda Central Toluca,2.08,54.49,4.5,4.5,2,1,13,0,1,37,transporte_publico,transporte_publico,requiere_ajuste
+Parque Ambiental Bicentenario,Centro Histórico de Metepec,3.95,267.53,5.0,5.0,1,7,14,0,0,39,auto_privado,auto_privado,viable
+Estadio Nemesio Diez,Galerías Metepec,5.99,251.16,4.5,4.5,4,7,20,1,0,62,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Zona Artesanal de San Mateo Atenco,1.06,462.41,4.5,4.5,4,1,15,0,0,45,caminando,caminando,viable
+Los Portales de Toluca,Galerías Metepec,7.38,256.88,4.7,4.7,5,7,8,1,0,129,caminando,caminando,viable
+Parque Metropolitano Bicentenario,Parque Metropolitano Bicentenario,2.49,244.79,4.2,4.2,2,6,12,0,0,46,caminando,caminando,viable
+Parque Estatal Sierra Morelos,Mercado 16 de Septiembre,1.71,481.86,4.3,4.3,6,3,11,0,0,55,auto_privado,auto_privado,viable
+Centro Histórico de Metepec,Galerías Metepec,19.33,236.28,4.0,4.0,6,6,20,1,0,104,auto_privado,auto_privado,requiere_ajuste

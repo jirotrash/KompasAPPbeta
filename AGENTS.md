@@ -33,13 +33,15 @@ El proyecto integra las prácticas de Inteligencia Artificial y Ciencia de Datos
 
 3. **Trazabilidad de las prácticas:**
 
-   * `p01_grafo_bfs.py` $\rightarrow$ Búsqueda en anchura para minimizar escalas/transbordos entre paradas de un plan.
+   * `p01_grafo_bfs.py` y `bfs_y_reglas.py` $\rightarrow$ Búsqueda en anchura (BFS) para minimizar escalas/transbordos entre paradas de un plan y sistema heurístico base (`predecir_con_reglas`).
 
    * `p01_regla_fija.py` $\rightarrow$ Heurística determinista base (*baseline*) para recomendación de transporte.
 
-   * `p02_pipeline_datos.py` $\rightarrow$ Funciones explícitas para las etapas `a` (análisis), `b` (exploración), `c` (calidad de datos), `d` (limpieza y guardado CSV) y `e` (selección de variables $X$ y $y$).
+   * `p02_pipeline_datos.py`, `datos_kompas.py` y `datos_y_limpieza.py` $\rightarrow$ Generación de 500 recorridos/planes turísticos del dominio de Kompás y etapas `a` (análisis), `b` (exploración), `c` (calidad de datos), `d` (limpieza e imputación por mediana) y `e` (selección de variables $X$ y $y$).
 
-   * `p03_modelo_predictivo.py` $\rightarrow$ Entrenamiento con `scikit-learn`, evaluación comparativa contra `p01_regla_fija` e inferencia en tiempo real para los endpoints de rutas e itinerarios.
+   * `p03_modelo_predictivo.py`, `entrenamiento_particiones.py` y `modelo_entrenamiento.py` $\rightarrow$ Entrenamiento con `DecisionTreeClassifier`, optimización experimental de particiones más allá del 70/30 tradicional (`80/20` y `60/20/20` con 5-Fold CV), control de *Underfitting* vs. *Overfitting* (`max_depth` 1 a 15), evaluación comparativa contra `p01_regla_fija` e inferencia en tiempo real (`/api/ia/metricas`, `/api/ia/simular`, `/api/ia/evaluacion-modelo`).
 
-4. **No regresión:** Cualquier cambio en `rutas` o `itinerarios` debe mantener en verde las suites de pruebas `backend/tests/test_planes_guardados.py`, `backend/tests/test_transporte.py` y `app/tests/transporte.test.cjs`.
+   * `app/src/app/laboratorio-ia.tsx` $\rightarrow$ Vista móvil/web del Laboratorio de IA con tarjetas comparativas, barras de particiones, monitor de subajuste/sobreajuste, matriz de confusión y simulador interactivo en vivo.
+
+4. **No regresión:** Cualquier cambio en `rutas` o `itinerarios` debe mantener en verde las suites de pruebas `backend/tests/test_planes_guardados.py`, `backend/tests/test_transporte.py`, `backend/tests/test_ia_kompas.py` y `app/tests/transporte.test.cjs`.
 

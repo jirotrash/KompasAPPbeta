@@ -1,0 +1,501 @@
+parada_origen,parada_destino,distancia_km,presupuesto_mxn,rating_lugar,num_paradas,trafico_nivel,modo_optimo,plan_viable
+Alameda Central Toluca,Parque Ambiental Bicentenario,19.46,373.62,3.1,7,1,auto_privado,0
+Lerma Centro,Centro Metepec,11.25,445.47,3.9,6,7,auto_privado,1
+Terminal Toluca,Plazas Outlet Lerma,21.54,256.13,3.3,8,4,auto_privado,1
+Parque Metropolitano Bicentenario,San Mateo Atenco,17.59,261.74,3.3,8,3,auto_privado,0
+San Mateo Atenco,Terminal Toluca,2.81,269.73,4.3,6,1,auto_privado,1
+Plazas Outlet Lerma,Estadio Nemesio Diez,24.4,403.94,3.8,3,9,auto_privado,1
+Alameda Central Toluca,Alameda Central Toluca,19.15,170.94,4.8,5,9,transporte_publico,0
+Galerias Metepec,Galerias Metepec,19.76,421.94,3.6,4,9,auto_privado,0
+Los Portales,Alameda Central Toluca,3.64,257.19,4.5,6,1,auto_privado,1
+Cosmovitral,Plazas Outlet Lerma,11.53,75.61,3.9,7,4,transporte_publico,0
+Estadio Nemesio Diez,Alameda Central Toluca,9.58,54.59,4.3,3,10,transporte_publico,0
+Lerma Centro,Centro Metepec,23.21,424.16,4.2,5,6,auto_privado,1
+Parque Ambiental Bicentenario,Cosmovitral,16.27,46.67,3.9,1,2,transporte_publico,0
+Parque Metropolitano Bicentenario,Lerma Centro,20.66,154.69,4.9,6,2,transporte_publico,0
+Alameda Central Toluca,Lerma Centro,11.36,180.38,3.7,4,3,transporte_publico,1
+Cosmovitral,San Mateo Atenco,6.07,103.04,3.4,4,10,transporte_publico,0
+Alameda Central Toluca,Estadio Nemesio Diez,14.09,170.67,4.4,5,2,transporte_publico,0
+Cosmovitral,Terminal Toluca,2.06,376.49,4.7,2,10,auto_privado,1
+Los Portales,Parque Ambiental Bicentenario,20.78,27.05,3.1,5,7,transporte_publico,0
+Parque Ambiental Bicentenario,Parque Metropolitano Bicentenario,15.98,417.04,3.9,6,10,auto_privado,1
+Cosmovitral,Plazas Outlet Lerma,19.07,431.14,4.8,3,9,auto_privado,1
+Terminal Toluca,Parque Ambiental Bicentenario,9.19,198.69,4.5,2,4,transporte_publico,1
+Centro Metepec,Centro Metepec,24.28,93.73,5.0,4,9,transporte_publico,0
+Alameda Central Toluca,Plazas Outlet Lerma,22.38,308.4,4.1,2,2,auto_privado,1
+Parque Metropolitano Bicentenario,San Mateo Atenco,19.57,77.44,4.3,3,3,transporte_publico,0
+Cosmovitral,Parque Metropolitano Bicentenario,5.27,195.16,3.6,6,3,transporte_publico,0
+Los Portales,Terminal Toluca,11.93,480.05,4.9,1,2,auto_privado,1
+Parque Metropolitano Bicentenario,Cosmovitral,1.57,497.82,3.7,6,1,auto_privado,1
+Parque Ambiental Bicentenario,Parque Metropolitano Bicentenario,4.28,390.61,4.5,2,2,transporte_publico,1
+Estadio Nemesio Diez,Centro Metepec,17.23,169.26,3.8,8,2,transporte_publico,0
+Centro Metepec,Terminal Toluca,18.75,350.08,4.1,6,4,auto_privado,1
+Centro Metepec,Cosmovitral,24.2,358.6,4.4,3,1,auto_privado,1
+Alameda Central Toluca,Parque Ambiental Bicentenario,8.48,206.16,4.0,5,1,transporte_publico,0
+Alameda Central Toluca,San Mateo Atenco,9.58,327.63,4.8,1,10,auto_privado,1
+Parque Metropolitano Bicentenario,Terminal Toluca,12.0,25.15,3.8,1,1,transporte_publico,0
+Terminal Toluca,Centro Metepec,5.14,120.35,4.3,8,1,transporte_publico,0
+Parque Ambiental Bicentenario,Terminal Toluca,3.68,272.04,3.7,7,1,auto_privado,1
+Galerias Metepec,Parque Ambiental Bicentenario,12.15,98.6,3.8,2,2,transporte_publico,0
+Alameda Central Toluca,Lerma Centro,6.06,99.64,3.9,3,6,transporte_publico,0
+Estadio Nemesio Diez,Lerma Centro,16.91,421.43,3.3,2,9,auto_privado,0
+Alameda Central Toluca,Galerias Metepec,11.21,494.78,4.0,4,8,auto_privado,1
+Galerias Metepec,Galerias Metepec,20.9,286.87,4.3,3,6,auto_privado,1
+San Mateo Atenco,Plazas Outlet Lerma,17.66,422.75,4.3,3,1,auto_privado,1
+Cosmovitral,Galerias Metepec,8.15,495.35,4.3,5,8,auto_privado,1
+Estadio Nemesio Diez,Parque Metropolitano Bicentenario,20.89,87.97,3.0,2,1,transporte_publico,0
+Terminal Toluca,San Mateo Atenco,20.22,235.16,3.7,8,7,auto_privado,0
+Parque Metropolitano Bicentenario,Galerias Metepec,9.99,208.43,3.4,6,5,transporte_publico,0
+Los Portales,Lerma Centro,7.56,58.42,4.6,7,9,transporte_publico,0
+Estadio Nemesio Diez,Centro Metepec,17.22,382.56,4.7,2,4,auto_privado,1
+Parque Metropolitano Bicentenario,Lerma Centro,3.92,228.21,3.5,6,7,auto_privado,0
+Alameda Central Toluca,Terminal Toluca,5.4,245.28,4.3,7,5,auto_privado,0
+Estadio Nemesio Diez,Terminal Toluca,0.68,92.32,3.3,2,6,caminando,0
+San Mateo Atenco,Cosmovitral,19.78,106.84,3.6,7,10,transporte_publico,0
+San Mateo Atenco,Centro Metepec,16.79,455.41,3.3,3,8,auto_privado,1
+Terminal Toluca,Parque Ambiental Bicentenario,17.78,41.43,3.6,7,5,transporte_publico,1
+Estadio Nemesio Diez,Los Portales,19.63,131.77,4.3,4,5,transporte_publico,0
+Lerma Centro,Cosmovitral,11.74,160.19,4.8,7,8,transporte_publico,0
+Centro Metepec,Lerma Centro,14.43,255.29,3.4,2,4,auto_privado,0
+Los Portales,San Mateo Atenco,3.93,301.49,4.1,4,2,transporte_publico,1
+Galerias Metepec,Galerias Metepec,3.31,256.78,4.4,3,5,transporte_publico,1
+Cosmovitral,Parque Metropolitano Bicentenario,16.88,60.38,4.9,2,1,transporte_publico,0
+Terminal Toluca,Parque Metropolitano Bicentenario,12.04,136.96,4.2,3,2,transporte_publico,0
+Galerias Metepec,Terminal Toluca,14.35,424.92,3.5,4,5,auto_privado,1
+Centro Metepec,Los Portales,19.24,326.04,4.3,2,8,auto_privado,1
+San Mateo Atenco,Lerma Centro,16.05,331.59,3.6,6,8,auto_privado,1
+Estadio Nemesio Diez,Estadio Nemesio Diez,14.06,341.7,5.0,5,3,auto_privado,1
+Lerma Centro,Parque Ambiental Bicentenario,14.2,386.19,3.8,7,5,auto_privado,1
+Parque Metropolitano Bicentenario,Parque Ambiental Bicentenario,7.95,47.89,4.4,6,2,transporte_publico,0
+Parque Ambiental Bicentenario,Alameda Central Toluca,1.26,195.97,3.0,2,8,transporte_publico,0
+Cosmovitral,Los Portales,11.2,278.97,3.8,1,3,auto_privado,1
+Cosmovitral,Parque Ambiental Bicentenario,5.76,182.46,4.8,4,8,transporte_publico,0
+San Mateo Atenco,Cosmovitral,10.51,425.35,4.2,4,9,auto_privado,1
+Lerma Centro,Parque Metropolitano Bicentenario,21.41,251.63,3.9,2,7,auto_privado,1
+Plazas Outlet Lerma,Lerma Centro,6.23,388.94,4.9,7,4,auto_privado,1
+Alameda Central Toluca,Parque Ambiental Bicentenario,1.93,428.97,4.7,5,10,auto_privado,1
+Terminal Toluca,San Mateo Atenco,7.39,262.3,3.6,6,7,auto_privado,0
+Plazas Outlet Lerma,Terminal Toluca,7.69,456.59,4.1,1,7,auto_privado,1
+Galerias Metepec,Los Portales,16.72,301.82,4.0,7,9,auto_privado,0
+Los Portales,Alameda Central Toluca,14.15,428.13,4.3,2,9,auto_privado,1
+San Mateo Atenco,Alameda Central Toluca,19.71,183.48,3.7,4,1,transporte_publico,0
+Lerma Centro,Los Portales,16.78,259.43,3.5,4,9,auto_privado,0
+Alameda Central Toluca,Plazas Outlet Lerma,10.46,275.08,4.8,7,8,auto_privado,0
+San Mateo Atenco,Cosmovitral,20.44,70.39,4.8,3,3,transporte_publico,0
+San Mateo Atenco,Parque Ambiental Bicentenario,4.59,211.31,4.7,2,4,transporte_publico,1
+Centro Metepec,Galerias Metepec,1.06,460.32,5.0,3,8,auto_privado,1
+Galerias Metepec,Galerias Metepec,2.71,322.8,4.5,3,3,caminando,1
+Alameda Central Toluca,Los Portales,18.2,105.2,4.5,2,5,transporte_publico,0
+Plazas Outlet Lerma,Alameda Central Toluca,11.82,182.65,4.5,2,7,transporte_publico,1
+Plazas Outlet Lerma,Galerias Metepec,4.45,111.97,4.0,2,7,transporte_publico,0
+Plazas Outlet Lerma,Alameda Central Toluca,12.78,31.92,3.9,4,10,transporte_publico,0
+Parque Ambiental Bicentenario,Parque Ambiental Bicentenario,4.23,465.18,3.5,3,2,transporte_publico,1
+Terminal Toluca,Terminal Toluca,17.56,235.14,4.3,4,3,auto_privado,1
+Estadio Nemesio Diez,Terminal Toluca,11.43,167.62,4.0,6,10,transporte_publico,1
+Parque Metropolitano Bicentenario,Parque Ambiental Bicentenario,9.84,307.27,3.5,2,6,auto_privado,1
+Plazas Outlet Lerma,Galerias Metepec,7.89,23.51,4.2,8,3,transporte_publico,0
+Centro Metepec,Terminal Toluca,15.94,153.45,3.8,7,3,transporte_publico,0
+Centro Metepec,Lerma Centro,9.36,357.46,3.4,2,4,transporte_publico,1
+Cosmovitral,Terminal Toluca,2.65,324.21,4.6,3,6,caminando,1
+San Mateo Atenco,Plazas Outlet Lerma,3.39,491.27,4.7,2,3,transporte_publico,1
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,24.07,317.77,3.3,3,7,auto_privado,0
+Cosmovitral,Plazas Outlet Lerma,22.76,249.2,3.0,3,5,auto_privado,0
+Plazas Outlet Lerma,Plazas Outlet Lerma,17.64,385.49,3.7,2,7,auto_privado,1
+Los Portales,Alameda Central Toluca,7.01,453.6,4.6,1,2,transporte_publico,1
+Terminal Toluca,San Mateo Atenco,24.24,365.93,4.7,4,7,auto_privado,1
+Terminal Toluca,Los Portales,19.58,482.34,3.3,6,10,auto_privado,0
+Parque Metropolitano Bicentenario,Parque Metropolitano Bicentenario,18.06,395.36,4.5,3,2,auto_privado,1
+Cosmovitral,Los Portales,11.51,436.06,3.2,7,4,auto_privado,1
+Lerma Centro,Parque Metropolitano Bicentenario,7.17,74.77,3.8,3,7,transporte_publico,0
+Centro Metepec,Lerma Centro,2.86,371.56,5.0,8,7,auto_privado,1
+Alameda Central Toluca,Parque Metropolitano Bicentenario,22.61,231.24,3.4,2,7,auto_privado,0
+Terminal Toluca,Cosmovitral,11.67,285.49,3.3,5,6,auto_privado,0
+Parque Metropolitano Bicentenario,Alameda Central Toluca,5.46,333.97,3.8,7,7,auto_privado,1
+Cosmovitral,San Mateo Atenco,8.0,485.51,4.2,1,7,auto_privado,1
+Plazas Outlet Lerma,Centro Metepec,14.69,492.6,4.9,8,1,auto_privado,1
+Alameda Central Toluca,Centro Metepec,4.83,158.35,5.0,3,8,transporte_publico,1
+Parque Metropolitano Bicentenario,Parque Metropolitano Bicentenario,21.49,372.2,3.1,4,5,auto_privado,0
+Terminal Toluca,Alameda Central Toluca,19.08,379.99,3.3,6,1,auto_privado,1
+Cosmovitral,Galerias Metepec,18.13,186.32,4.0,6,5,transporte_publico,0
+Los Portales,Galerias Metepec,11.09,79.46,3.5,1,5,transporte_publico,1
+Terminal Toluca,Lerma Centro,15.87,39.65,4.8,7,1,transporte_publico,0
+Parque Ambiental Bicentenario,Galerias Metepec,14.81,393.12,4.0,5,10,auto_privado,1
+Plazas Outlet Lerma,Plazas Outlet Lerma,16.42,255.06,3.2,8,3,auto_privado,0
+Plazas Outlet Lerma,San Mateo Atenco,2.57,493.06,4.7,4,4,transporte_publico,1
+Alameda Central Toluca,Terminal Toluca,10.69,243.19,3.4,5,5,auto_privado,0
+San Mateo Atenco,Estadio Nemesio Diez,1.52,489.4,3.8,4,9,auto_privado,1
+Centro Metepec,Estadio Nemesio Diez,12.6,217.56,4.1,8,8,transporte_publico,0
+Terminal Toluca,Terminal Toluca,8.58,400.97,4.0,7,8,auto_privado,1
+Cosmovitral,Los Portales,4.04,60.71,4.4,8,3,transporte_publico,0
+Centro Metepec,San Mateo Atenco,3.03,286.62,4.3,5,9,auto_privado,1
+Parque Metropolitano Bicentenario,Estadio Nemesio Diez,14.9,404.99,5.0,7,9,auto_privado,1
+Terminal Toluca,Cosmovitral,4.68,256.13,5.0,3,5,transporte_publico,1
+Plazas Outlet Lerma,Alameda Central Toluca,23.17,414.84,4.0,4,6,auto_privado,1
+Parque Ambiental Bicentenario,Alameda Central Toluca,14.74,37.75,3.2,7,1,transporte_publico,0
+Centro Metepec,Los Portales,9.0,198.9,4.5,1,8,transporte_publico,1
+Plazas Outlet Lerma,Cosmovitral,14.98,43.38,5.0,6,10,transporte_publico,0
+Plazas Outlet Lerma,San Mateo Atenco,1.06,72.46,3.6,1,5,caminando,1
+Plazas Outlet Lerma,San Mateo Atenco,23.98,344.15,3.9,5,6,auto_privado,0
+Alameda Central Toluca,Parque Metropolitano Bicentenario,12.32,362.36,3.8,4,5,auto_privado,1
+Lerma Centro,Galerias Metepec,19.68,391.39,3.1,4,1,auto_privado,0
+Centro Metepec,Plazas Outlet Lerma,2.53,435.42,4.3,4,7,auto_privado,1
+Parque Ambiental Bicentenario,Lerma Centro,12.42,374.93,3.7,4,8,auto_privado,1
+Lerma Centro,Terminal Toluca,12.52,404.42,4.6,4,10,auto_privado,1
+Cosmovitral,Plazas Outlet Lerma,23.48,43.5,4.7,4,10,transporte_publico,0
+Parque Metropolitano Bicentenario,Terminal Toluca,14.51,256.13,4.6,5,5,transporte_publico,0
+Cosmovitral,Terminal Toluca,12.1,318.51,3.8,7,10,auto_privado,0
+Alameda Central Toluca,Estadio Nemesio Diez,7.04,431.9,3.6,5,6,auto_privado,1
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,8.62,22.16,4.5,6,7,transporte_publico,0
+Lerma Centro,Terminal Toluca,13.26,267.02,4.6,7,7,auto_privado,0
+Lerma Centro,Alameda Central Toluca,11.25,345.1,4.0,8,10,auto_privado,0
+Estadio Nemesio Diez,Alameda Central Toluca,1.03,34.21,4.8,1,8,transporte_publico,0
+Alameda Central Toluca,Estadio Nemesio Diez,20.74,212.65,3.3,6,2,transporte_publico,0
+Centro Metepec,Plazas Outlet Lerma,22.46,449.9,4.8,2,1,auto_privado,1
+Lerma Centro,Alameda Central Toluca,3.94,342.37,3.2,2,5,transporte_publico,1
+Plazas Outlet Lerma,Los Portales,14.07,134.08,3.3,7,6,transporte_publico,0
+Los Portales,Cosmovitral,3.16,429.33,4.1,1,7,caminando,1
+Los Portales,Los Portales,16.97,187.06,3.1,7,5,transporte_publico,0
+Parque Ambiental Bicentenario,Cosmovitral,7.39,429.61,3.1,7,6,auto_privado,0
+Alameda Central Toluca,Centro Metepec,16.66,163.49,3.0,8,10,transporte_publico,0
+Los Portales,Parque Metropolitano Bicentenario,18.31,303.35,3.9,6,4,auto_privado,1
+Terminal Toluca,Parque Metropolitano Bicentenario,19.33,210.53,4.5,7,5,transporte_publico,0
+Estadio Nemesio Diez,San Mateo Atenco,3.14,151.92,3.1,1,6,caminando,0
+Estadio Nemesio Diez,Centro Metepec,22.94,445.55,4.3,8,5,auto_privado,1
+Centro Metepec,Cosmovitral,6.14,110.04,4.6,2,10,transporte_publico,0
+Los Portales,Estadio Nemesio Diez,1.42,60.71,3.3,3,10,transporte_publico,0
+Parque Ambiental Bicentenario,Alameda Central Toluca,14.09,184.12,3.3,2,6,transporte_publico,0
+Parque Ambiental Bicentenario,San Mateo Atenco,9.59,364.47,4.7,4,5,transporte_publico,1
+Parque Metropolitano Bicentenario,Alameda Central Toluca,20.83,407.57,4.6,6,6,auto_privado,1
+Los Portales,Cosmovitral,20.3,499.4,4.1,3,2,auto_privado,1
+Centro Metepec,Parque Ambiental Bicentenario,8.27,256.13,4.6,7,5,transporte_publico,0
+Parque Ambiental Bicentenario,Parque Metropolitano Bicentenario,23.85,215.81,3.2,5,3,transporte_publico,0
+Estadio Nemesio Diez,Cosmovitral,7.63,85.67,3.8,6,2,transporte_publico,0
+Alameda Central Toluca,Parque Ambiental Bicentenario,13.12,295.94,4.5,8,1,auto_privado,0
+Centro Metepec,Los Portales,6.77,498.84,3.5,4,6,auto_privado,1
+Estadio Nemesio Diez,Lerma Centro,23.43,356.42,4.5,3,1,auto_privado,1
+Estadio Nemesio Diez,San Mateo Atenco,4.53,305.7,4.0,8,7,auto_privado,0
+Estadio Nemesio Diez,Estadio Nemesio Diez,1.6,208.34,4.5,5,5,transporte_publico,1
+Alameda Central Toluca,Centro Metepec,11.16,459.34,3.9,5,4,auto_privado,1
+Parque Ambiental Bicentenario,Centro Metepec,24.81,258.52,3.7,3,8,auto_privado,0
+Parque Metropolitano Bicentenario,Galerias Metepec,22.35,84.5,3.4,2,6,transporte_publico,0
+Parque Metropolitano Bicentenario,Terminal Toluca,18.84,195.38,3.4,2,8,transporte_publico,0
+Galerias Metepec,Alameda Central Toluca,22.32,52.24,4.5,2,8,transporte_publico,0
+Estadio Nemesio Diez,Los Portales,22.39,116.95,3.2,2,1,transporte_publico,0
+Cosmovitral,Parque Ambiental Bicentenario,13.21,28.48,3.2,6,3,transporte_publico,0
+Lerma Centro,Terminal Toluca,8.24,237.57,3.4,1,6,auto_privado,1
+Terminal Toluca,Centro Metepec,19.41,324.58,3.4,6,10,auto_privado,0
+Centro Metepec,Parque Ambiental Bicentenario,16.71,184.78,4.6,8,2,transporte_publico,0
+Alameda Central Toluca,Plazas Outlet Lerma,9.65,221.78,3.8,7,2,auto_privado,0
+Los Portales,Alameda Central Toluca,2.81,480.42,5.0,4,10,auto_privado,1
+Terminal Toluca,Terminal Toluca,18.8,380.94,3.3,1,10,auto_privado,0
+Lerma Centro,Parque Ambiental Bicentenario,6.93,279.61,4.3,7,2,auto_privado,1
+Parque Metropolitano Bicentenario,Terminal Toluca,23.45,156.58,3.9,1,5,transporte_publico,1
+Estadio Nemesio Diez,Terminal Toluca,6.4,450.56,3.8,6,7,auto_privado,1
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,3.51,132.85,4.8,6,2,transporte_publico,0
+Terminal Toluca,Lerma Centro,20.86,176.16,5.0,2,4,transporte_publico,1
+Centro Metepec,Parque Ambiental Bicentenario,4.26,456.35,4.7,6,4,auto_privado,1
+Parque Metropolitano Bicentenario,Lerma Centro,4.89,274.18,3.4,2,7,auto_privado,1
+Centro Metepec,Terminal Toluca,15.18,376.31,3.4,2,4,auto_privado,1
+Cosmovitral,Cosmovitral,21.93,303.56,4.3,7,5,auto_privado,0
+Plazas Outlet Lerma,Alameda Central Toluca,5.31,333.65,3.6,8,3,auto_privado,1
+Los Portales,Terminal Toluca,8.1,163.7,4.5,3,8,transporte_publico,0
+Parque Ambiental Bicentenario,Lerma Centro,19.55,135.86,4.1,8,2,transporte_publico,0
+Parque Ambiental Bicentenario,Terminal Toluca,24.31,174.8,4.1,8,3,transporte_publico,0
+Estadio Nemesio Diez,Centro Metepec,12.77,94.61,4.7,7,3,transporte_publico,0
+Cosmovitral,Lerma Centro,4.03,439.67,4.4,2,10,auto_privado,1
+Alameda Central Toluca,Parque Ambiental Bicentenario,0.84,155.96,3.1,3,10,transporte_publico,0
+San Mateo Atenco,Los Portales,6.13,289.51,3.1,6,6,auto_privado,0
+Lerma Centro,Parque Metropolitano Bicentenario,3.73,400.15,4.2,8,2,auto_privado,1
+Plazas Outlet Lerma,Centro Metepec,17.1,396.24,4.0,7,8,auto_privado,1
+Los Portales,San Mateo Atenco,3.48,230.43,3.5,4,5,transporte_publico,0
+Galerias Metepec,Parque Metropolitano Bicentenario,12.91,248.6,3.8,2,9,auto_privado,1
+Cosmovitral,Alameda Central Toluca,17.51,497.46,4.5,8,4,auto_privado,1
+Parque Ambiental Bicentenario,San Mateo Atenco,14.74,343.81,4.7,3,10,auto_privado,1
+Estadio Nemesio Diez,Lerma Centro,5.39,411.03,4.1,3,9,auto_privado,1
+Parque Ambiental Bicentenario,Parque Metropolitano Bicentenario,20.2,453.23,4.0,8,3,auto_privado,1
+Parque Ambiental Bicentenario,Terminal Toluca,18.03,398.04,3.5,5,8,auto_privado,1
+Plazas Outlet Lerma,Centro Metepec,18.61,108.89,4.0,3,3,transporte_publico,0
+Parque Metropolitano Bicentenario,Lerma Centro,3.71,289.84,3.6,1,4,transporte_publico,1
+Estadio Nemesio Diez,Plazas Outlet Lerma,3.53,68.91,4.1,4,3,transporte_publico,0
+Centro Metepec,Estadio Nemesio Diez,23.23,333.4,4.4,8,7,auto_privado,0
+Cosmovitral,Cosmovitral,10.24,478.57,3.1,4,3,auto_privado,0
+Cosmovitral,Centro Metepec,7.87,266.11,3.0,6,7,auto_privado,0
+Centro Metepec,San Mateo Atenco,12.47,227.83,3.4,3,6,auto_privado,0
+San Mateo Atenco,Plazas Outlet Lerma,16.74,37.2,4.8,7,8,transporte_publico,0
+Centro Metepec,Terminal Toluca,23.91,480.69,4.3,7,10,auto_privado,0
+San Mateo Atenco,Alameda Central Toluca,7.52,69.44,3.3,5,1,transporte_publico,0
+Los Portales,Parque Metropolitano Bicentenario,23.16,39.72,4.8,7,10,transporte_publico,0
+Parque Metropolitano Bicentenario,Cosmovitral,1.11,138.11,3.9,5,2,transporte_publico,0
+Galerias Metepec,Lerma Centro,14.1,51.45,4.0,4,6,transporte_publico,0
+Estadio Nemesio Diez,Cosmovitral,16.03,238.46,4.9,6,4,auto_privado,0
+Terminal Toluca,Galerias Metepec,3.09,267.72,3.1,7,7,auto_privado,0
+Terminal Toluca,Plazas Outlet Lerma,3.94,170.03,3.4,7,8,transporte_publico,0
+Plazas Outlet Lerma,Parque Ambiental Bicentenario,10.77,44.46,4.2,2,9,transporte_publico,0
+Galerias Metepec,San Mateo Atenco,24.17,73.57,3.4,6,5,transporte_publico,0
+Alameda Central Toluca,Alameda Central Toluca,15.1,204.56,4.4,1,10,transporte_publico,1
+Alameda Central Toluca,San Mateo Atenco,23.36,49.05,3.4,5,4,transporte_publico,0
+Terminal Toluca,Parque Metropolitano Bicentenario,20.21,355.13,3.2,5,3,auto_privado,1
+Plazas Outlet Lerma,Terminal Toluca,11.95,119.37,3.4,3,4,transporte_publico,0
+Cosmovitral,Estadio Nemesio Diez,19.73,164.99,3.8,8,6,transporte_publico,0
+San Mateo Atenco,Estadio Nemesio Diez,0.94,209.18,3.4,8,7,transporte_publico,0
+Los Portales,Centro Metepec,3.17,219.97,3.3,1,9,transporte_publico,0
+Estadio Nemesio Diez,Alameda Central Toluca,20.82,20.8,4.7,2,3,transporte_publico,0
+Alameda Central Toluca,Parque Metropolitano Bicentenario,20.02,73.79,3.6,2,4,transporte_publico,0
+San Mateo Atenco,Parque Metropolitano Bicentenario,6.2,434.13,3.7,8,10,auto_privado,1
+Terminal Toluca,Alameda Central Toluca,13.5,20.59,4.0,5,5,transporte_publico,0
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,15.35,263.92,3.7,6,3,auto_privado,0
+Alameda Central Toluca,Alameda Central Toluca,21.76,254.96,3.5,7,10,auto_privado,1
+Alameda Central Toluca,San Mateo Atenco,15.28,179.89,4.2,7,5,transporte_publico,0
+Los Portales,Alameda Central Toluca,10.61,227.04,3.4,1,10,auto_privado,0
+Lerma Centro,Lerma Centro,9.67,394.68,4.8,2,10,auto_privado,1
+Estadio Nemesio Diez,Estadio Nemesio Diez,10.93,423.78,4.9,4,10,auto_privado,1
+Parque Metropolitano Bicentenario,Terminal Toluca,16.47,144.97,3.2,3,6,transporte_publico,0
+Estadio Nemesio Diez,Cosmovitral,21.75,174.8,3.2,6,8,transporte_publico,0
+Plazas Outlet Lerma,San Mateo Atenco,11.62,136.39,3.2,2,10,transporte_publico,0
+Estadio Nemesio Diez,Lerma Centro,6.57,250.33,4.2,3,3,transporte_publico,1
+Estadio Nemesio Diez,Los Portales,6.3,347.96,3.2,2,1,transporte_publico,1
+Alameda Central Toluca,Galerias Metepec,18.78,129.56,4.7,2,4,transporte_publico,1
+Alameda Central Toluca,Centro Metepec,20.51,178.75,4.5,2,7,transporte_publico,0
+Cosmovitral,Cosmovitral,3.08,466.58,4.6,2,6,caminando,1
+Galerias Metepec,Parque Metropolitano Bicentenario,2.13,43.31,4.0,5,1,transporte_publico,0
+Terminal Toluca,Parque Ambiental Bicentenario,15.06,241.17,5.0,4,6,auto_privado,0
+Los Portales,Plazas Outlet Lerma,4.08,361.55,3.1,4,2,transporte_publico,0
+Los Portales,Lerma Centro,20.7,92.22,3.8,4,6,transporte_publico,0
+Alameda Central Toluca,Cosmovitral,8.1,42.74,3.6,6,6,transporte_publico,0
+San Mateo Atenco,Los Portales,4.02,86.34,4.9,7,7,transporte_publico,0
+Galerias Metepec,Parque Metropolitano Bicentenario,23.06,461.04,4.2,5,5,auto_privado,1
+Plazas Outlet Lerma,Cosmovitral,4.56,24.44,4.6,6,5,transporte_publico,0
+Estadio Nemesio Diez,Centro Metepec,7.48,110.39,3.3,6,7,transporte_publico,0
+Plazas Outlet Lerma,Terminal Toluca,4.26,35.02,5.0,6,8,transporte_publico,0
+Terminal Toluca,Cosmovitral,3.33,73.1,4.0,2,9,transporte_publico,0
+Centro Metepec,Terminal Toluca,1.02,317.67,4.0,8,4,auto_privado,1
+San Mateo Atenco,Alameda Central Toluca,1.86,135.99,4.9,2,5,caminando,1
+Centro Metepec,San Mateo Atenco,4.78,293.22,3.8,4,4,transporte_publico,1
+Plazas Outlet Lerma,Los Portales,1.81,303.29,3.8,6,6,auto_privado,1
+Alameda Central Toluca,Plazas Outlet Lerma,14.98,427.73,4.2,4,2,auto_privado,1
+Terminal Toluca,Alameda Central Toluca,17.18,22.28,3.3,2,5,transporte_publico,0
+San Mateo Atenco,Terminal Toluca,10.14,429.62,3.6,8,2,auto_privado,1
+Terminal Toluca,Estadio Nemesio Diez,8.29,317.18,3.4,1,6,auto_privado,1
+San Mateo Atenco,Parque Ambiental Bicentenario,12.86,98.12,3.2,2,9,transporte_publico,0
+Parque Ambiental Bicentenario,Cosmovitral,21.94,391.01,4.7,8,10,auto_privado,0
+Lerma Centro,Terminal Toluca,21.35,430.64,4.2,6,5,auto_privado,1
+Parque Metropolitano Bicentenario,Lerma Centro,1.57,142.05,3.7,1,1,caminando,1
+Lerma Centro,Galerias Metepec,4.95,461.02,3.8,7,3,auto_privado,1
+Los Portales,Estadio Nemesio Diez,6.3,238.14,3.9,8,2,auto_privado,0
+Parque Metropolitano Bicentenario,San Mateo Atenco,6.61,309.64,4.3,1,8,auto_privado,1
+Cosmovitral,Lerma Centro,14.5,492.63,4.9,4,10,auto_privado,1
+San Mateo Atenco,Estadio Nemesio Diez,10.7,193.54,4.9,4,6,transporte_publico,0
+Parque Ambiental Bicentenario,Centro Metepec,1.71,410.32,3.8,2,2,caminando,1
+San Mateo Atenco,Terminal Toluca,9.65,172.83,3.7,2,1,transporte_publico,1
+San Mateo Atenco,Alameda Central Toluca,13.33,403.62,4.0,2,10,auto_privado,1
+Alameda Central Toluca,Galerias Metepec,2.99,308.35,4.1,2,4,caminando,1
+Terminal Toluca,Los Portales,20.92,123.85,3.9,4,2,transporte_publico,0
+Plazas Outlet Lerma,Plazas Outlet Lerma,1.77,218.73,4.3,4,2,transporte_publico,1
+Parque Metropolitano Bicentenario,Plazas Outlet Lerma,23.16,172.47,4.1,2,3,transporte_publico,1
+Cosmovitral,Alameda Central Toluca,2.93,57.49,3.6,3,7,caminando,0
+Plazas Outlet Lerma,Estadio Nemesio Diez,21.17,34.32,3.7,2,9,transporte_publico,0
+Plazas Outlet Lerma,Los Portales,22.62,186.31,3.8,7,3,transporte_publico,0
+Parque Metropolitano Bicentenario,Centro Metepec,24.5,29.14,3.2,2,7,transporte_publico,0
+San Mateo Atenco,Cosmovitral,20.15,99.43,3.3,8,1,transporte_publico,0
+Terminal Toluca,Estadio Nemesio Diez,19.6,368.09,4.4,5,1,auto_privado,1
+Cosmovitral,Centro Metepec,16.24,359.88,3.8,7,1,auto_privado,1
+Alameda Central Toluca,Galerias Metepec,19.59,374.52,3.4,6,10,auto_privado,1
+Galerias Metepec,Galerias Metepec,3.8,172.23,4.1,3,6,transporte_publico,1
+Cosmovitral,Los Portales,13.63,447.21,4.5,5,9,auto_privado,1
+Terminal Toluca,San Mateo Atenco,13.1,305.04,3.5,3,1,auto_privado,1
+Parque Ambiental Bicentenario,Parque Ambiental Bicentenario,21.51,80.49,4.7,1,1,transporte_publico,1
+San Mateo Atenco,San Mateo Atenco,11.84,88.98,4.9,3,9,transporte_publico,0
+Parque Ambiental Bicentenario,Parque Metropolitano Bicentenario,9.93,352.69,4.2,3,2,transporte_publico,1
+San Mateo Atenco,Lerma Centro,16.17,103.01,4.3,2,2,transporte_publico,0
+San Mateo Atenco,Estadio Nemesio Diez,7.03,263.5,3.1,1,6,auto_privado,0
+Galerias Metepec,San Mateo Atenco,3.92,496.05,4.9,8,7,auto_privado,1
+Centro Metepec,Los Portales,12.21,21.92,3.8,5,3,transporte_publico,0
+Lerma Centro,Los Portales,10.71,27.96,4.0,4,5,transporte_publico,0
+Estadio Nemesio Diez,Centro Metepec,6.2,496.68,4.2,8,7,auto_privado,1
+Cosmovitral,Centro Metepec,9.5,300.63,3.0,2,5,transporte_publico,0
+San Mateo Atenco,Parque Ambiental Bicentenario,9.48,80.92,3.1,4,4,transporte_publico,0
+Alameda Central Toluca,Alameda Central Toluca,8.52,450.71,4.4,7,1,auto_privado,1
+Plazas Outlet Lerma,Lerma Centro,9.8,442.58,4.1,6,5,auto_privado,1
+Estadio Nemesio Diez,Alameda Central Toluca,17.3,277.38,3.1,4,9,auto_privado,1
+Lerma Centro,Centro Metepec,7.77,318.46,4.5,3,7,auto_privado,1
+Terminal Toluca,Plazas Outlet Lerma,23.75,151.13,4.7,1,9,transporte_publico,0
+Galerias Metepec,Centro Metepec,22.95,44.25,4.0,1,2,transporte_publico,0
+Parque Metropolitano Bicentenario,Parque Ambiental Bicentenario,12.28,305.39,3.9,2,1,auto_privado,1
+Parque Metropolitano Bicentenario,Lerma Centro,8.54,161.48,3.0,7,6,transporte_publico,0
+Alameda Central Toluca,Plazas Outlet Lerma,13.62,338.54,4.6,6,2,auto_privado,1
+Plazas Outlet Lerma,Parque Metropolitano Bicentenario,21.29,421.4,3.7,4,6,auto_privado,1
+Estadio Nemesio Diez,Parque Metropolitano Bicentenario,16.49,28.72,4.0,7,10,transporte_publico,0
+Lerma Centro,Los Portales,20.21,305.94,3.7,2,4,auto_privado,1
+Parque Metropolitano Bicentenario,Centro Metepec,13.55,131.01,4.1,2,6,transporte_publico,0
+Terminal Toluca,Plazas Outlet Lerma,16.01,439.47,3.5,4,7,auto_privado,0
+Lerma Centro,Parque Metropolitano Bicentenario,7.56,141.76,3.3,8,2,transporte_publico,0
+Los Portales,Estadio Nemesio Diez,18.5,313.17,4.5,5,9,auto_privado,0
+Alameda Central Toluca,Cosmovitral,5.46,285.7,4.0,7,3,auto_privado,1
+Lerma Centro,Estadio Nemesio Diez,17.52,210.16,4.1,2,9,transporte_publico,1
+Lerma Centro,Los Portales,21.59,345.26,4.9,7,7,auto_privado,0
+Plazas Outlet Lerma,Plazas Outlet Lerma,3.74,368.37,4.9,1,2,transporte_publico,1
+Parque Metropolitano Bicentenario,Centro Metepec,15.55,292.13,4.7,2,8,auto_privado,1
+San Mateo Atenco,Cosmovitral,2.83,384.04,3.4,5,2,auto_privado,1
+Alameda Central Toluca,Terminal Toluca,18.28,492.04,4.2,1,6,auto_privado,1
+Parque Ambiental Bicentenario,Lerma Centro,2.57,221.25,4.8,7,10,auto_privado,0
+Centro Metepec,Plazas Outlet Lerma,23.43,267.0,3.7,7,10,auto_privado,0
+Terminal Toluca,San Mateo Atenco,3.87,25.99,3.2,5,9,transporte_publico,0
+Parque Metropolitano Bicentenario,Cosmovitral,23.99,402.09,4.6,3,5,auto_privado,1
+Parque Metropolitano Bicentenario,Cosmovitral,20.12,269.71,4.0,1,6,auto_privado,1
+Alameda Central Toluca,Los Portales,15.05,215.82,4.1,5,4,transporte_publico,0
+Estadio Nemesio Diez,San Mateo Atenco,19.67,65.15,5.0,5,10,transporte_publico,0
+Centro Metepec,San Mateo Atenco,19.98,447.04,4.2,7,5,auto_privado,1
+Terminal Toluca,Lerma Centro,23.68,209.6,4.0,5,8,transporte_publico,0
+Cosmovitral,Cosmovitral,6.71,347.64,3.7,2,4,transporte_publico,1
+San Mateo Atenco,Cosmovitral,14.96,91.7,3.8,1,8,transporte_publico,0
+Estadio Nemesio Diez,Lerma Centro,2.83,481.54,3.2,7,3,auto_privado,1
+Galerias Metepec,Plazas Outlet Lerma,15.6,105.65,4.6,2,8,transporte_publico,0
+Centro Metepec,Parque Ambiental Bicentenario,4.7,115.78,4.7,8,1,transporte_publico,0
+Centro Metepec,Cosmovitral,14.34,432.31,3.6,1,2,auto_privado,1
+Estadio Nemesio Diez,Terminal Toluca,14.52,458.04,3.6,6,4,auto_privado,1
+Parque Metropolitano Bicentenario,Terminal Toluca,11.92,121.83,4.7,8,5,transporte_publico,0
+San Mateo Atenco,Parque Ambiental Bicentenario,13.3,245.5,3.0,4,8,auto_privado,0
+Plazas Outlet Lerma,Lerma Centro,19.22,372.08,4.0,1,4,auto_privado,1
+Alameda Central Toluca,Galerias Metepec,20.08,441.62,3.9,8,1,auto_privado,1
+Parque Ambiental Bicentenario,Alameda Central Toluca,12.56,201.95,4.4,2,4,transporte_publico,1
+Plazas Outlet Lerma,San Mateo Atenco,15.19,268.17,3.3,5,5,auto_privado,1
+Terminal Toluca,Terminal Toluca,23.32,376.02,4.3,8,6,auto_privado,0
+San Mateo Atenco,San Mateo Atenco,3.43,370.95,3.8,6,7,auto_privado,1
+Parque Metropolitano Bicentenario,Lerma Centro,3.37,256.13,4.2,1,3,transporte_publico,1
+Plazas Outlet Lerma,Parque Ambiental Bicentenario,2.65,293.57,3.1,7,7,auto_privado,0
+Centro Metepec,Lerma Centro,16.62,70.22,3.9,2,7,transporte_publico,0
+Lerma Centro,Galerias Metepec,10.76,453.91,4.0,6,8,auto_privado,1
+Cosmovitral,Parque Metropolitano Bicentenario,19.47,435.47,3.4,5,6,auto_privado,1
+Cosmovitral,Alameda Central Toluca,16.95,403.09,3.3,3,9,auto_privado,0
+Plazas Outlet Lerma,Plazas Outlet Lerma,8.67,67.93,3.4,4,3,transporte_publico,0
+Centro Metepec,Parque Ambiental Bicentenario,22.51,118.11,3.7,1,8,transporte_publico,0
+Centro Metepec,Los Portales,19.18,376.93,3.2,8,1,auto_privado,1
+Los Portales,Plazas Outlet Lerma,7.13,31.11,4.9,2,2,transporte_publico,0
+Los Portales,Terminal Toluca,9.42,490.03,3.8,3,9,auto_privado,1
+San Mateo Atenco,Galerias Metepec,8.2,201.03,4.6,5,5,transporte_publico,0
+Alameda Central Toluca,Los Portales,4.36,365.27,4.9,6,7,auto_privado,1
+Galerias Metepec,Galerias Metepec,4.12,446.03,3.2,5,7,auto_privado,1
+Alameda Central Toluca,Estadio Nemesio Diez,23.44,209.42,4.3,5,7,transporte_publico,0
+Alameda Central Toluca,Parque Metropolitano Bicentenario,11.23,173.18,4.7,5,3,transporte_publico,0
+Cosmovitral,Parque Ambiental Bicentenario,9.89,312.2,4.3,7,2,auto_privado,1
+Plazas Outlet Lerma,San Mateo Atenco,18.38,298.87,3.9,4,1,auto_privado,1
+Plazas Outlet Lerma,Estadio Nemesio Diez,14.05,216.39,3.9,7,9,transporte_publico,0
+Cosmovitral,Plazas Outlet Lerma,23.44,308.85,3.1,7,3,auto_privado,0
+Estadio Nemesio Diez,Parque Metropolitano Bicentenario,19.62,468.98,4.1,8,6,auto_privado,1
+Centro Metepec,Cosmovitral,12.24,244.47,5.0,8,5,auto_privado,0
+Estadio Nemesio Diez,Terminal Toluca,9.72,114.44,4.9,7,2,transporte_publico,0
+Parque Ambiental Bicentenario,Los Portales,24.67,201.06,3.1,2,5,transporte_publico,0
+Alameda Central Toluca,Parque Ambiental Bicentenario,18.09,209.17,4.4,7,1,transporte_publico,0
+Terminal Toluca,Centro Metepec,23.8,82.93,3.6,6,2,transporte_publico,0
+Estadio Nemesio Diez,Estadio Nemesio Diez,3.4,98.18,4.8,3,2,transporte_publico,0
+Galerias Metepec,Parque Metropolitano Bicentenario,21.34,348.59,3.1,6,9,auto_privado,0
+Los Portales,Lerma Centro,16.11,182.95,4.9,3,6,transporte_publico,0
+San Mateo Atenco,Centro Metepec,3.49,478.35,4.7,5,10,auto_privado,1
+Terminal Toluca,Terminal Toluca,14.91,136.93,3.2,7,5,transporte_publico,0
+Terminal Toluca,Terminal Toluca,17.31,67.48,3.1,2,3,transporte_publico,0
+Centro Metepec,Parque Metropolitano Bicentenario,0.8,381.68,4.7,3,7,caminando,1
+Centro Metepec,Estadio Nemesio Diez,11.63,442.9,3.3,7,10,auto_privado,0
+Alameda Central Toluca,Lerma Centro,20.72,153.49,4.1,4,6,transporte_publico,0
+Alameda Central Toluca,Centro Metepec,7.74,117.0,4.8,8,1,transporte_publico,0
+Terminal Toluca,San Mateo Atenco,11.73,256.13,4.1,1,4,transporte_publico,1
+Galerias Metepec,Galerias Metepec,11.34,270.57,3.8,6,10,auto_privado,0
+Estadio Nemesio Diez,Estadio Nemesio Diez,7.9,244.84,3.9,7,6,auto_privado,0
+Cosmovitral,Galerias Metepec,23.0,144.53,3.1,8,10,transporte_publico,0
+Estadio Nemesio Diez,Galerias Metepec,19.64,41.68,4.9,2,6,transporte_publico,0
+Plazas Outlet Lerma,Parque Ambiental Bicentenario,3.21,251.12,3.6,8,1,auto_privado,0
+Alameda Central Toluca,Los Portales,24.93,480.48,3.4,4,9,auto_privado,0
+Lerma Centro,Galerias Metepec,22.04,333.21,3.6,3,8,auto_privado,0
+Alameda Central Toluca,Alameda Central Toluca,7.46,257.84,4.9,3,8,auto_privado,1
+Los Portales,San Mateo Atenco,21.0,73.13,3.2,6,10,transporte_publico,0
+Alameda Central Toluca,San Mateo Atenco,3.11,141.17,4.7,6,2,transporte_publico,0
+Alameda Central Toluca,Galerias Metepec,24.98,256.13,4.0,4,10,transporte_publico,0
+Cosmovitral,Plazas Outlet Lerma,16.81,387.11,4.7,1,3,auto_privado,1
+Galerias Metepec,Centro Metepec,16.43,440.82,5.0,8,10,auto_privado,0
+Estadio Nemesio Diez,Terminal Toluca,2.72,452.79,4.7,2,2,caminando,1
+Parque Ambiental Bicentenario,Galerias Metepec,22.48,492.59,4.9,1,6,auto_privado,1
+Parque Metropolitano Bicentenario,San Mateo Atenco,1.21,491.54,3.3,5,8,auto_privado,1
+Parque Metropolitano Bicentenario,Cosmovitral,6.4,477.44,4.6,4,1,transporte_publico,1
+Parque Metropolitano Bicentenario,Cosmovitral,4.0,54.47,4.1,5,1,transporte_publico,0
+Cosmovitral,Alameda Central Toluca,19.53,86.14,4.1,8,9,transporte_publico,0
+Parque Ambiental Bicentenario,Lerma Centro,5.36,166.14,4.8,1,1,transporte_publico,1
+Cosmovitral,Centro Metepec,22.81,285.39,4.9,3,7,auto_privado,1
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,16.58,66.55,4.4,5,10,transporte_publico,0
+Plazas Outlet Lerma,Lerma Centro,1.39,425.98,4.0,7,7,auto_privado,1
+San Mateo Atenco,Centro Metepec,0.63,316.04,3.9,5,5,auto_privado,1
+Parque Metropolitano Bicentenario,Parque Ambiental Bicentenario,1.77,256.13,3.8,4,5,transporte_publico,1
+Alameda Central Toluca,Alameda Central Toluca,15.35,99.35,3.7,5,7,transporte_publico,0
+Lerma Centro,Cosmovitral,20.14,141.56,3.8,8,6,transporte_publico,0
+Alameda Central Toluca,Estadio Nemesio Diez,6.34,96.95,3.2,4,6,transporte_publico,0
+Parque Metropolitano Bicentenario,Galerias Metepec,21.31,428.93,3.2,8,2,auto_privado,1
+San Mateo Atenco,Los Portales,1.9,300.43,4.6,7,7,auto_privado,0
+Plazas Outlet Lerma,Los Portales,20.12,372.86,3.9,3,8,auto_privado,1
+Plazas Outlet Lerma,Terminal Toluca,23.23,162.1,4.9,2,8,transporte_publico,0
+Cosmovitral,Parque Ambiental Bicentenario,19.42,198.2,4.2,7,1,transporte_publico,0
+Lerma Centro,Lerma Centro,17.6,214.33,3.1,2,8,transporte_publico,0
+Cosmovitral,San Mateo Atenco,21.03,384.81,3.3,3,8,auto_privado,1
+Galerias Metepec,Estadio Nemesio Diez,1.48,390.73,3.4,2,2,caminando,1
+Plazas Outlet Lerma,Galerias Metepec,5.44,119.27,5.0,5,9,transporte_publico,0
+Galerias Metepec,Plazas Outlet Lerma,3.56,256.13,3.4,3,6,auto_privado,1
+Plazas Outlet Lerma,Galerias Metepec,12.86,77.91,4.0,6,5,transporte_publico,0
+Estadio Nemesio Diez,Alameda Central Toluca,18.76,450.14,4.9,8,8,auto_privado,0
+Alameda Central Toluca,Estadio Nemesio Diez,15.94,68.19,5.0,7,6,transporte_publico,0
+Alameda Central Toluca,Parque Ambiental Bicentenario,21.35,146.98,3.5,8,6,transporte_publico,0
+Estadio Nemesio Diez,Parque Metropolitano Bicentenario,4.3,426.31,3.1,1,4,transporte_publico,0
+Parque Ambiental Bicentenario,Lerma Centro,18.5,106.16,3.3,4,10,transporte_publico,0
+Parque Metropolitano Bicentenario,Lerma Centro,5.23,218.51,3.1,2,10,transporte_publico,0
+Parque Ambiental Bicentenario,Terminal Toluca,7.13,235.93,3.4,8,2,auto_privado,0
+Estadio Nemesio Diez,Parque Ambiental Bicentenario,17.89,137.72,4.1,6,8,transporte_publico,0
+Alameda Central Toluca,Estadio Nemesio Diez,24.52,360.92,4.8,3,1,auto_privado,1
+Los Portales,Centro Metepec,15.48,428.64,4.1,5,4,auto_privado,1
+Centro Metepec,Alameda Central Toluca,1.84,439.8,4.3,5,10,auto_privado,1
+Lerma Centro,Estadio Nemesio Diez,15.6,182.87,3.4,4,2,transporte_publico,0
+Lerma Centro,Alameda Central Toluca,1.54,274.81,4.6,4,4,transporte_publico,1
+Alameda Central Toluca,Terminal Toluca,22.16,139.24,4.2,1,3,transporte_publico,1
+Parque Metropolitano Bicentenario,San Mateo Atenco,17.88,137.5,4.7,4,8,transporte_publico,0
+Parque Ambiental Bicentenario,Cosmovitral,4.74,97.4,4.9,3,5,transporte_publico,0
+Galerias Metepec,Estadio Nemesio Diez,2.75,471.21,3.7,7,6,auto_privado,1
+Terminal Toluca,Los Portales,5.0,446.23,3.2,7,10,auto_privado,0
+Galerias Metepec,Cosmovitral,24.51,393.13,3.5,7,6,auto_privado,1
+Terminal Toluca,Estadio Nemesio Diez,11.73,268.48,3.9,1,8,auto_privado,1
+Cosmovitral,Plazas Outlet Lerma,19.71,255.49,4.9,7,1,auto_privado,0
+Galerias Metepec,Plazas Outlet Lerma,16.09,256.13,3.8,4,3,auto_privado,1
+Cosmovitral,Estadio Nemesio Diez,14.52,277.55,4.5,4,10,auto_privado,1
+Estadio Nemesio Diez,Centro Metepec,4.06,228.59,4.1,8,9,auto_privado,0
+Galerias Metepec,Plazas Outlet Lerma,23.68,83.24,3.4,7,7,transporte_publico,0
+Galerias Metepec,Los Portales,7.88,80.32,3.6,1,4,transporte_publico,1
+Parque Metropolitano Bicentenario,Plazas Outlet Lerma,14.66,477.08,4.3,3,2,auto_privado,1
+Cosmovitral,Cosmovitral,17.64,251.37,4.3,6,9,auto_privado,0
+San Mateo Atenco,Los Portales,16.41,477.54,3.9,5,8,auto_privado,1
+Plazas Outlet Lerma,Estadio Nemesio Diez,23.54,98.52,3.5,3,3,transporte_publico,0
+Lerma Centro,Terminal Toluca,4.14,286.12,4.4,5,6,auto_privado,1
+Parque Ambiental Bicentenario,San Mateo Atenco,12.95,119.7,3.3,7,7,transporte_publico,0
+Estadio Nemesio Diez,Lerma Centro,10.4,141.53,4.9,2,5,transporte_publico,1
+Lerma Centro,Estadio Nemesio Diez,12.12,34.43,3.4,6,10,transporte_publico,0
+Parque Metropolitano Bicentenario,Lerma Centro,3.42,77.1,3.2,6,2,transporte_publico,0
+Cosmovitral,San Mateo Atenco,3.79,460.09,4.0,8,3,auto_privado,1
+Lerma Centro,San Mateo Atenco,7.31,174.34,4.0,3,1,transporte_publico,1
+Alameda Central Toluca,San Mateo Atenco,7.97,311.9,4.0,2,7,auto_privado,1
+Plazas Outlet Lerma,Centro Metepec,10.98,243.21,3.9,5,7,auto_privado,0
+Estadio Nemesio Diez,Cosmovitral,15.47,212.22,5.0,5,10,transporte_publico,0
+Lerma Centro,Plazas Outlet Lerma,16.05,275.31,4.0,4,6,auto_privado,1
+Centro Metepec,Galerias Metepec,10.59,109.87,4.0,7,2,transporte_publico,0
+Parque Metropolitano Bicentenario,Lerma Centro,10.52,494.53,3.8,7,5,auto_privado,1
+Alameda Central Toluca,Plazas Outlet Lerma,5.83,412.79,3.1,2,1,transporte_publico,0
+Lerma Centro,Los Portales,14.91,375.98,4.2,7,7,auto_privado,0
+Terminal Toluca,Estadio Nemesio Diez,8.27,245.0,3.5,2,7,auto_privado,1
+Parque Metropolitano Bicentenario,Los Portales,1.38,93.38,4.0,4,9,transporte_publico,0
+Estadio Nemesio Diez,Terminal Toluca,10.75,461.92,3.1,1,4,auto_privado,0
+Centro Metepec,Plazas Outlet Lerma,12.12,183.87,5.0,3,4,transporte_publico,1
+Alameda Central Toluca,Plazas Outlet Lerma,6.03,44.05,3.9,8,1,transporte_publico,0
+Galerias Metepec,Plazas Outlet Lerma,14.53,184.35,4.8,4,5,transporte_publico,1
+Estadio Nemesio Diez,Lerma Centro,14.36,401.34,4.0,6,5,auto_privado,1
+Los Portales,Galerias Metepec,17.7,318.9,3.1,1,8,auto_privado,0
+Los Portales,Centro Metepec,16.37,380.4,4.6,6,8,auto_privado,1
+Parque Ambiental Bicentenario,Plazas Outlet Lerma,16.48,400.94,4.3,3,2,auto_privado,1
+Alameda Central Toluca,Centro Metepec,8.25,121.74,4.6,6,3,transporte_publico,0
+Alameda Central Toluca,Galerias Metepec,19.79,463.42,3.9,8,6,auto_privado,1
+Galerias Metepec,Los Portales,13.95,230.24,4.3,5,4,auto_privado,1
+Alameda Central Toluca,Parque Ambiental Bicentenario,11.07,326.73,4.7,1,1,auto_privado,1
+Estadio Nemesio Diez,San Mateo Atenco,15.84,21.11,4.3,4,9,transporte_publico,0
+Los Portales,Parque Ambiental Bicentenario,9.34,496.82,3.7,1,8,auto_privado,1
+Estadio Nemesio Diez,Parque Metropolitano Bicentenario,13.06,154.83,4.3,4,6,transporte_publico,0

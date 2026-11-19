@@ -27,6 +27,7 @@ import type {
 } from '@/types/dominio';
 
 import * as mock from './mock';
+import * as mockLaboratorioIa from './mock/laboratorioIa';
 import * as mockPlanes from './mock/planes';
 
 const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
@@ -346,4 +347,36 @@ export const recomendarTrasladoIA = (consulta: ConsultaRecomendacionIA) =>
 
 /** GET /api/ia/pipeline-estado → reporte de exactitud y estado del pipeline de IA */
 export const obtenerEstadoIA = () => solicitud<Record<string, unknown>>('/api/ia/pipeline-estado');
+
+export type {
+  ComparativaSistemasIA,
+  MetricasLaboratorioIA,
+  ParticionComparativaIA,
+  PeticionSimulacionIA,
+  PuntoCurvaComplejidadIA,
+  RespuestaSimulacionIA,
+  ResumenLimpiezaIA,
+} from './mock/laboratorioIa';
+export { ZONAS_BFS_KOMPAS } from './mock/laboratorioIa';
+
+/** GET /api/ia/metricas → métricas de limpieza (P02), particiones, under/overfitting y Reglas vs ML (P03).
+ *  Si el backend local no responde o está en modo mock, devuelve el cálculo determinista de respaldo. */
+export const obtenerMetricasIA = (): Promise<mockLaboratorioIa.MetricasLaboratorioIA> =>
+  USA_MOCK
+    ? mockLaboratorioIa.obtenerMetricasIAMock()
+    : solicitud<mockLaboratorioIa.MetricasLaboratorioIA>('/api/ia/metricas').catch(() =>
+        mockLaboratorioIa.obtenerMetricasIAMock(),
+      );
+
+/** POST /api/ia/simular → simula en vivo un plan/traslado con Reglas Fijas, Árbol de Decisión óptimo y BFS. */
+export const simularPrediccionIA = (
+  payload: mockLaboratorioIa.PeticionSimulacionIA,
+): Promise<mockLaboratorioIa.RespuestaSimulacionIA> =>
+  USA_MOCK
+    ? mockLaboratorioIa.simularPrediccionIAMock(payload)
+    : solicitud<mockLaboratorioIa.RespuestaSimulacionIA>('/api/ia/simular', {
+        method: 'POST',
+        body: payload,
+      }).catch(() => mockLaboratorioIa.simularPrediccionIAMock(payload));
+
 

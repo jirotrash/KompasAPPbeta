@@ -2,9 +2,42 @@
 ## Versión 3.0 (Edición Noviembre 2026)
 
 > **Fecha de Actualización:** 18 de noviembre de 2026  
-> **Plataforma:** Android / iOS (Expo React Native)  
+> **Plataforma:** Android (instalador APK; requiere el servidor de Kompás encendido)  
 > **Versión de la App:** v0.7.0 / Manual v3.0  
 > **Versión Previa:** v2.0 (27 de octubre de 2026)  
+
+---
+
+## Antes de empezar: Descargar e instalar la app (Android)
+
+### Descarga
+Descarga el instalador desde este enlace (siempre apunta a la versión más reciente):
+
+**https://github.com/jirotrash/KompasAPPbeta/releases/latest/download/kompas.apk**
+
+### Instalación
+1. Abre el archivo `kompas.apk` descargado desde las notificaciones o desde la carpeta **Descargas**.
+2. Si Android muestra *"Por tu seguridad, tu teléfono no puede instalar apps desconocidas"*, toca **Configuración** y activa **Permitir de esta fuente** para el navegador o el administrador de archivos que usaste.
+3. Toca **Instalar**. Si aparece un aviso de Play Protect, elige **Instalar de todas formas** (la app no viene de la Play Store, por eso aparece el aviso).
+4. Abre **Kompás App** y acepta el permiso de ubicación.
+
+### Requisito: el servidor de Kompás debe estar encendido
+La app no guarda los datos en el teléfono: lugares, planes, recomendaciones y tu cuenta viven en el servidor de Kompás (una PC del equipo). Por eso:
+
+- La app **funciona solo mientras el servidor está encendido**.
+- El celular debe estar conectado a la **misma red WiFi** que la PC del servidor.
+- Si el servidor está apagado, la app muestra el mensaje **"No hay conexión con el servidor"**. No es una falla del teléfono: espera a que el servidor se encienda y vuelve a intentarlo.
+
+### Conectar la app con el servidor
+1. En la PC del servidor, ejecuta `iniciar_backend.bat` desde la carpeta raíz del proyecto. La ventana muestra la dirección, por ejemplo `http://192.168.1.50:8000`. Deja la ventana abierta.
+2. En el celular, en la pantalla **Iniciar sesión**, escribe esa IP en el campo **Dirección del servidor** (basta con `192.168.1.50`; la app agrega `http://` y el puerto `:8000`).
+3. Escribe tu correo y contraseña y toca **Iniciar sesión**, o toca **Regístrate** para crear una cuenta. La app comprueba primero que el servidor responda.
+
+La app recuerda la última dirección que funcionó. **Si la PC se conecta a otra WiFi, su IP cambia:** cierra sesión en **Perfil**, escribe la IP nueva en **Dirección del servidor** y vuelve a entrar.
+
+> **Si no conecta aunque el servidor esté encendido:** revisa que el celular y la PC estén en la misma WiFi y que el Firewall de Windows permita a Python en redes privadas (puerto 8000). Algunas redes públicas o escolares bloquean la comunicación entre dispositivos; en ese caso usa el punto de acceso (hotspot) de un celular para ambos.
+
+> **iPhone:** por ahora no hay instalador para iOS.
 
 ---
 
@@ -196,4 +229,18 @@ Porque el chat anterior dependía de un programa externo (Ollama) que tardaba mu
 La app te sugerirá la ruta óptima mediante el **Recomendador Multimodal (Random Forest)** y guardará ese nuevo recorrido. Cuando lo repitas un par de veces, se integrará automáticamente a tus hábitos habituales.
 
 ### ¿La app funciona sin conexión a internet?
-Sí. El mapa base, tus planes guardados y el motor de hábitos funcionan de forma local en tu teléfono inteligente. Al recuperar la conexión a internet, se sincronizan las condiciones de clima y tráfico en tiempo real.
+**No.** Kompás necesita internet y que el servidor de Kompás esté encendido: tu cuenta, tus planes guardados, las recomendaciones y el mapa se cargan desde internet. Sin conexión, o con el servidor apagado, la app muestra el mensaje *"No hay conexión con el servidor"*. Revisa tu internet y vuelve a intentarlo más tarde.
+
+### Olvidé mi contraseña, ¿cómo la recupero?
+1. En **Iniciar sesión**, toca **¿Olvidaste tu contraseña?**
+2. Escribe el correo de tu cuenta y toca **Enviar código**.
+3. Revisa tu correo (también la carpeta de spam) y escribe el **código de 6 dígitos**. Vence en 15 minutos y tienes 5 intentos.
+4. Escribe tu contraseña nueva dos veces y toca **Cambiar contraseña**. La app entra a tu cuenta.
+
+Si no te llega el código, toca **Enviar otro código** (puedes pedir uno nuevo cada minuto).
+
+### La app dice "No hay conexión con el servidor", ¿qué hago?
+1. Revisa que tengas internet (abre cualquier página web).
+2. Revisa que estés en la misma WiFi que la PC del servidor.
+3. Si la PC cambió de red, su IP también cambió: cierra sesión y escribe la IP nueva en **Dirección del servidor**.
+4. Si todo lo anterior está bien, el servidor está apagado. Avisa al equipo de Kompás o intenta más tarde.

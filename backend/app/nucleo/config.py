@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     # Asistente con LLM local (Ollama corre en la misma PC que la API). El modelo debe soportar tools
     ollama_url: str = "http://localhost:11434"
     ollama_modelo: str = "llama3.2:3b"
+    # Correo para los códigos de recuperación de contraseña (SMTP: Gmail, Outlook, Brevo…).
+    # Sin SMTP_HOST el código solo se escribe en la consola de la API (modo desarrollo)
+    smtp_host: str | None = None
+    smtp_puerto: int = 587
+    smtp_usuario: str | None = None
+    smtp_password: str | None = None
+    smtp_remitente: str | None = None
 
     @model_validator(mode="after")
     def _atlas_configurado(self) -> "Settings":

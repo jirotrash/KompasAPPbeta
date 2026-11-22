@@ -6,6 +6,7 @@ La app muestra `detail` tal cual, así que los mensajes deben quedarse idéntico
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pymongo.errors import ServerSelectionTimeoutError
 
 
 class ErrorNegocio(Exception):
@@ -49,6 +50,14 @@ def registrar_manejadores(app: FastAPI) -> None:
     async def _manejar(_: Request, exc: ErrorNegocio) -> JSONResponse:
         encabezados = {"WWW-Authenticate": "Bearer"} if isinstance(exc, NoAutorizado) else None
         return JSONResponse(status_code=exc.codigo_http, content={"detail": exc.mensaje}, headers=encabezados)
+
+    @app.exception_handler(ServerSelectionTimeoutError)
+    async def _base_no_responde(_: Request, __: ServerSelectionTimeoutError) -> JSONResponse:
+        """MongoDB apagado o inaccesible: 503 con mensaje (un 500 sin CORS la app lo lee como 'sin conexión')."""
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={"detail": "La base de datos del servidor no responde. Intenta de nuevo en unos minutos."},
+        )
 
     @app.exception_handler(RequestValidationError)
     async def error_de_validacion(_: Request, exc: RequestValidationError) -> JSONResponse:

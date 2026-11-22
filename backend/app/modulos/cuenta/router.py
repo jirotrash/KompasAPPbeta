@@ -1,11 +1,15 @@
-"""Cuenta: registro, login, usuario actual y residencia (colección `usuarios`)."""
+"""Cuenta: registro, login, recuperación de contraseña, usuario actual y residencia (colección `usuarios`)."""
 
 from fastapi import APIRouter, Depends, status
 from pymongo.database import Database
 
 from app.modulos.cuenta.esquemas import (
+    CodigoEntrada,
     LoginEntrada,
+    MensajeSalida,
+    RecuperarEntrada,
     RegistroEntrada,
+    RestablecerEntrada,
     ResidenciaEntrada,
     ResidenciaSalida,
     SesionSalida,
@@ -40,6 +44,26 @@ def registrar(datos: RegistroEntrada, servicio: ServicioCuenta = Depends(get_ser
 def login(datos: LoginEntrada, servicio: ServicioCuenta = Depends(get_servicio)):
     """401 si el correo o la contraseña no coinciden (no se dice cuál de los dos)."""
     return _sesion(servicio.login(datos.correo, datos.password))
+
+
+@router.post("/recuperar", response_model=MensajeSalida)
+def solicitar_recuperacion(datos: RecuperarEntrada, servicio: ServicioCuenta = Depends(get_servicio)):
+    """Envía un código de 6 dígitos al correo (vence en 15 min). Responde igual aunque el correo no exista.
+    503 si el servidor de correo falla."""
+    return MensajeSalida(mensaje=servicio.solicitar_recuperacion(datos.correo))
+
+
+@router.post("/recuperar/verificar", response_model=MensajeSalida)
+def verificar_codigo(datos: CodigoEntrada, servicio: ServicioCuenta = Depends(get_servicio)):
+    """Comprueba el código sin gastarlo. 400 si no coincide, venció o se agotaron los 5 intentos."""
+    servicio.verificar_codigo(datos.correo, datos.codigo)
+    return MensajeSalida(mensaje="Código correcto.")
+
+
+@router.post("/recuperar/restablecer", response_model=MensajeSalida)
+def restablecer_password(datos: RestablecerEntrada, servicio: ServicioCuenta = Depends(get_servicio)):
+    """Cambia la contraseña con el código (solo sirve una vez). 400 si el código no es válido."""
+    return MensajeSalida(mensaje=servicio.restablecer_password(datos.correo, datos.codigo, datos.password))
 
 
 @router.get("/yo", response_model=UsuarioSalida)

@@ -6,6 +6,8 @@
 // En el celular "localhost" es el propio celular: usa la IP de tu PC, p. ej. http://192.168.1.50:8000
 // Coordenadas en parámetros de consulta: "lat,lng". Geometrías que regresa la API: GeoJSON ([lng, lat]).
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import type { Coordenada } from '@/constants/zona';
 import type {
   ComparacionDistancias,
@@ -30,9 +32,64 @@ import * as mock from './mock';
 import * as mockLaboratorioIa from './mock/laboratorioIa';
 import * as mockPlanes from './mock/planes';
 
-const API_URL = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 export const USA_MOCK = process.env.EXPO_PUBLIC_USE_MOCK !== 'false';
 const TIEMPO_LIMITE_MS = 15000;
+
+// ─────────────────────────── Dirección del servidor ─────────────────────────
+// La IP de la PC cambia con cada WiFi: el usuario la escribe en la pantalla de inicio de sesión
+// y se guarda en el teléfono. EXPO_PUBLIC_API_URL es solo el valor inicial.
+const CLAVE_SERVIDOR = 'bu_servidor';
+const PUERTO_API = '8000';
+const TIEMPO_PRUEBA_MS = 5000;
+
+/** "192.168.1.50" → "http://192.168.1.50:8000". Respeta el esquema y el puerto si se escriben. */
+export function normalizarServidor(texto: string): string {
+  let url = texto.trim().replace(/\/+$/, '');
+  if (!url) return '';
+  if (!/^https?:\/\//i.test(url)) url = `http://${url}`;
+  const sinEsquema = url.replace(/^https?:\/\//i, '');
+  if (url.startsWith('http://') && !/:\d+$/.test(sinEsquema)) url += `:${PUERTO_API}`;
+  return url;
+}
+
+let API_URL = normalizarServidor(process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000');
+
+export const obtenerServidor = () => API_URL;
+
+/** Lo llama el contexto de sesión al abrir la app: recupera la última dirección que funcionó. */
+export async function cargarServidor() {
+  try {
+    const guardado = await AsyncStorage.getItem(CLAVE_SERVIDOR);
+    if (guardado) API_URL = guardado;
+  } catch {
+    // Sin almacenamiento se usa el valor inicial
+  }
+}
+
+/** Prueba /api/salud en la dirección escrita; si responde, la usa y la guarda. */
+export async function cambiarServidor(texto: string) {
+  const url = normalizarServidor(texto);
+  if (!url) throw new ErrorApi('Escribe la dirección del servidor (la IP de la PC).', 0);
+  const control = new AbortController();
+  const temporizador = setTimeout(() => control.abort(), TIEMPO_PRUEBA_MS);
+  try {
+    const respuesta = await fetch(`${url}/api/salud`, { signal: control.signal });
+    if (!respuesta.ok) throw new Error();
+  } catch {
+    throw new ErrorApi(
+      `No se encontró el servidor en ${url}. Revisa que esté encendido y que estés en la misma WiFi.`,
+      0,
+    );
+  } finally {
+    clearTimeout(temporizador);
+  }
+  API_URL = url;
+  try {
+    await AsyncStorage.setItem(CLAVE_SERVIDOR, url);
+  } catch {
+    // Si no se guarda, la dirección dura mientras la app esté abierta
+  }
+}
 
 let token: string | null = null;
 /** Lo llama el contexto de sesión al iniciar o cerrar sesión. */
@@ -99,6 +156,25 @@ export const login = (datos: { email: string; password: string }) =>
 /** POST /api/auth/register → { token, usuario } */
 export const registrar = (datos: NuevoUsuario) =>
   USA_MOCK ? mock.registrar(datos) : solicitud<Sesion>('/api/auth/register', { method: 'POST', body: datos });
+
+// ─────────────────────────── Recuperación de contraseña ─────────────────────────
+// El servidor manda un código de 6 dígitos al correo; vence en 15 minutos y admite 5 intentos.
+
+/** POST /api/auth/recuperar → responde igual aunque el correo no esté registrado */
+export const solicitarRecuperacion = (email: string) =>
+  USA_MOCK ? mock.solicitarRecuperacion(email) : solicitud<{ mensaje: string }>('/api/auth/recuperar', { method: 'POST', body: { email } });
+
+/** POST /api/auth/recuperar/verificar → 400 si el código no coincide o venció */
+export const verificarCodigo = (email: string, codigo: string) =>
+  USA_MOCK
+    ? mock.verificarCodigo(email, codigo)
+    : solicitud<{ mensaje: string }>('/api/auth/recuperar/verificar', { method: 'POST', body: { email, codigo } });
+
+/** POST /api/auth/recuperar/restablecer → cambia la contraseña; el código ya no sirve después */
+export const restablecerPassword = (email: string, codigo: string, password: string) =>
+  USA_MOCK
+    ? mock.restablecerPassword(email, codigo, password)
+    : solicitud<{ mensaje: string }>('/api/auth/recuperar/restablecer', { method: 'POST', body: { email, codigo, password } });
 
 // ─────────────────────────────── Rutas (MongoDB) ──────────────────────────────
 

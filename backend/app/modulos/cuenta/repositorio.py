@@ -1,7 +1,8 @@
-"""Acceso a la colección `usuarios` (la residencia va embebida en el usuario)."""
+"""Acceso a las colecciones `usuarios` (la residencia va embebida) y `codigos_recuperacion`."""
 
 from datetime import date, datetime, time
 
+from pymongo import ReturnDocument
 from pymongo.database import Database
 from pymongo.errors import DuplicateKeyError
 
@@ -96,3 +97,35 @@ class RepositorioCuenta:
 
     def contar(self) -> int:
         return self.bd.usuarios.count_documents({"deleted_at": None})
+
+    def cambiar_password(self, correo: str, password_hash: str) -> bool:
+        resultado = self.bd.usuarios.update_one(
+            {"correo": correo, "deleted_at": None}, {"$set": {"password": password_hash, "updated_at": ahora()}}
+        )
+        return resultado.matched_count > 0
+
+    # ── Códigos de recuperación (colección `codigos_recuperacion`, un documento por correo) ──
+    # Se guarda solo el hash del código. El índice TTL de `expira` borra los vencidos (preparar_bd.py)
+
+    def codigo_recuperacion(self, correo: str) -> dict | None:
+        doc = self.bd.codigos_recuperacion.find_one({"_id": correo})
+        if doc is None:
+            return None
+        return {"codigo_hash": doc["codigo_hash"], "expira": doc["expira"], "intentos": doc["intentos"], "creado": doc["creado"]}
+
+    def guardar_codigo_recuperacion(self, correo: str, codigo_hash: str, expira: datetime) -> None:
+        """Un código nuevo reemplaza al anterior y reinicia los intentos."""
+        self.bd.codigos_recuperacion.replace_one(
+            {"_id": correo},
+            {"codigo_hash": codigo_hash, "expira": expira, "intentos": 0, "creado": ahora()},
+            upsert=True,
+        )
+
+    def sumar_intento_recuperacion(self, correo: str) -> int:
+        doc = self.bd.codigos_recuperacion.find_one_and_update(
+            {"_id": correo}, {"$inc": {"intentos": 1}}, return_document=ReturnDocument.AFTER
+        )
+        return doc["intentos"] if doc else 0
+
+    def borrar_codigo_recuperacion(self, correo: str) -> None:
+        self.bd.codigos_recuperacion.delete_one({"_id": correo})

@@ -237,6 +237,8 @@ INDICES = {
         IndexModel([("estado", ASCENDING), ("created_at", DESCENDING)], name="estado_recientes"),
         IndexModel([("id_usuario", ASCENDING), ("created_at", DESCENDING)], name="usuario_recientes"),
     ],
+    # Un documento por correo (_id = correo). TTL: MongoDB borra solo los códigos vencidos
+    "codigos_recuperacion": [IndexModel([("expira", ASCENDING)], expireAfterSeconds=0, name="expira_ttl")],
     "contadores": [],
 }
 

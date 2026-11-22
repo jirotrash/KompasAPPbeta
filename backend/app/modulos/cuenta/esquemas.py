@@ -88,6 +88,36 @@ class SesionSalida(BaseModel):
     usuario: UsuarioSalida
 
 
+# ── Recuperación de contraseña ──
+
+
+class RecuperarEntrada(BaseModel):
+    correo: str = Field(max_length=100, validation_alias=_CORREO)
+
+    @field_validator("correo")
+    @classmethod
+    def _minusculas(cls, valor: str) -> str:
+        return valor.strip().lower()
+
+
+class CodigoEntrada(RecuperarEntrada):
+    codigo: str = Field(pattern=r"^\d{6}$", description="Código de 6 dígitos que llegó por correo")
+
+    @field_validator("codigo", mode="before")
+    @classmethod
+    def _sin_espacios(cls, valor: str) -> str:
+        return valor.strip() if isinstance(valor, str) else valor
+
+
+class RestablecerEntrada(CodigoEntrada):
+    # bcrypt solo usa los primeros 72 bytes
+    password: str = Field(min_length=6, max_length=72, description="Contraseña nueva")
+
+
+class MensajeSalida(BaseModel):
+    mensaje: str
+
+
 class ResidenciaEntrada(BaseModel):
     calle: str | None = Field(default=None, max_length=100)
     numero_interior: str | None = Field(default=None, max_length=10)

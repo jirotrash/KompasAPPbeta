@@ -22,7 +22,9 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
 
   // Recupera la sesión guardada al abrir la app
   useEffect(() => {
-    AsyncStorage.getItem(CLAVE)
+    api
+      .cargarServidor()
+      .then(() => AsyncStorage.getItem(CLAVE))
       .then((texto) => {
         const guardada = texto ? (JSON.parse(texto) as Sesion) : null;
         api.usarToken(guardada?.token ?? null);

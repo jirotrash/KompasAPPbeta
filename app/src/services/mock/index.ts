@@ -30,6 +30,27 @@ export async function login({ email, password }: { email: string; password: stri
   return { token: 'token-de-ejemplo', usuario: { id: 1, nombre: nombre[0].toUpperCase() + nombre.slice(1), email, rol: 'usuario' } };
 }
 
+// Recuperación de contraseña en modo demostración: el código siempre es 123456
+const CODIGO_DEMO = '123456';
+
+export async function solicitarRecuperacion(email: string): Promise<{ mensaje: string }> {
+  await esperar();
+  if (!email.includes('@')) throw new ErrorMock('Escribe un correo válido.', 422);
+  return { mensaje: `Modo demostración: tu código es ${CODIGO_DEMO}.` };
+}
+
+export async function verificarCodigo(_email: string, codigo: string): Promise<{ mensaje: string }> {
+  await esperar();
+  if (codigo !== CODIGO_DEMO) throw new ErrorMock('El código no es válido o ya venció. Pide uno nuevo.', 400);
+  return { mensaje: 'Código correcto.' };
+}
+
+export async function restablecerPassword(email: string, codigo: string, password: string): Promise<{ mensaje: string }> {
+  await verificarCodigo(email, codigo);
+  if (password.length < 6) throw new ErrorMock('La contraseña necesita al menos 6 caracteres.', 422);
+  return { mensaje: 'Tu contraseña se cambió. Ya puedes iniciar sesión.' };
+}
+
 export async function registrar({ password, segundo_apellido, ...datos }: NuevoUsuario): Promise<Sesion> {
   await esperar();
   if (!datos.nombre || !datos.primer_apellido || !datos.email.includes('@') || password.length < 6) {

@@ -5,6 +5,7 @@ export default function LayoutAuth() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />
       <Stack.Screen name="registro" />
+      <Stack.Screen name="recuperar" />
     </Stack>
   );
 }

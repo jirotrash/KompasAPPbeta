@@ -46,6 +46,14 @@
         {
           "locationWhenInUsePermission": "Kompás App usa tu ubicación para sugerirte rutas y lugares cercanos."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
     ],
     "experiments": {

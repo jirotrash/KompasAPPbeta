@@ -18,7 +18,7 @@ from typing import Any
 from app.compartido.geo import Coordenada, distancia_por_calles_km
 from app.compartido.traslados import FACTOR_AUTOBUS, FACTOR_CAMINATA
 from app.ia.busqueda_informada import a_estrella, distancia_plano_km
-from app.ia.trazos import arbol_de_ruta
+from app.ia.trazos import arbol_de_ruta, huella
 
 RADIO_TRANSBORDO_KM = 0.4
 # Parámetro de la búsqueda (en minutos-equivalentes) para preferir menos transbordos. No es un tiempo
@@ -32,13 +32,30 @@ def _celda(p: Coordenada) -> tuple[int, int]:
     return int(p["lat"] / 0.0036), int(p["lng"] / 0.0038)
 
 
-def armar_grafo(rutas: list[dict[str, Any]], origen: Coordenada, destino: Coordenada) -> tuple[dict, dict, dict]:
-    """(grafo para busqueda_informada, coordenadas de cada nodo, info de cada nodo {id_ruta, parada, km})."""
-    grafo: dict[str, list[dict[str, Any]]] = {ORIGEN: [], DESTINO: []}
-    coords: dict[str, Coordenada] = {ORIGEN: origen, DESTINO: destino}
+def _caminar(coords: dict[str, Coordenada], a: str, b: str, penalizar: bool = True) -> dict[str, Any] | None:
+    # Primero la recta (barata) para descartar; solo si está a ≤ 400 m se calcula la distancia por calles
+    if distancia_plano_km(coords[a], coords[b]) > RADIO_TRANSBORDO_KM:
+        return None
+    km = distancia_por_calles_km(coords[a], coords[b])
+    return {"destino": b, "costo": km * FACTOR_CAMINATA + (PENALIZACION_TRANSBORDO if penalizar else 0), "modo": "pie", "km": km}
+
+
+# SOLO LOCAL (optimización para muchas rutas, p. ej. las del GTFS oficial): la parte del grafo que
+# depende solo de las rutas (paradas, tramos en autobús y transbordos a pie) se arma una vez y se
+# guarda en memoria; en cada búsqueda solo se agregan el origen y el destino. Si cambia cualquier
+# ruta (alta, edición o baja), cambia la firma y el grafo se vuelve a armar.
+_BASE: dict[str, Any] = {"firma": None}
+
+
+def _grafo_de_rutas(rutas: list[dict[str, Any]]) -> tuple[dict, dict, dict, dict]:
+    firma = tuple((r["id"], huella(r)) for r in rutas)
+    if _BASE["firma"] == firma:
+        return _BASE["grafo"], _BASE["coords"], _BASE["info"], _BASE["rejilla"]
+
+    grafo: dict[str, list[dict[str, Any]]] = {}
+    coords: dict[str, Coordenada] = {}
     info: dict[str, dict[str, Any]] = {}
     rejilla: dict[tuple[int, int], list[str]] = {}
-
     for ruta in rutas:
         arbol, _ = arbol_de_ruta(ruta)
         anterior: str | None = None
@@ -54,28 +71,35 @@ def armar_grafo(rutas: list[dict[str, Any]], origen: Coordenada, destino: Coorde
             anterior = nodo
             rejilla.setdefault(_celda(coords[nodo]), []).append(nodo)
 
+    # Transbordos a pie entre paradas de rutas distintas
+    for nodo, datos in info.items():
+        f, c = _celda(coords[nodo])
+        for otro in (n for df in (-1, 0, 1) for dc in (-1, 0, 1) for n in rejilla.get((f + df, c + dc), [])):
+            if info[otro]["id_ruta"] != datos["id_ruta"] and (arista := _caminar(coords, nodo, otro)):
+                grafo[nodo].append(arista)
+
+    _BASE.update(firma=firma, grafo=grafo, coords=coords, info=info, rejilla=rejilla)
+    return grafo, coords, info, rejilla
+
+
+def armar_grafo(rutas: list[dict[str, Any]], origen: Coordenada, destino: Coordenada) -> tuple[dict, dict, dict]:
+    """(grafo para busqueda_informada, coordenadas de cada nodo, info de cada nodo {id_ruta, parada, km})."""
+    base, coords_base, info, rejilla = _grafo_de_rutas(rutas)
+    # Copias superficiales: lo que se agrega para esta búsqueda no toca el grafo guardado
+    grafo: dict[str, list[dict[str, Any]]] = {**base, ORIGEN: [], DESTINO: []}
+    coords: dict[str, Coordenada] = {**coords_base, ORIGEN: origen, DESTINO: destino}
+
     def cercanos(p: Coordenada) -> list[str]:
         f, c = _celda(p)
         return [n for df in (-1, 0, 1) for dc in (-1, 0, 1) for n in rejilla.get((f + df, c + dc), [])]
 
-    def caminar(a: str, b: str, penalizar: bool = True) -> dict[str, Any] | None:
-        km = distancia_por_calles_km(coords[a], coords[b])
-        if distancia_plano_km(coords[a], coords[b]) > RADIO_TRANSBORDO_KM:
-            return None
-        return {"destino": b, "costo": km * FACTOR_CAMINATA + (PENALIZACION_TRANSBORDO if penalizar else 0), "modo": "pie", "km": km}
-
-    # Transbordos a pie entre paradas de rutas distintas
-    for nodo, datos in info.items():
-        for otro in cercanos(coords[nodo]):
-            if info[otro]["id_ruta"] != datos["id_ruta"] and (arista := caminar(nodo, otro)):
-                grafo[nodo].append(arista)
     # Del origen a las paradas cercanas y de las paradas cercanas al destino
     for otro in cercanos(origen):
-        if arista := caminar(ORIGEN, otro):
+        if arista := _caminar(coords, ORIGEN, otro):
             grafo[ORIGEN].append(arista)
     for otro in cercanos(destino):
-        if arista := caminar(otro, DESTINO):
-            grafo[otro].append(arista)
+        if arista := _caminar(coords, otro, DESTINO):
+            grafo[otro] = [*grafo[otro], arista]
     return grafo, coords, info
 
 

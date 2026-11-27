@@ -19,6 +19,10 @@ def _ruta(doc: dict) -> dict:
     # Opcionales: nombre de la línea y paradas reales capturadas por el equipo ({nombre, ubicacion: Point})
     if doc.get("nombre"):
         ruta["nombre"] = doc["nombre"]
+    # SOLO LOCAL: color y línea de las rutas importadas del GTFS oficial (para dibujarlas en el mapa)
+    for campo in ("color", "linea"):
+        if doc.get(campo):
+            ruta[campo] = doc[campo]
     if doc.get("paradas"):
         ruta["paradas"] = [{"nombre": p["nombre"], "ubicacion": p["ubicacion"]} for p in doc["paradas"]]
     return ruta

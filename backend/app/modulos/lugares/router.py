@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from pymongo.database import Database
 
+from app.compartido.texto import INTERESES, clave
+from app.externos import google_cercanos
+from app.externos.google_places import ErrorGooglePlaces
 from app.modulos.catalogos.repositorio import RepositorioCatalogos
 from app.modulos.catalogos.servicio import ServicioCatalogos
 from app.modulos.lugares.esquemas import LugarEntrada, LugarSalida
@@ -31,6 +34,14 @@ def buscar_lugares(
     `minutos_caminando` es una estimación (≈ 12 min por km). Horario, costo, calificación y foto van
     en `null` porque la base todavía no los tiene."""
     origen = punto_lat_lng(lat, lng) or punto_de_consulta("cerca", cerca)
+    # SOLO LOCAL (no subir al repo): con ubicación, lugares reales de Google; si falla, los de la base
+    interes = clave(categoria) if categoria else None
+    if origen and (interes is None or interes in INTERESES):
+        try:
+            lugares = google_cercanos.cercanos(origen, interes)
+            return [l for l in lugares if not radio_km or l["distancia_km"] <= radio_km]
+        except ErrorGooglePlaces:
+            pass
     return servicio.buscar(origen, radio_km, categoria)
 
 

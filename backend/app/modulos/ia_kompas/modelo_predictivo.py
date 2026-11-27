@@ -23,6 +23,8 @@ from app.modulos.ia_kompas.reglas_transporte import evaluar_traslado_regla_fija
 HORAS_PICO_SET = {7, 8, 9, 18, 19, 20}
 
 
+# ALGORITMO: ÁRBOL DE DECISIÓN - predice si un traslado es viable y se compara con la regla fija.
+#   Se ve en: App > Perfil > Laboratorio IA | Dashboard > Machine Learning.
 class ModeloPredictivoKompás:
     """Encapsula el ciclo de vida del clasificador de Machine Learning:
 

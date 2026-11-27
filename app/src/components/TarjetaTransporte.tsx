@@ -77,6 +77,7 @@ export default function TarjetaTransporte({ alternativa: a, origen, onMapa }: { 
         <Texto tam="sm">1. Camina hasta {buses[0].parada_subida?.nombre}.</Texto>
         {buses.map((t, i) => <Recuadro key={`${t.id_ruta ?? i}-${i}`} gap={5}>
           <Texto peso="semi" tam="sm">{i + 2}. {i ? 'Transborda a' : 'Toma'} {t.linea ?? 'la línea indicada'}</Texto>
+          {/* ALGORITMO: ÁRBOL BINARIO (dónde subir/bajar) y A* (transbordos) - backend/app/modulos/rutas/servicio.py */}
           <Texto tam="sm">Sube en {t.parada_subida?.nombre} y baja en {t.parada_bajada?.nombre}.</Texto>
           <Texto suave tam="xs">Trayecto: {formatoMinutos(t.duracion_min)} estimados · {(t.paradas_intermedias ?? []).length} paradas intermedias registradas.</Texto>
           {i > 0 && <Texto suave tam="xs">Camina desde la bajada anterior hasta esta subida; confirma la conexión y su espera.</Texto>}

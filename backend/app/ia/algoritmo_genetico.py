@@ -81,6 +81,7 @@ class Evaluador:
         return self._cache[clave]
 
 
+# ALGORITMO: GENÉTICO - selección por torneo (k = 3): gana el más apto de 3 al azar.
 def _torneo(poblacion: list[list[int]], aptitudes: list[float], k: int, azar: random.Random) -> list[int]:
     elegidos = azar.sample(range(len(poblacion)), min(k, len(poblacion)))
     return poblacion[max(elegidos, key=lambda i: aptitudes[i])]
@@ -100,6 +101,7 @@ def cruza_ox(padre: list[int], madre: list[int], azar: random.Random) -> list[in
     return [g for g in hijo if g is not None]
 
 
+# ALGORITMO: GENÉTICO - mutación por intercambio de dos paradas.
 def mutar_intercambio(orden: list[int], azar: random.Random) -> list[int]:
     """Intercambia dos posiciones al azar."""
     if len(orden) < 2:
@@ -110,6 +112,7 @@ def mutar_intercambio(orden: list[int], azar: random.Random) -> list[int]:
     return nuevo
 
 
+# ALGORITMO: GENÉTICO - óptimo por fuerza bruta (8 paradas o menos), para comparar contra el genético.
 def fuerza_bruta(evaluador: Evaluador, n: int) -> tuple[list[int], float]:
     """Mejor orden revisando las n! permutaciones (solo para n ≤ 8)."""
     mejor = max(itertools.permutations(range(n)), key=lambda o: evaluador.aptitud(list(o)))

@@ -115,6 +115,10 @@ def _reglas(evaluacion: dict) -> list[dict]:
     return [{"id": p["regla_id"], "descripcion": p["explicacion"]} for p in evaluacion["traza"]]
 
 
+# ALGORITMO: flujo completo de 'Crear mi plan'
+#   1) armar_candidatos  2) construir_hechos  3) motor.evaluar (sistema experto)
+#   4) optimizar_orden (algoritmo genético) para los planes recomendados.
+#   Se ve en: App > Planificar > Tus planes.
 def recomendar(solicitud_app: dict, lugares_google: list[dict], ahora: datetime) -> dict:
     """Respuesta para la app: {datos_suficientes, mensaje, aviso, advertencias, version_reglas, planes, descartados}."""
     origen = {"lat": solicitud_app["origen"]["lat"], "lng": solicitud_app["origen"]["lng"]}

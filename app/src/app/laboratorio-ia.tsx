@@ -277,6 +277,7 @@ export default function LaboratorioIA() {
               </Tarjeta>
             </XStack>
 
+            {/* ALGORITMO: PARTICIONES del árbol de decisión (backend/app/modulos/ia_kompas/entrenamiento_particiones.py) */}
             {/* 2. Comparativa Visual de Particiones (60/40, 70/30, 75/25, 80/20, 60/20/20) */}
             <Tarjeta>
               <XStack items="center" gap={10}>
@@ -355,6 +356,7 @@ export default function LaboratorioIA() {
               </YStack>
             </Tarjeta>
 
+            {/* ALGORITMO: UNDERFITTING vs OVERFITTING con max_depth (backend/app/modulos/ia_kompas/entrenamiento_particiones.py) */}
             {/* 3. Monitor de Overfitting vs. Underfitting (Curva de Complejidad max_depth) */}
             <Tarjeta>
               <XStack items="center" gap={10}>
@@ -570,6 +572,7 @@ export default function LaboratorioIA() {
               </Tarjeta>
             </XStack>
 
+            {/* ALGORITMO: BFS + ÁRBOL DE DECISIÓN + REGLA FIJA en el simulador (backend/app/modulos/ia_kompas/busqueda_escalas.py) */}
             {/* 5. Simulador Interactivo en Vivo: Regla Fija vs Árbol de Decisión + Ruta BFS */}
             <Tarjeta destacada>
               <XStack items="center" gap={10}>

@@ -112,6 +112,9 @@ def _elegir(
     return elegidos if len(elegidos) >= MIN_VISITAS else []
 
 
+# ALGORITMO: SISTEMA EXPERTO - planes candidatos
+#   Qué hace: arma los planes posibles con lugares reales de Google Places según intereses, presupuesto
+#     y tiempo. Después el sistema experto decide cuáles se recomiendan.
 def armar_candidatos(solicitud: dict, origen: dict, lugares: list[dict], salida: datetime) -> list[dict]:
     """Hasta 3 candidatos distintos: [{tipo, lugares, itinerario}] (itinerario con el formato de hechos.py)."""
     pool = [l for l in lugares if l.get("categoria") in ESTANCIAS_MINUTOS]

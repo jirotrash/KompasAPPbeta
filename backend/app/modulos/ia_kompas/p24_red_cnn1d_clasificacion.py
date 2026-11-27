@@ -67,6 +67,7 @@ else:
             pass
 
 
+# ALGORITMO: RED CNN 1D (clasificación) - clasifica la congestión a partir de una secuencia de tramos.
 class ClasificadorCongestionCNN1D:
     """Orquestador de preparacion de datos, entrenamiento y evaluacion de la CNN 1D."""
 

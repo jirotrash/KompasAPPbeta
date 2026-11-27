@@ -48,6 +48,8 @@ class ComparadorAlgoritmosKompas:
         self.semilla = semilla
         self.evaluador = EvaluadorAjusteKompas(ruta_csv_limpio=self.ruta_csv_limpio, semilla=self.semilla)
 
+    # ALGORITMO: COMPARACIÓN Árbol de decisión vs Random Forest vs KNN (exactitud, F1 y tiempo).
+    #   Ningún algoritmo es el mejor para todo (No Free Lunch). Se ve en: Dashboard > Machine Learning.
     def comparar_tres_algoritmos(self) -> dict[str, Any]:
         """Entrena y compara Arbol de Decision, Bosque Aleatorio y K-Nearest Neighbors.
         

@@ -70,6 +70,7 @@ export default function DistanciasEnMapa() {
     setError('');
     if (nuevos.length === 2) {
       setCalculando(true);
+      // ALGORITMO: EUCLIDIANA vs MANHATTAN - compara las dos distancias (backend/app/ia/metricas_distancia.py)
       compararDistanciasGeo(nuevos[0], nuevos[1])
         .then(setResultado)
         .catch((causa) => setError(causa instanceof Error ? causa.message : 'No se pudieron calcular las distancias.'))

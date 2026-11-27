@@ -47,6 +47,9 @@ def _caminar(coords: dict[str, Coordenada], a: str, b: str, penalizar: bool = Tr
 _BASE: dict[str, Any] = {"firma": None}
 
 
+# ALGORITMO: TRANSBORDOS - grafo de las rutas reales (319 en Atlas)
+#   Nodos = puntos de cada ruta. Aristas = ir en camión por la ruta o caminar a otra ruta (máx. 400 m).
+#   Se arma una sola vez y se guarda en memoria (caché): así A* tarda menos de medio segundo.
 def _grafo_de_rutas(rutas: list[dict[str, Any]]) -> tuple[dict, dict, dict, dict]:
     firma = tuple((r["id"], huella(r)) for r in rutas)
     if _BASE["firma"] == firma:
@@ -103,6 +106,10 @@ def armar_grafo(rutas: list[dict[str, Any]], origen: Coordenada, destino: Coorde
     return grafo, coords, info
 
 
+# ALGORITMO: TRANSBORDOS CON A*
+#   Qué hace: busca la mejor combinación de 2 o más camiones entre origen y destino.
+#     Cada transbordo suma una penalización para preferir menos cambios de camión.
+#   Se ve en: App > Buscar destino > Compara tu transporte | Dashboard > Laboratorio > 'Transbordos con A*'.
 def buscar_transbordo(rutas: list[dict[str, Any]], origen: Coordenada, destino: Coordenada) -> dict[str, Any]:
     """A* sobre el grafo de rutas. Regresa {encontrado, tramos, rutas_usadas, nodos_explorados, ms, costo}.
 

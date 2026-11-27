@@ -150,6 +150,7 @@ class ServicioRutas:
         pa, pb = proyectar(a, trazo, acumulado), proyectar(b, trazo, acumulado)
         if pa["distancia_km"] > RADIO_TRANSBORDO_KM or pb["distancia_km"] > RADIO_TRANSBORDO_KM:
             return None
+        # ALGORITMO: ÁRBOL BINARIO en uso - la parada más cercana al origen (sube) y al destino (baja).
         arbol, _ = arbol_de_ruta(ruta)
         sube, _ = arbol.mas_cercano(pa["km"])
         baja, _ = arbol.mas_cercano(pb["km"])
@@ -162,6 +163,7 @@ class ServicioRutas:
         return self._opcion([self._caminata(a, sube.parada), bus, self._caminata(baja.parada, b)], "directo")
 
     def _combinada(self, rutas: list[dict], a: Coordenada, b: Coordenada) -> dict | None:
+        # ALGORITMO: A* de transbordos en uso - cuando ninguna ruta sola conecta origen y destino.
         resultado = buscar_transbordo(rutas, a, b)
         if self.bitacora:
             self.bitacora.registrar(

@@ -59,6 +59,12 @@ def validar_base(base):
                "Peso de preferencia inválido.")
 
 
+# ALGORITMO: SISTEMA EXPERTO - motor de inferencia
+#   Qué hace: aplica las 20 reglas (R01-R20 de reglas.json) a los hechos de un plan con lógica de
+#     tres valores (true / false / null = desconocido) y da estado + puntuación de 0 a 6.
+#   Por qué: cada decisión se puede explicar con las reglas que se aplicaron, y si falta un dato
+#     el plan queda 'pendiente de verificar' en vez de recomendarse sin comprobar.
+#   Se ve en: App > Planificar > Tus planes | Dashboard > Sistema experto > 'Cómo clasifica los planes'.
 def evaluar(entrada, base):
     """Devuelve estado, preferencias y traza, sin alterar entrada ni base."""
     exigir(isinstance(entrada, dict), "La entrada debe ser un objeto de hechos.")

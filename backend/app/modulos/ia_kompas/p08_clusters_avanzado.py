@@ -24,6 +24,7 @@ from app.modulos.ia_kompas.pipeline_datos import RUTA_LIMPIO_DEFECTO
 from app.nucleo.bd import get_bd
 
 
+# ALGORITMO: AUDITORÍA DE CLUSTERS - estabilidad con ARI y viajes atípicos (distancia al centroide > percentil 95).
 class AuditorClustersKompas:
     """Clase para la evaluacion rigurosa, deteccion de anomalias y persistencia de clusters."""
 

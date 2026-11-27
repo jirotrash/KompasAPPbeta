@@ -24,6 +24,9 @@ GRAFO_BASE_KOMPAS: dict[str, list[str]] = {
 }
 
 
+# ALGORITMO: BÚSQUEDA EN AMPLITUD (BFS)
+#   Qué hace: recorre por niveles con una cola; da la ruta con MENOS ESCALAS entre zonas.
+#   Se ve en: App > Perfil > Laboratorio IA > 'Simulador Interactivo en Vivo'.
 def buscar_ruta_bfs(
     grafo: dict[str, list[str]] | None = None,
     origen: str = "Terminal Toluca",

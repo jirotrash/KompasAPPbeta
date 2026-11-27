@@ -152,6 +152,7 @@ export default function DemostracionDfs() {
     }
     setBuscando(true);
     setError('');
+    // ALGORITMO: DFS - pide al backend la búsqueda en profundidad (backend/app/ia/busqueda_dfs.py)
     buscarRutasDfs(origen, destino, profundidad)
       .then(setResultado)
       .catch((causa) => setError(causa instanceof Error ? causa.message : 'No se pudo ejecutar la búsqueda DFS.'))

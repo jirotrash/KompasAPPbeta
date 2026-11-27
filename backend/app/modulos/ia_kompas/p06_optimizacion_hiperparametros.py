@@ -33,6 +33,8 @@ class OptimizadorHiperparametrosKompas:
         self.semilla = semilla
         self.cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=self.semilla)
 
+    # ALGORITMO: GridSearchCV con 5 pliegues estratificados para elegir los hiperparámetros del árbol.
+    #   Se ve en: Dashboard > Machine Learning > 'Optimización con validación cruzada'.
     def optimizar_arbol_decision(self, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
         """Ejecuta una busqueda en rejilla (GridSearchCV) para afinar el DecisionTreeClassifier.
         

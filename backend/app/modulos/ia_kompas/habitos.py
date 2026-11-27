@@ -22,6 +22,9 @@ import numpy as np
 from sklearn.model_selection import LeaveOneOut, cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
 
+# ALGORITMO: KNN DEL ASISTENTE - umbrales
+#   Menos de 5 recorridos: no predice. De 5 a 19: frecuencia por franja horaria (suavizado de Laplace).
+#   Desde 20: KNN (KNeighborsClassifier, hasta 7 vecinos).
 MIN_VIAJES = 5
 UMBRAL_KNN = 20
 VECINOS_MAX = 7
@@ -79,6 +82,9 @@ def _probabilidades_por_frecuencia(viajes: list[dict], hora: int, dia_semana: in
     }
 
 
+# ALGORITMO: KNN (k vecinos más cercanos)
+#   Qué hace: predice a dónde suele ir el usuario según hora y día (codificados en círculo: 23:00 queda cerca de 00:00).
+#   Se ve en: App > pestaña Asistente y tarjeta 'A esta hora sueles ir a' en Inicio.
 def _modelo_knn(viajes: list[dict]) -> tuple[KNeighborsClassifier, np.ndarray, np.ndarray]:
     X = np.array([caracteristicas(_hora_decimal(v["momento"]), v["momento"].weekday()) for v in viajes])
     y = np.array([v["id_ruta"] for v in viajes])
@@ -87,6 +93,7 @@ def _modelo_knn(viajes: list[dict]) -> tuple[KNeighborsClassifier, np.ndarray, n
     return modelo, X, y
 
 
+# ALGORITMO: KNN - validación leave-one-out contra la regla 'siempre la ruta más frecuente' (baseline).
 def _validar_knn(X: np.ndarray, y: np.ndarray) -> tuple[float, float]:
     """Exactitud leave-one-out del KNN y del baseline (ruta más frecuente del resto de los viajes)."""
     vecinos = min(VECINOS_MAX, len(y) - 1)
@@ -100,6 +107,7 @@ def _validar_knn(X: np.ndarray, y: np.ndarray) -> tuple[float, float]:
     return round(exactitud_knn, 3), round(aciertos_baseline / len(y), 3)
 
 
+# ALGORITMO: KNN - punto de entrada: elige frecuencia o KNN según cuántos recorridos tenga el usuario.
 def predecir_destinos(viajes: list[dict], hora: int, dia_semana: int, minuto: int = 0) -> dict:
     """viajes: [{id_ruta, momento: datetime}] del usuario. Regresa los destinos más probables a esa hora."""
     base = {

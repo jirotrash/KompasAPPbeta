@@ -69,6 +69,11 @@ GRAFO_TRANSPORTE = {
 }
 
 
+# ALGORITMO: BÚSQUEDA EN PROFUNDIDAD (DFS)
+#   Qué hace: explora con una pila, yendo lo más profundo posible; no repite paradas (control de ciclos)
+#     y tiene límite de profundidad. Devuelve todas las rutas viables y el orden en que exploró.
+#   Ojo: usa una red académica de demostración, no las rutas reales.
+#   Se ve en: App > Buscar > 'Ver demostración DFS' | Dashboard > Laboratorio > 'Búsqueda de caminos'.
 def busqueda_dfs_transporte(
     grafo: dict[str, list[dict[str, Any]]],
     actual: str,

@@ -85,6 +85,7 @@ def huella(ruta: dict[str, Any]) -> str:
 _CACHE: dict[Any, tuple[str, ArbolParadas, bool]] = {}
 
 
+# ALGORITMO: ÁRBOL BINARIO - arma el árbol de cada ruta una vez y lo guarda en memoria (caché).
 def arbol_de_ruta(ruta: dict[str, Any]) -> tuple[ArbolParadas, bool]:
     """Árbol balanceado de las paradas de la ruta, construido una vez y guardado en memoria."""
     firma = huella(ruta)

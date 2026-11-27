@@ -256,6 +256,10 @@ def _validar_solicitud(solicitud: Mapping, hechos: dict[str, Hecho]) -> list[str
     return errores
 
 
+# ALGORITMO: SISTEMA EXPERTO - base de hechos
+#   Qué hace: convierte cada plan candidato en hechos (abierto a la hora de llegada, cabe en el
+#     presupuesto, cabe en el tiempo, modo de transporte posible...). Si Google no da el dato, el hecho es null.
+#   Se usa en: ia/servicio.py > recomendar(), justo antes de llamar a motor.evaluar().
 def construir_hechos(solicitud: Mapping[str, Any], itinerario: Mapping[str, Any], *,
                       ahora: datetime | None = None, zona_validada: bool | None = None,
                       politica: PoliticaHechos | None = None) -> ResultadoHechos:

@@ -56,6 +56,9 @@ def _evaluar_regla_fija_en_conjunto(X_eval: pd.DataFrame, y_eval: pd.Series) -> 
     }
 
 
+# ALGORITMO: UNDERFITTING vs OVERFITTING - mueve max_depth del árbol y compara entrenamiento contra validación.
+#   Overfitting: entrenamiento casi 100 % y validación más de 8-10 puntos abajo.
+#   Se ve en: App > Laboratorio IA (overfitting) | Dashboard > Machine Learning > 'Overfitting vs. underfitting'.
 def evaluar_underfitting_overfitting(
     X: pd.DataFrame,
     y: pd.Series,
@@ -205,6 +208,8 @@ def evaluar_underfitting_overfitting(
     }
 
 
+# ALGORITMO: PARTICIONES - compara 70/30, 80/20, 60/20/20... con el mismo árbol de decisión.
+#   Se ve en: App > Perfil > Laboratorio IA > comparativa de particiones.
 def comparar_particiones_kompas(
     X: pd.DataFrame,
     y: pd.Series,

@@ -22,6 +22,8 @@ def fmt(n: float) -> str:
     return f"{round(n, 2):g}"
 
 
+# ALGORITMO: DISTANCIA EUCLIDIANA = línea recta. Se usa como heurística de A* porque nunca sobreestima.
+#   Se ve en: App > Buscar > 'Comparar distancias' | Dashboard > Laboratorio > gráfica de distancias.
 def distancia_euclidiana(a: Punto, b: Punto) -> float:
     """Distancia en línea recta: √((x2 - x1)² + (y2 - y1)²)."""
     return math.hypot(b[0] - a[0], b[1] - a[1])
@@ -32,6 +34,7 @@ def distancia_manhattan(a: Punto, b: Punto) -> float:
     return abs(b[0] - a[0]) + abs(b[1] - a[1])
 
 
+# ALGORITMO: comparación Euclidiana vs Manhattan para dos puntos (pantalla 'Comparar distancias').
 def comparar_distancias(a: Punto, b: Punto) -> dict[str, Any]:
     """Compara ambas métricas entre A y B y explica el cálculo paso a paso."""
     dx = abs(b[0] - a[0])

@@ -73,6 +73,7 @@ def _ordenar_plan(plan: dict, lugares: list[dict], solicitud: dict, solicitud_ap
     }
 
 
+# ALGORITMO: GENÉTICO aplicado a cada plan recomendado; luego se vuelve a validar con el sistema experto.
 def optimizar_orden(respuesta: dict, solicitud_app: dict, lugares_google: list[dict], ahora: datetime) -> list[dict]:
     """Reordena en su lugar las paradas de cada plan de `respuesta`. Regresa un registro por ejecución."""
     por_id = {l["place_id"]: l for l in lugares_google}

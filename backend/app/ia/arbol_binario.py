@@ -31,6 +31,10 @@ class NodoParada:
         }
 
 
+# ALGORITMO: ÁRBOL BINARIO DE BÚSQUEDA (balanceado) de paradas
+#   Qué hace: guarda las paradas de una ruta ordenadas por kilómetro (izquierda menor, derecha mayor).
+#   Por qué: encontrar la parada más cercana toma unos log2(n) pasos en vez de revisar toda la lista.
+#   Se ve en: App > Compara tu transporte / Mapa: 'Sube en / Baja en' | Dashboard > panel de rutas y paradas.
 class ArbolParadas:
     def __init__(self) -> None:
         self.raiz: NodoParada | None = None
@@ -84,6 +88,7 @@ class ArbolParadas:
             actual = actual.izquierdo if km < actual.clave else actual.derecho
         return None
 
+    # ALGORITMO: ÁRBOL BINARIO - parada más cercana a un km dado (decide dónde subir y dónde bajar).
     def mas_cercano(self, km: float) -> tuple[NodoParada | None, list[float]]:
         """(parada con la clave más cercana a km, claves visitadas desde la raíz).
 
@@ -128,6 +133,7 @@ class ArbolParadas:
 
     # ───────────── Recorridos ─────────────
 
+    # ALGORITMO: ÁRBOL BINARIO - recorridos inorden / preorden / postorden. Inorden = paradas en su orden real.
     def inorden(self) -> list[NodoParada]:
         """Izquierdo → raíz → derecho: las paradas en orden de km."""
         salida: list[NodoParada] = []

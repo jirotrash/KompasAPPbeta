@@ -385,6 +385,7 @@ export default function SeccionMachineLearning() {
 
       <Planteamiento ajuste={a} comparacion={c} />
 
+      {/* ALGORITMO: COMPARACIÓN Árbol vs Random Forest vs KNN (backend/app/modulos/ia_kompas/p05_comparacion_modelos.py) */}
       <h2 className="mt-2 text-lg font-bold tracking-tight">Árbol de decisión vs. Random Forest vs. KNN</h2>
       <TarjetasAlgoritmos comparacion={c} />
       <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
@@ -393,6 +394,7 @@ export default function SeccionMachineLearning() {
       </div>
       <Matrices comparacion={c} />
 
+      {/* ALGORITMO: OVERFITTING vs UNDERFITTING - curva de complejidad (backend/app/modulos/ia_kompas/p04_ajuste_modelo.py) */}
       <h2 className="mt-2 text-lg font-bold tracking-tight">Overfitting vs. underfitting</h2>
       <GraficaCurvaComplejidad ajuste={a} />
       <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
@@ -400,6 +402,7 @@ export default function SeccionMachineLearning() {
         <DiagnosticoArboles ajuste={a} />
       </div>
 
+      {/* ALGORITMO: GridSearchCV con 5 pliegues (backend/app/modulos/ia_kompas/p06_optimizacion_hiperparametros.py) */}
       <h2 className="mt-2 text-lg font-bold tracking-tight">Optimización con validación cruzada</h2>
       {optimizacion.error ? (
         <AvisoError mensaje={optimizacion.error} recargar={recargar} />

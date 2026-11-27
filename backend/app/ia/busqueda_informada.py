@@ -65,6 +65,10 @@ def _r(x: float) -> float:
     return round(x, 4)
 
 
+# ALGORITMO: BÚSQUEDA INFORMADA - núcleo común
+#   Qué hace: saca de una cola de prioridad el nodo con menor f(n). g(n) = costo recorrido,
+#     h(n) = heurística (lo que falta). UCS usa f=g, voraz usa f=h y A* usa f=g+h.
+#   Se ve en: Dashboard > Laboratorio > 'Búsqueda de caminos'.
 def _buscar(
     algoritmo: str,
     origen: str,
@@ -186,6 +190,7 @@ def _con_red_dfs(resultado: dict[str, Any], origen: str, destino: str) -> dict[s
     return resultado
 
 
+# ALGORITMO: COSTO UNIFORME (UCS), f(n) = g(n). Siempre da el camino más barato, pero explora muchos nodos.
 def costo_uniforme(
     origen: str, destino: str, *, grafo: Grafo | None = None, coordenadas: dict[str, Coordenada] | None = None, con_traza: bool = True
 ) -> dict[str, Any]:
@@ -195,6 +200,7 @@ def costo_uniforme(
     return _buscar("costo_uniforme", origen, destino, None, grafo, coordenadas or {}, 1.0, con_traza)
 
 
+# ALGORITMO: BÚSQUEDA VORAZ, f(n) = h(n). Es rápida, pero no garantiza el camino óptimo.
 def voraz(
     origen: str,
     destino: str,
@@ -211,6 +217,9 @@ def voraz(
     return _buscar("voraz", origen, destino, heuristica, grafo, coordenadas or {}, escala_h, con_traza)
 
 
+# ALGORITMO: A* (A ESTRELLA), f(n) = g(n) + h(n).
+#   Por qué: con heurística admisible (no sobreestima) da el camino óptimo explorando menos nodos que UCS.
+#   Lo usa la app de verdad para los transbordos (ia/transbordos.py).
 def a_estrella(
     origen: str,
     destino: str,
@@ -276,6 +285,8 @@ def _primer_camino_dfs(origen: str, destino: str) -> dict[str, Any]:
     }
 
 
+# ALGORITMO: comparación DFS vs UCS vs voraz vs A* (Euclidiana y Manhattan): nodos explorados y costo.
+#   Se ve en: Dashboard > Laboratorio > 'Búsqueda de caminos' (comparativo y costo óptimo).
 def comparar_algoritmos(origen: str, destino: str) -> dict[str, Any]:
     """DFS, UCS, voraz (2 heurísticas) y A* (2 heurísticas) sobre la red académica, en una tabla."""
     if origen not in PARADAS_KOMPAS or destino not in PARADAS_KOMPAS:

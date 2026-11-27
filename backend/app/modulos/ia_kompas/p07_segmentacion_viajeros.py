@@ -62,6 +62,7 @@ class SegmentadorViajerosKompas:
         X_escalado = self.escalador.fit_transform(X_crudo)
         return X_escalado, COLUMNAS_CLUSTERING
 
+    # ALGORITMO: K-MEANS - agrupa viajeros parecidos; K se elige con el codo (inercia) y la silueta.
     def evaluar_rango_k(self, X_escalado: np.ndarray, k_min: int = 2, k_max: int = 6) -> dict[str, Any]:
         """Evalua diferentes valores de K mediante Inercia y Coeficiente de Silueta.
         

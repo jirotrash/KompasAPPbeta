@@ -56,6 +56,7 @@ export default function Asistente() {
       setCargando(true);
       setError('');
       const ahora = new Date();
+      // ALGORITMO: KNN del Asistente - destinos probables por hora y día (backend/app/modulos/ia_kompas/habitos.py)
       Promise.all([destinosProbables(ahora, momento === 'ahora' ? ahora.getHours() : momento), misHabitos()])
         .then(([p, h]) => {
           if (!activo) return;

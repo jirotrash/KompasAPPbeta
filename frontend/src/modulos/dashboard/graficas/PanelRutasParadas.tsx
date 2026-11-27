@@ -36,6 +36,7 @@ export default function PanelRutasParadas({ movilidad }: { movilidad: MovilidadD
   useEffect(() => {
     if (idRuta === null) return
     let vigente = true
+    // ALGORITMO: ÁRBOL BINARIO de paradas de la ruta: GET /api/rutas/{id}/arbol (backend/app/ia/arbol_binario.py)
     obtenerArbolRuta(idRuta)
       .then((datos) => vigente && setArbol({ para: idRuta, datos, error: '' }))
       .catch((e: unknown) => vigente && setArbol({ para: idRuta, datos: null, error: e instanceof Error ? e.message : String(e) }))

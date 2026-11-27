@@ -55,6 +55,7 @@ else:
             pass
 
 
+# ALGORITMO: RED CNN 1D (regresión) - estima el tiempo de llegada (ETA) de una secuencia de tramos.
 class RegresorETACNN1D:
     """Clase orquestadora para la preparacion, entrenamiento y prediccion de ETA continuo."""
 

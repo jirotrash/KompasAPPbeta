@@ -38,6 +38,7 @@ class ReductorDimensionalidadPCA:
         self.escalador = StandardScaler()
         self.pca = PCA(n_components=2, random_state=self.semilla)
 
+    # ALGORITMO: PCA - reduce los datos a 2 dimensiones para graficar los grupos de K-means.
     def ejecutar_pca_con_clusters(self, k: int = 3) -> dict[str, Any]:
         """Calcula los dos componentes principales y proyecta las observaciones y clusters.
         

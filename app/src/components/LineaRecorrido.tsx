@@ -38,6 +38,7 @@ function PasoTramo({ tramo }: { tramo: Tramo }) {
               </Texto>
             )}
             <Texto tam="xs">
+              {/* ALGORITMO: ÁRBOL BINARIO - 'Sube en / Baja en' sale de mas_cercano() (backend/app/ia/arbol_binario.py) */}
               <Texto tam="xs" peso="fuerte" color="$ok">
                 ↑ Sube en:{' '}
               </Texto>

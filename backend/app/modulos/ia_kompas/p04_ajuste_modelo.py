@@ -39,6 +39,7 @@ class EvaluadorAjusteKompas:
         self.ruta_csv_limpio = Path(ruta_csv_limpio)
         self.semilla = semilla
 
+    # ALGORITMO: PARTICIÓN 60/20/20 - entrenamiento / validación (para ajustar) / prueba (solo al final).
     def particionar_datos_60_20_20(
         self, X: pd.DataFrame, y: pd.Series
     ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series]:
@@ -83,6 +84,7 @@ class EvaluadorAjusteKompas:
             y_prueba,
         )
 
+    # ALGORITMO: CURVA DE COMPLEJIDAD - exactitud según max_depth (Dashboard > Machine Learning).
     def curva_complejidad(
         self,
         X_entrenamiento: pd.DataFrame,
